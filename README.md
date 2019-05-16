@@ -1,6 +1,6 @@
 # Fluigent Software Developement Kit
 
-## Overview
+# Overview
 Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been declined in several languages, among the most popular ones in the instrumentation field (e.g. LabVIEW, C++, C\char`# .NET, Python…).
 
 This SDK regroups all Fluigent pressure and sensor instruments as well as an advanced regulation loop. 
@@ -14,50 +14,55 @@ Main advantages of using this SDK:
 * custom sensors (other than Fluigent ones) can also be pressure regulated
 * features such as limits, units, calibration and detailed errors allow advanced functionalities
 
-## Supported hardware
+# Supported hardware
 By using Fluigent SDK, you have direct access to following Fluigent devices:
-* MFCS™ Series: MFCS™, MFCS™-EZ, MFCS™-EX and PX pressure controllers
-* LineUP Series: Link, Flow EZ™ pressure controller, flow-units XS, S, M, L and XL connected to Flow EZ™
+* MFCS Series: MFCS, MFCS-EZ, MFCS-EX and PX pressure controllers
+* LineUP Series: Link, Flow EZ pressure controller, flow-units XS, S, M, L and XL connected to Flow EZ
 * Flowboard: XS, S, M, L and XL flow-units
 
-## Software layers
+# Software layers
 
-# Fluigent dll
+## Fluigent dll
 
 Fluigent SDK, is based upon the following files:
-* fgt\_SDK\_32.dll
-* fgt\_SDK\_64.dll
-* fgt\_SDK.h
-
+* fgt_SDK_32.dll
+* fgt_SDK_64.dll
+* fgt_SDK.h
 
 Additionally, as Fluigent SDK interacts with Fluigent devices following dependencies are required:
-* mfcs\_c\_32.dll
-* mfcs\_c\_64.dll
-* frp\_c\_32.dll
-* frp\_c\_64.dll
-* LineUP\_c\_32.dll
-* LineUP\_c\_64.dll
+* mfcs_c_32.dll
+* mfcs_c_64.dll
+* frp_c_32.dll
+* frp_c_64.dll
+* LineUP_c_32.dll
+* LineUP_c_64.dll
 
-# Dll wrappers
+## Dll wrappers
 
 The SDK’s wrapper layer is an abstraction layer allowing the developer to manipulate high level concepts rather than low level function exposed by the provided dll.
 
+Middleware layer main aim is to :
+* call the fgt_SDK_*.dll file
+* adapt variable type for a more friendly use
+* display pretty error if occurs
 
-Installation Instructions
-1. From LabVIEW, launch **Tools»VI Package Manager**, search for "NIPM API", and install it.
-![alt text](images/nipm-api-on-vipm.png)
-2. In LabVIEW, access the NIPM API by going to the **Functions Palette»Addons»NIPM API**.
-3. (Optional) Install the [NIPM Feed Manager (Beta)](https://github.com/allenh-ni/nipm-feed-manager-gui-labview), and use it to manage NIPM feeds and packages. 
+Each programming language has it's own specificities however SDK Wrapper tries at best to be the same for each environment. 
 
-Note: If necessary, you can find historical versions in the [Exports](https://github.com/allenh-ni/nipm-api-labview/tree/master/Exports) folder.
+Supported packages:
+| Language | Package |
+| --- | --- |
+| C++ | fgt_SDK_Cpp.cpp middleware file 
+fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
 
-## Documentation
-Refer to the Context Help and examples that ship with the installed API.
+# Documentation
+Refer to Fluigent SDK.pdf file for detailed documentation.
+fgt_SDK_*.dll functions are documented in fgt_SDK.h header file.
+Wrappers and examples are also documented, depending on the environement.
 
-## Support
-This API is not officially supported by National Instruments. You can use this GitHub repository to find the source code, report issues, and contribute.
+# Support
+You can use this GitHub repository to find the source code, report issues, and contribute.
 
-## Source Code
-* **Source** folder - Contains the source code for this API.  At a low-level, this API calls the nipkg command-line interface (CLI).
-* **Build Spec** folder - Contains the VIPM build spec (.vipb) used to create the .vip file.
-* **Export** folder - Contains versions of the VIPM package (.vip), which you can use to install this API.
+# Folders content
+* **Fluigent SDK.pdf**[a relative link](Fluigent SDK.pdf) file - Detailed documentation explaining global philosophy, functions and examples.
+* **Shared** folder - Contains dll file and dependencies for 32 and 64 windows operating systems.
+* **C++** folder - Contains C++ console application examples.
