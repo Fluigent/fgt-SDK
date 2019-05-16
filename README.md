@@ -52,8 +52,7 @@ Supported packages:
 
 | Language | Package |
 | --- | --- |
-| C++ | fgt_SDK_Cpp.cpp middleware file <br/>
-fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
+| C++ | fgt_SDK_Cpp.cpp middleware file.  fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
 
 # Documentation
 Refer to Fluigent SDK.pdf file for detailed documentation.
