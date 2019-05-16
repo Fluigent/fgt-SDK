@@ -49,13 +49,16 @@ Middleware layer main aim is to :
 Each programming language has it's own specificities however SDK Wrapper tries at best to be the same for each environment. 
 
 Supported packages:
+
 | Language | Package |
 | --- | --- |
 | C++ | fgt_SDK_Cpp.cpp middleware file fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
 
 # Documentation
 Refer to Fluigent SDK.pdf file for detailed documentation.
+
 fgt_SDK_*.dll functions are documented in fgt_SDK.h header file.
+
 Wrappers and examples are also documented, depending on the environement.
 
 # Support
