@@ -1,25 +1,47 @@
-# nipm-api-labview
-NI Package Manager API (Beta) for LabVIEW 2014 or later.
+# Fluigent Software Developement Kit
 
 ## Overview
-My goal is to provide users with a beta API for NI Package Manager tasks.  Please feel free to use this API, give feedback, and contribute.  NI will use this feedback to create an official NIPM API in the future.
+Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been declined in several languages, among the most popular ones in the instrumentation field (e.g. LabVIEW, C++, C\char`# .NET, Python…).
 
-You can use this API to:
-* Install/uninstall/upgrade packages
-* Get package attributes
-* Create feeds, add packages to feeds, remove packages from feeds, list packages in feeds
-* Register/unregister feeds
-* ...
+This SDK regroups all Fluigent pressure and sensor instruments as well as an advanced regulation loop. 
 
-![alt text](images/nipm-beta-api-screenshot.png)
+You can still use independent SDK (MFCS, FRP, LineUP) for basic hardware set-ups or for specific software requirements. 
 
-You can find content, tutorials, and additional tools for NI package management at [bit.ly/nipkg](http://bit.ly/nipkg)
+Main advantages of using this SDK:
+* all Fluigent instruments (pressure and sensor) are managed by one instance (instead of one instance per intrument type)
+* if hardware is changed in many cases software code does not need to be adapted
+* embedded regulation allow powerful and custom loop feedback between any pressure and sensor
+* custom sensors (other than Fluigent ones) can also be pressure regulated
+* features such as limits, units, calibration and detailed errors allow advanced functionalities
 
-## How to Install
-Prerequisites:
-* LabVIEW 2014 or later
-* [NI Package Manager](http://www.ni.com/downloads/ni-package-manager) 17.5 or later
-* Operating System: Refer to the OS requirements for NI Package Manager
+## Supported hardware
+By using Fluigent SDK, you have direct access to following Fluigent devices:
+* MFCS™ Series: MFCS™, MFCS™-EZ, MFCS™-EX and PX pressure controllers
+* LineUP Series: Link, Flow EZ™ pressure controller, flow-units XS, S, M, L and XL connected to Flow EZ™
+* Flowboard: XS, S, M, L and XL flow-units
+
+## Software layers
+
+# Fluigent dll
+
+Fluigent SDK, is based upon the following files:
+* fgt\_SDK\_32.dll
+* fgt\_SDK\_64.dll
+* fgt\_SDK.h
+
+
+Additionally, as Fluigent SDK interacts with Fluigent devices following dependencies are required:
+* mfcs\_c\_32.dll
+* mfcs\_c\_64.dll
+* frp\_c\_32.dll
+* frp\_c\_64.dll
+* LineUP\_c\_32.dll
+* LineUP\_c\_64.dll
+
+# Dll wrappers
+
+The SDK’s wrapper layer is an abstraction layer allowing the developer to manipulate high level concepts rather than low level function exposed by the provided dll.
+
 
 Installation Instructions
 1. From LabVIEW, launch **Tools»VI Package Manager**, search for "NIPM API", and install it.
