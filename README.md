@@ -1,7 +1,7 @@
 # Fluigent Software Developement Kit
 
 # Overview
-Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been declined in several languages, among the most popular ones in the instrumentation field (e.g. LabVIEW, C++, C\char`# .NET, Python…).
+Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been declined in several languages, among the most popular ones in the instrumentation field (e.g. LabVIEW, C++, C# .NET, Python…).
 
 This SDK regroups all Fluigent pressure and sensor instruments as well as an advanced regulation loop. 
 
@@ -52,7 +52,9 @@ Supported packages:
 
 | Language | Package |
 | --- | --- |
-| C++ | fgt_SDK_Cpp.cpp middleware file fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
+| C++ | fgt_SDK_Cpp.cpp middleware file 
+
+fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
 
 # Documentation
 Refer to Fluigent SDK.pdf file for detailed documentation.
@@ -65,6 +67,6 @@ Wrappers and examples are also documented, depending on the environement.
 You can use this GitHub repository to find the source code, report issues, and contribute.
 
 # Folders content
-* [**Fluigent SDK.pdf**](Fluigent SDK.pdf) file - Detailed documentation explaining global philosophy, functions and examples.
+* **[Fluigent SDK.pdf](Fluigent SDK.pdf)** file - Detailed documentation explaining global philosophy, functions and examples.
 * **Shared** folder - Contains dll file and dependencies for 32 and 64 windows operating systems.
 * **C++** folder - Contains C++ console application examples.
