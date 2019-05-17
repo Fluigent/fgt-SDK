@@ -1,6 +1,0 @@
-[submodule "Shared/Windows"]
-	path = Shared/Windows
-	url = http://192.168.1.12:8080/retd-team/dev-team/middleware/sharedLibs/fgt-sdk/dlls.git
-[submodule "C++"]
-	path = C++
-	url = http://192.168.1.12:8080/retd-team/dev-team/middleware/fgt-sdk-cpp-examples.git
