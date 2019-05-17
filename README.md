@@ -1,4 +1,4 @@
-# Fluigent Software Developement Kit - Beta version
+# Fluigent Software Developement Kit - Beta version 19.0.0
 
 # Overview
 Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been declined in several languages, among the most popular ones in the instrumentation field (e.g. LabVIEW, C++, C# .NET, Python…).
@@ -65,6 +65,6 @@ Wrappers and examples are also documented, depending on the environement.
 You can use this GitHub repository to find the source code, report issues, and contribute.
 
 # Folders content
-* **[Fluigent SDK.pdf](Fluigent SDK.pdf)** file - Detailed documentation explaining global philosophy, functions and examples.
+* **Fluigent SDK.pdf** file - Detailed documentation explaining global philosophy, functions and examples.
 * **Shared** folder - Contains dll file and dependencies for 32 and 64 windows operating systems.
 * **C++** folder - Contains C++ console application examples.
