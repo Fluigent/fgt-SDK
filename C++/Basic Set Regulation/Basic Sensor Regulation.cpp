@@ -54,13 +54,16 @@ int main()
 	Fgt_get_sensorValue(0, &sensorRead);
 	std::cout << "Read sensor value: " << sensorRead << std::endl;
 
+	Fgt_set_sensorCustomScale(0, -1, 0, 0);
+	std::cout << "Apply scale factor scaled_value = -sensor_value" << std::endl;
+
 	// Create a sinusoidal profile from 0 to device maximal sensor range
 	std::cout << "Set sinusoidal orders from 0 to device maximal sensor range" << std::endl;
 	for (int loop = 0; loop < 360; loop+=10)
 	{
 		// Set regulation
-		std::cout << "Set sensor regulation: " << loop << std::endl;
-		Fgt_set_sensorRegulation(0, 0, sin(loop * PI / 180)* maxSensor);
+		std::cout << "Set sensor regulation: " << sin(loop * PI / 360) * maxSensor << std::endl;
+		Fgt_set_sensorRegulation(0, 0, sin(loop * PI / 360)* maxSensor);
 
 		// Wait 1 second
 		Sleep(1000);
