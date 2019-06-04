@@ -60,7 +60,7 @@ int main()
 	Fgt_get_sensorChannelCount(&sensor_number);
 	std::cout << "Total number of sensor channels: " << int(sensor_number) << std::endl;
 
-	// Get total number of initialized pressure channel(s)
+	// Get total number of initialized TTL channel(s)
 	Fgt_get_TtlChannelCount(&ttl_number);
 	std::cout << "Total number of TTL channels: " << int(ttl_number) << std::endl << std::endl;
 

@@ -4,7 +4,7 @@
 *         Copyright (c) Fluigent 2019.  All Rights Reserved.
 *----------------------------------------------------------------------------
 *
-* Title:   Basic Advanced Specific Multiple Instruments.cpp
+* Title:   Advanced Specific Multiple Instruments.cpp
 * Purpose: This example shows how to use specific channels ID and multiple
 *			connected instruments
 *

@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Set Pressure", "Basic Set Pressure\Basic Set Pressure.vcxproj", "{815D43EB-8466-4763-A63E-7781CBA114C9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Sensor Regulation", "Basic Set Regulation\Basic Set Regulation.vcxproj", "{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Advanced Parallel Pressure Control", "Advanced Parallel Pressure Control\Advanced Parallel Pressure Control.vcxproj", "{3204839B-3D51-4245-81EC-4A37E72677F1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Get Instruments Info", "Basic Get Instruments Info\Basic Get Instruments Info.vcxproj", "{E1D514FC-21DB-40AD-BEA4-A36BD32F2C76}"
@@ -16,6 +14,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Advanced Features", "Advanced Features\Advanced Features.vcxproj", "{8D60AE24-A137-4542-8463-8A849653BBC5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Advanced Specific Multiple Instruments", "Advanced Specific Multiple Instruments\Advanced Specific Multiple Instruments.vcxproj", "{7D15EB62-E476-4469-8A7A-D1C1287CF89F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Sensor Regulation", "Basic Sensor Regulation\Basic Sensor Regulation.vcxproj", "{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,14 +33,6 @@ Global
 		{815D43EB-8466-4763-A63E-7781CBA114C9}.Release|x64.Build.0 = Release|x64
 		{815D43EB-8466-4763-A63E-7781CBA114C9}.Release|x86.ActiveCfg = Release|Win32
 		{815D43EB-8466-4763-A63E-7781CBA114C9}.Release|x86.Build.0 = Release|Win32
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x64.ActiveCfg = Debug|x64
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x64.Build.0 = Debug|x64
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x86.ActiveCfg = Debug|Win32
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x86.Build.0 = Debug|Win32
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x64.ActiveCfg = Release|x64
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x64.Build.0 = Release|x64
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x86.ActiveCfg = Release|Win32
-		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x86.Build.0 = Release|Win32
 		{3204839B-3D51-4245-81EC-4A37E72677F1}.Debug|x64.ActiveCfg = Debug|x64
 		{3204839B-3D51-4245-81EC-4A37E72677F1}.Debug|x64.Build.0 = Debug|x64
 		{3204839B-3D51-4245-81EC-4A37E72677F1}.Debug|x86.ActiveCfg = Debug|Win32
@@ -81,6 +73,14 @@ Global
 		{7D15EB62-E476-4469-8A7A-D1C1287CF89F}.Release|x64.Build.0 = Release|x64
 		{7D15EB62-E476-4469-8A7A-D1C1287CF89F}.Release|x86.ActiveCfg = Release|Win32
 		{7D15EB62-E476-4469-8A7A-D1C1287CF89F}.Release|x86.Build.0 = Release|Win32
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x64.ActiveCfg = Debug|x64
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x64.Build.0 = Debug|x64
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x86.ActiveCfg = Debug|Win32
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Debug|x86.Build.0 = Debug|Win32
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x64.ActiveCfg = Release|x64
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x64.Build.0 = Release|x64
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x86.ActiveCfg = Release|Win32
+		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

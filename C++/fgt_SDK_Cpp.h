@@ -77,6 +77,7 @@ void Fgt_Manage_Generic_Status(fgt_ERROR_CODE error, std::string calledFunctionN
 /**
  * @Description Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP) are initialized.
  * This function is optional, directly calling a function will automatically creates the instance.
+ * Only one instance can be opened at once. If called again, session is reinitialized.
  * @param void
  * @return fgt_ERROR_CODE
  * @see fgt_close
@@ -144,7 +145,7 @@ fgt_ERROR_CODE Fgt_get_sensorChannelCount(unsigned char* nbSChan);
 fgt_ERROR_CODE Fgt_get_TtlChannelCount(unsigned char* nbTtlChan);
 
 /**
- * @Description: Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and InstrType.
+ * @Description: Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and intrument type.
  * By default this array is built with MFCS first, MFCS-EZ second and FlowEZ last. If only one instrument is used, index is the default channel indexing starting at 0.
  * You can initialize instruments in specific order using fgt_initEx function
  * @param info Array of structure of fgt_CHANNEL_INFO
@@ -153,7 +154,7 @@ fgt_ERROR_CODE Fgt_get_TtlChannelCount(unsigned char* nbTtlChan);
 fgt_ERROR_CODE Fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256]);
 
 /**
- * @Description: Retrieve information about each initialized sensor channel. This function is useful in order to get channels order, controller, unique ID and InstrType.
+ * @Description: Retrieve information about each initialized sensor channel. This function is useful in order to get channels order, controller, unique ID and intrument type.
  * By default this array is built with FRP first then FlowEZ and contains flow-units. If only one instrument is used, index is the default channel indexing starting at 0.
  * You can initialize instruments in specific order using fgt_initEx function
  * @param info Array of structure of fgt_CHANNEL_INFO
@@ -163,7 +164,7 @@ fgt_ERROR_CODE Fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256]);
 fgt_ERROR_CODE Fgt_get_sensorChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_SENSOR_TYPE sensorType[256]);
 
 /**
- * @Description: Retrieve information about each initialized TTL channel. This function is useful in order to get channels order, controller, unique ID and InstrType.
+ * @Description: Retrieve information about each initialized TTL channel. This function is useful in order to get channels order, controller, unique ID and intrument type.
  * TTL channels are only available for LineUP Series, 2 ports for each connected Link
  * @param info Array of structure of fgt_CHANNEL_INFO
  * @return fgt_ERROR_CODE
@@ -196,7 +197,7 @@ fgt_ERROR_CODE Fgt_set_pressure(unsigned int pressureIndex, float pressure);
 fgt_ERROR_CODE Fgt_get_pressure(unsigned int pressureIndex, float* pressure);
 
 /**
- * @Description Read pressure value and time stamp of selected device
+ * @Description Read pressure value and time stamp of selected device. Time stamp is the device internal timer.
  * @param pressureIndex Index of pressure channel or unique ID
  * @param *pressure Read pressure value in selected unit, default is "mbar"
  * @param *timeStamp Hardware timer in ms
@@ -229,7 +230,7 @@ fgt_ERROR_CODE Fgt_set_sensorRegulation(unsigned int sensorIndex, unsigned int p
 fgt_ERROR_CODE Fgt_get_sensorValue(unsigned int sensorIndex, float* value);
 
 /**
- * @Description Read sensor value and timestamp of selected device
+ * @Description Read sensor value and timestamp of selected device. Time stamp is the device internal timer.
  * @param sensorIndex Index of sensor channel or unique ID
  * @param *value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
  * @param *timeStamp Hardware timer in ms
@@ -302,7 +303,7 @@ fgt_ERROR_CODE Fgt_get_sensorUnit(unsigned int sensorIndex, std::string* unit);
 fgt_ERROR_CODE Fgt_set_sensorCalibration(unsigned int sensorIndex, fgt_SENSOR_CALIBRATION calibration);
 
 /**
- * @Description Get internal used calibration table by the sensor.
+ * @Description Get internal calibration table used by the sensor.
  * @param sensorIndex Index of sensor channel or unique ID
  * @param *calibration fgt_SENSOR_CALIBRATION
  * @return fgt_ERROR_CODE
@@ -340,7 +341,7 @@ fgt_ERROR_CODE Fgt_set_sensorCustomScale(unsigned int sensorIndex, float a, floa
 fgt_ERROR_CODE Fgt_set_sensorCustomScaleEx(unsigned int sensorIndex, float a, float b, float c, float SMax);
 
 /**
- * @Description Calibrate internal pressure depending on atmospheric pressure. After calling this function 0 pressure value corresponds to atmospheric pressure.
+ * @Description Calibrate internal pressure sensor depending on atmospheric pressure. After calling this function 0 pressure value corresponds to atmospheric pressure.
  * During calibration step no pressure order is accepted. Total duration vary from 3s to 8s.
  * @param pressureIndex Index of pressure channel or unique ID
  * @return fgt_ERROR_CODE
