@@ -45,10 +45,10 @@ int main()
 	// Get pressure controller range
 	Fgt_get_pressureRange(0, &minPressure, &maxPressure);
 
-	// Create a pressure ramp profile from 0 to device maximal pressure range
-	std::cout << "Send a pressure ramp from 0 to device maximal pressure range" << std::endl;
-	for(float loop = 0; loop < maxPressure; loop += (maxPressure/10))	
-	{
+	// Create a pressure ramp profile from device minimal to maximal pressure range
+	std::cout << "Send a pressure ramp from device minimal to maximal pressure range" << std::endl;
+	for(float loop = minPressure; loop < maxPressure; loop += (max(maxPressure, abs(minPressure))/10))		// (max(maxPressure, abs(minPressure))/10 increment allows example to run bowth on positive and vacuum pressure controllers
+	{ 
 		// Set pressure
 		std::cout << "Set pressure: " << loop << std::endl;
 		Fgt_set_pressure(0, loop);
