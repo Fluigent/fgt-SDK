@@ -15,17 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\fgt_SDK_Cpp.cpp">
+    <ClCompile Include="Basic Set Pressure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Basic Set Pressure.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\fgt_SDK.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\fgt_SDK_Cpp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
