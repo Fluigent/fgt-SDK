@@ -1,15 +1,15 @@
-/*============================================================================
-*               Fluigent Software Developement Kit for C++                  
-*----------------------------------------------------------------------------
-*         Copyright (c) Fluigent 2019.  All Rights Reserved.                 
-*----------------------------------------------------------------------------
-*                                                                            
-* Title:   fgt_SDK_Cpp.cpp                                                  
-* Purpose: Wrapper to fgt_SDK_*.dll				                          
-*			Contains an interface to each dll function and type conversions	  
-* Version: 19.0.0.0                                                         
-* Date:	06/2019															 
-*============================================================================*/
+/*============================================================================*/
+/*               Fluigent Software Developement Kit for C++                   */
+/*----------------------------------------------------------------------------*/
+/*         Copyright (c) Fluigent 2019.  All Rights Reserved.                 */
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/* Title:   fgt_SDK_Cpp.c                                                     */
+/* Purpose: Wrapper to fgt_SDK_*.dll				                          */
+/*			Contains an interface to each dll function and type conversions	  */
+/* Version: 1.0.0.0                                                           */
+/* Date:	06/2019															  */
+/*============================================================================*/
 
 #include <iostream>
 #include "fgt_SDK_Cpp.h"
@@ -17,9 +17,6 @@
 /*============================================================================*/
 /*-------------  Custom definitions and functions section  -------------------*/
 /*============================================================================*/
-
-// Global variable, handles fgt_SDK_*.dll file
-HINSTANCE proc_fgt_dll;
 
 /** Overload << operator for more intuitive enum display */
 /** fgt_ERROR_CODE: enumerator of all returned codes */
@@ -156,22 +153,18 @@ void Fgt_Manage_Pressure_Status(unsigned int pressureIndex, std::string calledFu
 	unsigned short controllerSN;
 	unsigned char information;
 	std::string detail;
-	std::string info;
 
 	fgt_ERROR_CODE error = Fgt_get_pressureStatus(pressureIndex, &type, &controllerSN, &information, &detail);
-
-	if (information == 0) info = "info: remote control";
-	if (information == 1) info = "info: local control";
 
 	if(error != fgt_ERROR_CODE::OK)
 	{
 		std::cout << calledFunctionName << " pressure channel " << pressureIndex << " of type " << type << " error " << int(error) << ": " << error << " - " << detail << ", Controller SN: " << controllerSN <<
-			", " << info << std::endl;
+			", info code: " << int(information) << std::endl;
 	}
 }
 
 /** Manage sensor error and status, display details
- *  Change this function for custom error management, returned fgt_ERROR_CODE can directly be used in main application
+ *  Change this function for custom error management, returned fgt_ERROR_CODE can directly be used in main application 
  *  This functions calls Fgt_get_sensorStatus and displays error details */
 void Fgt_Manage_Sensor_Status(unsigned int sensorIndex, std::string calledFunctionName)
 {
@@ -179,14 +172,13 @@ void Fgt_Manage_Sensor_Status(unsigned int sensorIndex, std::string calledFuncti
 	unsigned short controllerSN;
 	unsigned char information;
 	std::string detail;
-	std::string info;
 
-	fgt_ERROR_CODE error = Fgt_get_sensorStatus(sensorIndex, &type, &controllerSN, &information, &detail);
+	fgt_ERROR_CODE error = Fgt_get_pressureStatus(sensorIndex, &type, &controllerSN, &information, &detail);
 
 	if (error != fgt_ERROR_CODE::OK)
 	{
 		std::cout << calledFunctionName << " sensor channel " << sensorIndex << " of type " << type << " error " << int(error) << ": " << error << " - " << detail << ", Controller SN: " << controllerSN <<
-			", info: " << int(information) << std::endl;
+			", info code: " << int(information) << std::endl;
 	}
 }
 
@@ -210,7 +202,6 @@ void Fgt_Manage_Generic_Status(fgt_ERROR_CODE error, std::string calledFunctionN
 /**
  * @Description Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP) are initialized.
  * This function is optional, directly calling a function will automatically creates the instance.
- * Only one instance can be opened at once. If called again, session is reinitialized.
  * @param void
  * @return fgt_ERROR_CODE
  * @see fgt_close
@@ -248,15 +239,16 @@ fgt_ERROR_CODE Fgt_close(void)
  * @return total number of detected instruments
  * @see fgt_initEx for specific initialization
  */
-unsigned char Fgt_detect(unsigned short SN[256], fgt_INSTRUMENT_TYPE type[256])
+fgt_ERROR_CODE Fgt_detect(unsigned short SN[256], fgt_INSTRUMENT_TYPE type[256])
 {
 	int localType[256] = {0};
-	unsigned char returnCode;
+	fgt_ERROR_CODE returnCode;
 	typedef unsigned char(__stdcall * fgt_detect)(unsigned short SN[], int type[]);
 	fgt_detect pfgt_detect = (fgt_detect)(GetProcAddress(fgt_Dll_Handle(), "fgt_detect"));
 
-	returnCode = pfgt_detect(SN, localType);
+	returnCode = fgt_ERROR_CODE(pfgt_detect(SN, localType));
 	for(unsigned char loop = 0; loop < 255; loop++) type[loop] = fgt_INSTRUMENT_TYPE(localType[loop]);		// Convert type from dll int to C++ enum fgt_INSTRUMENT_TYPE
+	Fgt_Manage_Generic_Status(returnCode, "Fgt_detect");
 	return returnCode;
 }
 
@@ -281,7 +273,7 @@ fgt_ERROR_CODE Fgt_initEx(unsigned short SN[256])
 
 /**
  * @Description Retrieve information about session controllers. Controllers are MFCS, Flowboard, Link in an array.
- * @param [info] Array of structure of fgt_CONTROLLER_INFO
+ * @out [info] Array of structure of fgt_CONTROLLER_INFO
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_controllersInfo(fgt_CONTROLLER_INFO info[256])
@@ -343,7 +335,7 @@ fgt_ERROR_CODE Fgt_get_TtlChannelCount(unsigned char* nbTtlChan)
 }
 
 /**
- * @Description: Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
+ * @Description: Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and InstrType.
  * By default this array is built with MFCS first, MFCS-EZ second and FlowEZ last. If only one instrument is used, index is the default channel indexing starting at 0.
  * You can initialize instruments in specific order using fgt_initEx function
  * @param info Array of structure of fgt_CHANNEL_INFO
@@ -360,7 +352,7 @@ fgt_ERROR_CODE Fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256])
 }
 
 /**
- * @Description: Retrieve information about each initialized sensor channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
+ * @Description: Retrieve information about each initialized sensor channel. This function is useful in order to get channels order, controller, unique ID and InstrType.
  * By default this array is built with FRP first then FlowEZ and contains flow-units. If only one instrument is used, index is the default channel indexing starting at 0.
  * You can initialize instruments in specific order using fgt_initEx function
  * @param info Array of structure of fgt_CHANNEL_INFO
@@ -380,7 +372,7 @@ fgt_ERROR_CODE Fgt_get_sensorChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_SENSOR
 }
 
 /**
- * @Description: Retrieve information about each initialized TTL channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
+ * @Description: Retrieve information about each initialized TTL channel. This function is useful in order to get channels order, controller, unique ID and InstrType.
  * TTL channels are only available for LineUP Series, 2 ports for each connected Link
  * @param info Array of structure of fgt_CHANNEL_INFO
  * @return fgt_ERROR_CODE
@@ -422,7 +414,7 @@ fgt_ERROR_CODE Fgt_set_pressure(unsigned int pressureIndex, float pressure)
 /**
  * @Description Read pressure value of selected device
  * @param pressureIndex Index of pressure channel or unique ID
- * @param *pressure Read pressure value in selected unit, default is "mbar"
+ * @out *pressure Read pressure value in selected unit, default is "mbar"
  * @return errorCode
  * @see fgt_get_pressureEx
  * @see fgt_get_pressureStatus
@@ -438,10 +430,10 @@ fgt_ERROR_CODE Fgt_get_pressure(unsigned int pressureIndex, float* pressure)
 }
 
 /**
- * @Description Read pressure value and time stamp of selected device. Time stamp is the device internal timer.
+ * @Description Read pressure value and time stamp of selected device
  * @param pressureIndex Index of pressure channel or unique ID
- * @param *pressure Read pressure value in selected unit, default is "mbar"
- * @param *timeStamp Hardware timer in ms
+ * @out *pressure Read pressure value in selected unit, default is "mbar"
+ * @out *timeStamp Hardware timer in ms
  * @return fgt_ERROR_CODE
  * @see fgt_get_pressure
  * @see fgt_get_pressureStatus
@@ -480,7 +472,7 @@ fgt_ERROR_CODE Fgt_set_sensorRegulation(unsigned int sensorIndex, unsigned int p
 /**
  * @Description Read sensor value of selected device
  * @param sensorIndex Index of sensor channel or unique ID
- * @param *value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
+ * @out value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
  * @return fgt_ERROR_CODE
  * @see fgt_get_sensorStatus
  */
@@ -495,10 +487,10 @@ fgt_ERROR_CODE Fgt_get_sensorValue(unsigned int sensorIndex, float* value)
 }
 
 /**
- * @Description Read sensor value and timestamp of selected device. Time stamp is the device internal timer.
+ * @Description Read sensor value and timestamp of selected device
  * @param sensorIndex Index of sensor channel or unique ID
- * @param *value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
- * @param *timeStamp Hardware timer in ms
+ * @out value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
+ * @out timeStamp Hardware timer in ms
  * @return fgt_ERROR_CODE
  * @see fgt_get_sensorStatus
  */
@@ -520,8 +512,8 @@ fgt_ERROR_CODE Fgt_get_sensorValueEx(unsigned int sensorIndex, float* value, uns
 /**
  * @Description Set pressure unit for all initialized channels, default value is "mbar". If type is invalid an error is returned.
  * Every pressure read value and sent command will then use this unit.
- * Example: "mbar", "millibar", "kPa" ...
- * @param unit Unit string
+ * Example of type: "mbar", "millibar", "kPa" ...
+ * @param unit Array of char containing a unit string
  * @return fgt_ERROR_CODE
  * @see fgt_get_pressureStatus
  */
@@ -540,9 +532,9 @@ fgt_ERROR_CODE Fgt_set_sessionPressureUnit(std::string unit)
 /**
  * @Description Set pressure unit on selected pressure device, default value is "mbar". If type is invalid an error is returned.
  * Every pressure read value and sent command will then use this unit.
- * Example: "mbar", "millibar", "kPa" ...
+ * Example of type: "mbar", "millibar", "kPa" ...
  * @param presureIndex Index of pressure channel or unique ID
- * @param unit channel unit string
+ * @param unit[] Array of char containing a unit string
  * @return fgt_ERROR_CODE
  * @see fgt_get_pressureStatus
  */
@@ -562,7 +554,7 @@ fgt_ERROR_CODE Fgt_set_pressureUnit(unsigned int pressureIndex, std::string unit
  * @Description Get used unit on selected pressure device, default value is "mbar".
  * Every pressure read value and sent command use this unit.
  * @param pressureIndex Index of pressure channel or unique ID
- * @param unit channel unit string
+ * @out unit[] Array of char containing a unit string
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_pressureUnit(unsigned int pressureIndex, std::string* unit)
@@ -580,9 +572,9 @@ fgt_ERROR_CODE Fgt_get_pressureUnit(unsigned int pressureIndex, std::string* uni
 /**
  * @Description Set sensor unit on selected sensor device, default value is "µl/min" for flowunits. If type is invalid an error is returned.
  * Every sensor read value and regulation command will then use this unit.
- * Example: "µl/h", "ulperDay", "microliter/hour" ...
- * @param sensorIndex Index of sensor channel or unique ID
- * @param unit channel unit string
+ * Example of type: "µl/h", "ulperDay", "microliter/hour" ...
+ * @param pressureIndex Index of pressure channel or unique ID
+ * @param unit[] Array of char containing a unit string
  * @return fgt_ERROR_CODE
  * @see fgt_set_sensorStatus
  */
@@ -602,7 +594,7 @@ fgt_ERROR_CODE Fgt_set_sensorUnit(unsigned int sensorIndex, std::string unit)
  * @Description Get used unit on selected sensor device, default value is "µl/min" for flowunits.
  * Every sensor read value and regulation command use this unit.
  * @param sensorIndex Index of sensor channel or unique ID
- * @param unit channel unit string
+ * @out unit[] Array of char containing a unit string
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_sensorUnit(unsigned int sensorIndex, std::string* unit)
@@ -634,9 +626,9 @@ fgt_ERROR_CODE Fgt_set_sensorCalibration(unsigned int sensorIndex, fgt_SENSOR_CA
 }
 
 /**
- * @Description Get internal calibration table used by the sensor.
+ * @Description Get internal used calibration table by the sensor.
  * @param sensorIndex Index of sensor channel or unique ID
- * @param *calibration fgt_SENSOR_CALIBRATION
+ * @out *calibration fgt_SENSOR_CALIBRATION
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_sensorCalibration(unsigned int sensorIndex, fgt_SENSOR_CALIBRATION* calibration)
@@ -674,16 +666,16 @@ fgt_ERROR_CODE Fgt_set_sensorCustomScale(unsigned int sensorIndex, float a, floa
 }
 
 /**
- * @Description Apply a custom scale factor on sensor measurement. This function is useful in order to adapt read sensor value to physical measurement.
+ * @Description Apply a custom scale factor on sensor read value. This function is useful in order to adapt read sensor value to physical measurement.
  * For example if a flow-unit is used with a special oil and it's calibration table is set to H2O, read flowrate is not correct.
  * Scale factor is applied using following formula: scaled_value = a*sensor_value + b*sensor_value^2 + c*sensor_value^3
- * When applying a custom scale factor, sensor range may increase very rapidly, SMax parameter is meant to limit this maximal value.
+ * When applying a custom scale factor, sensor range may increase very rapidly, SMax parameter is ment to limit this maximal value.
  * This function purpose is to be used with the regulation in order to avoid too high maximum range on the sensor.
  * @param sensorIndex Index of sensor channel or unique ID
  * @param float a proportional multiplier value
  * @param float b square multiplier value
  * @param float c cubic multiplier value
- * @param float SMax after scale maximal value (saturation)
+ * @param float SMax maximal tolerance of scale factor
  * @return fgt_ERROR_CODE
  * @see fgt_set_sensorCustomScale
  */
@@ -698,7 +690,7 @@ fgt_ERROR_CODE Fgt_set_sensorCustomScaleEx(unsigned int sensorIndex, float a, fl
 }
 
 /**
- * @Description Calibrate internal pressure sensor depending on atmospheric pressure. After calling this function 0 pressure value corresponds to atmospheric pressure.
+ * @Description Calibrate internal pressure depending on atmospheric pressure. After calling this function 0 pressure value corresponds to atmospheric pressure.
  * During calibration step no pressure order is accepted. Total duration vary from 3s to 8s.
  * @param pressureIndex Index of pressure channel or unique ID
  * @return fgt_ERROR_CODE
@@ -713,13 +705,13 @@ fgt_ERROR_CODE Fgt_calibratePressure(unsigned int pressureIndex)
 	return returnCode;
 }
 
+
 /**
  * @Description Start closed loop regulation between a sensor and a pressure controller. Pressure will be regulated in order to reach sensor setpoint.
  * Custom sensors, outside Fluigent ones, can be used such as different flow-units, pressure, level ...
  * However we do not guarantee full compatibility with all sensors. Regulation quality is linked to sensor precision and your set-up.
  * In order to use this function, custom used sensor maximum range and measured values has to be updated at least once per second.
- * Directly setting pressure on same pressureIndex will stop regulation.
- * This function must be called at 1Hz minimum or the regulation will stop.
+ * Calling fgt_set_pressure on same pressureIndex or not updating sensor value over 1s will stop regulation.
  * @param measure custom sensor measured value, no unit is required
  * @param setpoint custom sensor regulation goal value, no unit is required
  * @param pressureIndex Index of pressure channel or unique ID
@@ -739,8 +731,8 @@ fgt_ERROR_CODE Fgt_set_customSensorRegulation(float measure, float setpoint, flo
 /**
  * @Description Get pressure controller minimum and maximum range. Returned values takes into account set unit, default value is 'mbar'.
  * @param pressureIndex Index of pressure channel or unique ID
- * @param *Pmin minim device pressure
- * @param *Pmax maximum device pressure
+ * @out Pmin minim device pressure
+ * @out Pmax maximum device pressure
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_pressureRange(unsigned int pressureIndex, float* Pmin, float* Pmax)
@@ -756,8 +748,8 @@ fgt_ERROR_CODE Fgt_get_pressureRange(unsigned int pressureIndex, float* Pmin, fl
 /**
  * @Description Get sensor minimum and maximum range. Returned values takes into account set unit, default value is 'µl/min' in case of flow-units.
  * @param sensorIndex Index of sensor channel or unique ID
- * @param *Smin minimum measured sensor value
- * @param *Smax maximum measured sensor value
+ * @out Smin minimum measured sensor value
+ * @out Smax maximum measured sensor value
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_sensorRange(unsigned int sensorIndex, float* Smin, float* Smax)
@@ -771,10 +763,11 @@ fgt_ERROR_CODE Fgt_get_sensorRange(unsigned int sensorIndex, float* Smin, float*
 }
 
 /**
- * @Description Set pressure working range and ensure that pressure will never exceed this limit. It takes into account current unit, default value is 'mbar'.
- * This function is useful to protect your microfluidic system.
+ * @Description Set a limit, not to exceed on a pressure controller. It takes into account set unit, default value is 'mbar'.
+ * This function is usefull when wanting to be sure not to go over a certain pressure value or during regulation.
+ * Setting a limit is used for next called functions. Limits can not exceed controller range.
  * @param pressureIndex Index of pressure channel or unique ID
- * @param PlimMin minimum admissible device pressure
+ * @param PlimMin minim admissible device pressure
  * @param PlimMax maximum admissible device pressure
  * @return fgt_ERROR_CODE
  */
@@ -815,7 +808,7 @@ fgt_ERROR_CODE Fgt_set_sensorRegulationResponse(unsigned int sensorIndex, unsign
  * For FlowEZ available values are 0: use of fast switch vales or 1: do not use fast switch vales. Default value is 0.
  * For MFCS available values are from 1 to 255. Higher the value, longer is the response time. Default value is 5.
  * @param pressureIndex Index of pressure channel or unique ID
- * @param value desired pressure controller response time, this depends on controller type
+ * @param value desired pressure controller response time
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_set_pressureResponse(unsigned int pressureIndex, unsigned char value)
@@ -833,13 +826,13 @@ fgt_ERROR_CODE Fgt_set_pressureResponse(unsigned int pressureIndex, unsigned cha
 /*============================================================================*/
 
 /**
- * @Description Get detailed information of pressure channel status. This function is meant to be invoked after calling a pressure related function which returns an error code.
+ * @Description Get detailed information of pressure channel status. This function is ment to be invoked after calling a pressure related function which returns an error code.
  * Retrieved information of last error contains controller position and a string detail.
  * @param pressureIndex Index of pressure channel or unique ID
- * @param *type fgt_INSTRUMENT_TYPE, controller type
- * @param *controllerSN serial number of controller (such as Link, MFCS)
- * @param *information information status code, 1 if pressure module is controller locally
- * @param detail detailed string about the error or state
+ * @out InstrType fgt_INSTRUMENT_TYPE, controller type
+ * @out controllerSN serial number of controller (such as Link, MFCS)
+ * @out information information status code, 1 if pressure module is controller locally
+ * @out detail array of characters which details the error
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_pressureStatus(unsigned int pressureIndex, fgt_INSTRUMENT_TYPE* type, unsigned short* controllerSN, unsigned char* infoCode, std::string* detail)
@@ -851,19 +844,18 @@ fgt_ERROR_CODE Fgt_get_pressureStatus(unsigned int pressureIndex, fgt_INSTRUMENT
 	fgt_get_pressureStatus pfgt_get_pressureStatus = (fgt_get_pressureStatus)GetProcAddress(fgt_Dll_Handle(), "fgt_get_pressureStatus");
 
 	fgt_ERROR_CODE error = fgt_ERROR_CODE(pfgt_get_pressureStatus(pressureIndex, &localType, controllerSN, infoCode, localDetail));
-	*type = fgt_INSTRUMENT_TYPE(localType);
 	*detail = localDetail;
 	return error;
 }
 
 /**
- * @Description Get detailed information of sensor status. This function is meant to be invoked after calling a sensor related function which returns an error code.
+ * @Description Get detailed information of sensor status. This function is ment to be invoked after calling a sensor related function which returns an error code.
  * Retrieved information of last error contains sensor position and a string detail.
  * @param sensorIndex Index of sensor channel or unique ID
- * @param *InstrType fgt_INSTRUMENT_TYPE, controller type
- * @param *controllerSN serial number of controller (such as Link, Flowboard)
- * @param *information information status code when regulating 0: No regulation; 1: Regulating; otherwise regulation might not be optimal
- * @param detail detailed string about the error or state
+ * @out InstrType fgt_INSTRUMENT_TYPE, controller type
+ * @out controllerSN serial number of controller (such as Link, Flowboard)
+ * @out information information status code when regulating 0: Ok otherwise regulation might not be optimal
+ * @out detail array of characters which details the error
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_sensorStatus(unsigned int sensorIndex, fgt_INSTRUMENT_TYPE* type, unsigned short* controllerSN, unsigned char* infoCode, std::string* detail)
@@ -875,7 +867,6 @@ fgt_ERROR_CODE Fgt_get_sensorStatus(unsigned int sensorIndex, fgt_INSTRUMENT_TYP
 	fgt_get_sensorStatus pfgt_get_sensorStatus = (fgt_get_sensorStatus)GetProcAddress(fgt_Dll_Handle(), "fgt_get_sensorStatus");
 
 	fgt_ERROR_CODE error = fgt_ERROR_CODE(pfgt_get_sensorStatus(sensorIndex, &localType, controllerSN, infoCode, localDetail));
-	*type = fgt_INSTRUMENT_TYPE(localType);
 	*detail = localDetail;
 	return error;
 }
@@ -887,9 +878,9 @@ fgt_ERROR_CODE Fgt_get_sensorStatus(unsigned int sensorIndex, fgt_INSTRUMENT_TYP
  * @param powerState fgt_POWER
  * @return fgt_ERROR_CODE
  */
-fgt_ERROR_CODE Fgt_set_power(unsigned int controllerIndex, fgt_POWER powerState)
+fgt_ERROR_CODE Fgt_set_power(unsigned short controllerIndex, fgt_POWER powerState)
 {
-	typedef unsigned char(__stdcall * fgt_set_power)(unsigned int controllerIndex, unsigned char powerState);
+	typedef unsigned char(__stdcall * fgt_set_power)(unsigned short controllerIndex, unsigned char powerState);
 	fgt_set_power pfgt_set_power = (fgt_set_power)GetProcAddress(fgt_Dll_Handle(), "fgt_set_power");
 
 	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(pfgt_set_power(controllerIndex, unsigned char(powerState)));
@@ -901,13 +892,13 @@ fgt_ERROR_CODE Fgt_set_power(unsigned int controllerIndex, fgt_POWER powerState)
  * @Description Get power information about a controller (such as Link, MFCS, Flowboard).
  * Not all controllers support this functionality.
  * @param controllerIndex Index of controller or unique ID
- * @param *powerState fgt_POWER
+ * @out powerState fgt_POWER
  * @return fgt_ERROR_CODE
  */
-fgt_ERROR_CODE Fgt_get_power(unsigned int controllerIndex, fgt_POWER* powerState)
+fgt_ERROR_CODE Fgt_get_power(unsigned short controllerIndex, fgt_POWER* powerState)
 {
 	unsigned char localPowerState;
-	typedef unsigned char(__stdcall * fgt_get_power)(unsigned int controllerIndex, unsigned char * powerState);
+	typedef unsigned char(__stdcall * fgt_get_power)(unsigned short controllerIndex, unsigned char * powerState);
 	fgt_get_power pfgt_get_power = (fgt_get_power)GetProcAddress(fgt_Dll_Handle(), "fgt_get_power");
 
 	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(pfgt_get_power(controllerIndex, &localPowerState));
@@ -939,7 +930,7 @@ fgt_ERROR_CODE Fgt_set_TtlMode(unsigned int TtlIndex, fgt_TTL_MODE mode)
 /**
  * @Description Read TTL ports (BNC ports) if set as input.
  * @param TtlIndex Index of TTL port or unique ID
- * @param *state 0: no edge was detected; 1: an edge is detected
+ * @out state 0: no edge was detected; 1: an edge is detected
  * @return fgt_ERROR_CODE
  * @see fgt_set_TtlMode
  */
@@ -980,9 +971,9 @@ fgt_ERROR_CODE Fgt_trigger_Ttl(unsigned int TtlIndex)
  * @param purge 0: OFF, 1:ON
  * @return fgt_ERROR_CODE
  */
-fgt_ERROR_CODE Fgt_set_purge(unsigned int controllerIndex, unsigned char purge)
+fgt_ERROR_CODE Fgt_set_purge(unsigned short controllerIndex, unsigned char purge)
 {
-	typedef unsigned char(__stdcall * fgt_set_purge)(unsigned int controllerIndex, unsigned char purge);
+	typedef unsigned char(__stdcall * fgt_set_purge)(unsigned short controllerIndex, unsigned char purge);
 	fgt_set_purge pfgt_set_purge = (fgt_set_purge)GetProcAddress(fgt_Dll_Handle(), "fgt_set_purge");
 
 	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(pfgt_set_purge(controllerIndex, purge));

@@ -427,7 +427,7 @@ extern "C"
 
 	/**
 	 * @Description Set pressure controller response. This function can be used to customise response time for your set-up.
-	 * For FlowEZ available values are 0: use of fast switch vales or 1: do not use fast switch vales. Default value is 0.
+	 * For FlowEZ available values are 0: use of fast switch valves or 1: do not use fast switch valves. Default value is 0.
 	 * For MFCS available values are from 1 to 255. Higher the value, longer is the response time. Default value is 5.
 	 * @param pressureIndex Index of pressure channel or unique ID
 	 * @param value desired pressure controller response time, this depends on controller type

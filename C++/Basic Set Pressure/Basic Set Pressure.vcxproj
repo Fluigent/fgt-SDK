@@ -96,12 +96,6 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_32.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_32.dll"
-copy /Y "$(SolutionDir)frp_c_32.dll" "$(SolutionDir)$(ProjectName)\frp_c_32.dll"
-copy /Y "$(SolutionDir)LineUP_c_32.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_32.dll"
-copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dll"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -117,12 +111,6 @@ copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dl
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_64.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_64.dll"
-copy /Y "$(SolutionDir)frp_c_64.dll" "$(SolutionDir)$(ProjectName)\frp_c_64.dll"
-copy /Y "$(SolutionDir)LineUP_c_64.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_64.dll"
-copy /Y "$(SolutionDir)mfcs_c_64.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_64.dll"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -142,12 +130,6 @@ copy /Y "$(SolutionDir)mfcs_c_64.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_64.dl
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_32.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_32.dll"
-copy /Y "$(SolutionDir)frp_c_32.dll" "$(SolutionDir)$(ProjectName)\frp_c_32.dll"
-copy /Y "$(SolutionDir)LineUP_c_32.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_32.dll"
-copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dll"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -167,20 +149,9 @@ copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dl
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_64.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_64.dll"
-copy /Y "$(SolutionDir)frp_c_64.dll" "$(SolutionDir)$(ProjectName)\frp_c_64.dll"
-copy /Y "$(SolutionDir)LineUP_c_64.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_64.dll"
-copy /Y "$(SolutionDir)mfcs_c_64.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_64.dll"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\fgt_SDK_Cpp.cpp" />
     <ClCompile Include="Basic Set Pressure.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\fgt_SDK.h" />
-    <ClInclude Include="..\fgt_SDK_Cpp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
