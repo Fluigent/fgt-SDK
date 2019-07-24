@@ -1,0 +1,206 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Advanced Features</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-07-23"><meta name="DC.source" content="Fluigent_SDK_AdvancedFeatures.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Advanced Features</h1><!--introduction--><p>This example shows advanced features such as limits, units and calibration.</p><p>Requires at least one Fluigent pressure controller (MFCS, MFCS-EZ or Flow EZ) and/or one Fluigent sensor (Flow Unit connected to FRP or Flow EZ)</p><p><a href="matlab:edit('Fluigent_SDK_AdvancedFeatures')">Open this M File</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Unit change</a></li><li><a href="#2">Limit change</a></li><li><a href="#3">Calibration</a></li><li><a href="#4">Close the session</a></li></ul></div><h2>Unit change<a name="1"></a></h2><pre class="codeinput">pressureIndex = 0;
+sensorIndex = 0;
+
+<span class="comment">% Read pressure value</span>
+pressureValue = fgt_get_pressure(pressureIndex);
+pressureUnit = fgt_get_pressureUnit(pressureIndex);
+fprintf(<span class="string">'Read pressure: %f %s\n'</span>, pressureValue, pressureUnit);
+
+<span class="comment">% Read sensor value</span>
+sensorValue = fgt_get_sensorValue(sensorIndex);
+sensorUnit = fgt_get_sensorUnit(sensorIndex);
+fprintf(<span class="string">'Read sensor: %f %s\n'</span>, sensorValue, sensorUnit);
+
+<span class="comment">% Change pressure and sensor unit</span>
+<span class="comment">% Note that if incorrect or invalid unit is used an error is returned.</span>
+<span class="comment">% When unit is changed, all values are then in set unit</span>
+fgt_set_pressureUnit(pressureIndex, <span class="string">'PSI'</span>);
+fgt_set_sensorUnit(sensorIndex, <span class="string">'ulperhour'</span>);
+fprintf(<span class="string">'Changed pressure and sensor unit\n'</span>);
+
+<span class="comment">% Read pressure value again</span>
+pressureValue = fgt_get_pressure(pressureIndex);
+pressureUnit = fgt_get_pressureUnit(pressureIndex);
+fprintf(<span class="string">'Read pressure: %f %s\n'</span>, pressureValue, pressureUnit);
+
+<span class="comment">% Read sensor value again</span>
+sensorValue = fgt_get_sensorValue(sensorIndex);
+sensorUnit = fgt_get_sensorUnit(sensorIndex);
+fprintf(<span class="string">'Read sensor: %f %s\n'</span>, sensorValue, sensorUnit);
+</pre><h2>Limit change<a name="2"></a></h2><pre class="codeinput">[minPressure, maxPressure] = fgt_get_pressureRange(pressureIndex);
+fgt_set_pressureLimit(pressureIndex, minPressure / 2, maxPressure / 2);
+fprintf(<span class="string">'Changed pressure limit to %f - %f\n'</span>, minPressure / 2, maxPressure / 2);
+fprintf(<span class="string">'Trying to set pressure to %f\n'</span>, maxPressure);
+fgt_set_pressure(pressureIndex, maxPressure);
+</pre><h2>Calibration<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Pressure calibration</span>
+fgt_calibratePressure(pressureIndex);
+fprintf(<span class="string">'Calibrating pressure channel... trying to send pressure order in same time\n'</span>);
+fgt_set_pressure(pressureIndex, maxPressure/2);
+<span class="comment">% An error is thrown, set pressure orders are not accepted during calibration</span>
+
+<span class="comment">% Sensor calibration</span>
+<span class="comment">% Read sensor calibration table</span>
+sensorCalibration = fgt_get_sensorCalibration(sensorIndex);
+fprintf(<span class="string">'Read sensor calibration: %s\n'</span>, char(sensorCalibration));
+
+<span class="comment">% Change sensor calibration to water</span>
+<span class="comment">% Note that if calibration is not supported, an error is thrown</span>
+fgt_set_sensorCalibration(sensorIndex, fgt_SENSOR_CALIBRATION.H2O);
+disp(<span class="string">'Setting sensor calibration...'</span>);
+<span class="comment">% As for pressure calibration, this step needs a few moments before the</span>
+<span class="comment">% read values are correct. The same error is thrown.</span>
+pause(1)
+<span class="comment">% Read sensor calibration table again</span>
+sensorCalibration = fgt_get_sensorCalibration(sensorIndex);
+fprintf(<span class="string">'Read sensor calibration: %s\n'</span>, char(sensorCalibration));
+</pre><h2>Close the session<a name="4"></a></h2><pre class="codeinput">fgt_close
+</pre><p>Copyright (c) Fluigent 2019.  All Rights Reserved.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Advanced Features
+% This example shows advanced features such as limits, units and
+% calibration.
+% 			
+% Requires at least one Fluigent pressure controller (MFCS, MFCS-EZ or Flow
+% EZ) and/or one Fluigent sensor (Flow Unit connected to FRP or Flow EZ)
+%
+% <matlab:edit('Fluigent_SDK_AdvancedFeatures') Open this M File>
+
+%% Unit change
+
+pressureIndex = 0;
+sensorIndex = 0;
+
+% Read pressure value
+pressureValue = fgt_get_pressure(pressureIndex);
+pressureUnit = fgt_get_pressureUnit(pressureIndex);
+fprintf('Read pressure: %f %s\n', pressureValue, pressureUnit);
+
+% Read sensor value
+sensorValue = fgt_get_sensorValue(sensorIndex);
+sensorUnit = fgt_get_sensorUnit(sensorIndex);
+fprintf('Read sensor: %f %s\n', sensorValue, sensorUnit);
+
+% Change pressure and sensor unit
+% Note that if incorrect or invalid unit is used an error is returned.
+% When unit is changed, all values are then in set unit
+fgt_set_pressureUnit(pressureIndex, 'PSI');
+fgt_set_sensorUnit(sensorIndex, 'ulperhour');
+fprintf('Changed pressure and sensor unit\n');
+
+% Read pressure value again
+pressureValue = fgt_get_pressure(pressureIndex);
+pressureUnit = fgt_get_pressureUnit(pressureIndex);
+fprintf('Read pressure: %f %s\n', pressureValue, pressureUnit);
+
+% Read sensor value again
+sensorValue = fgt_get_sensorValue(sensorIndex);
+sensorUnit = fgt_get_sensorUnit(sensorIndex);
+fprintf('Read sensor: %f %s\n', sensorValue, sensorUnit);
+
+%% Limit change
+
+[minPressure, maxPressure] = fgt_get_pressureRange(pressureIndex);
+fgt_set_pressureLimit(pressureIndex, minPressure / 2, maxPressure / 2);
+fprintf('Changed pressure limit to %f - %f\n', minPressure / 2, maxPressure / 2);
+fprintf('Trying to set pressure to %f\n', maxPressure);
+fgt_set_pressure(pressureIndex, maxPressure);
+
+%% Calibration
+
+% Pressure calibration
+fgt_calibratePressure(pressureIndex);
+fprintf('Calibrating pressure channel... trying to send pressure order in same time\n');
+fgt_set_pressure(pressureIndex, maxPressure/2);
+% An error is thrown, set pressure orders are not accepted during calibration
+
+% Sensor calibration
+% Read sensor calibration table
+sensorCalibration = fgt_get_sensorCalibration(sensorIndex);
+fprintf('Read sensor calibration: %s\n', char(sensorCalibration));
+
+% Change sensor calibration to water
+% Note that if calibration is not supported, an error is thrown
+fgt_set_sensorCalibration(sensorIndex, fgt_SENSOR_CALIBRATION.H2O);
+disp('Setting sensor calibration...');
+% As for pressure calibration, this step needs a few moments before the
+% read values are correct. The same error is thrown.
+pause(1)
+% Read sensor calibration table again
+sensorCalibration = fgt_get_sensorCalibration(sensorIndex);
+fprintf('Read sensor calibration: %s\n', char(sensorCalibration));
+
+%% Close the session
+fgt_close
+
+%%
+% Copyright (c) Fluigent 2019.  All Rights Reserved.
+##### SOURCE END #####
+--></body></html>

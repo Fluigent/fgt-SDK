@@ -1,0 +1,34 @@
+<productinfo
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://www.mathworks.com/namespace/info/v1/info.xsd">
+<?xml-stylesheet type="text/xsl" href="http://www.mathworks.com/namespace/info/v1/info.xsl"?>
+
+<matlabrelease>2016a</matlabrelease>
+<name>Fluigent SDK</name>
+<type>toolbox</type>
+<icon>res/fluigent.gif</icon>
+<help_location>html</help_location>
+
+<list>
+
+<listitem>
+<label>Help</label>
+<callback>doc Fluigent SDK</callback>
+<icon>$matlabroot/matlab/icons/book_mat.gif</icon>
+</listitem>
+
+<listitem>
+<label>Demos (Fluigent SDK Toolbox Example)</label>
+<callback>demo toolbox Fluigent_SDK</callback>
+<icon>$docroot/techdoc/matlab_env/examples/demoicon.gif</icon>
+</listitem>
+
+<listitem>
+<label>Web Site (Fluigent SDK Toolbox Example)</label>
+<callback>web http://www.fluigent.com -browser;</callback>
+<icon>$docroot/techdoc/matlab_env/examples/webicon.gif</icon>
+</listitem>
+
+</list>
+
+</productinfo>
