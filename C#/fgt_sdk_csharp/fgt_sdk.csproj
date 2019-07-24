@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Fluigent</Authors>
+    <Product>Fluigent Software Development Kit</Product>
+    <Description>Software Development Kit for Fluigent pressure controllers and sensors.</Description>
+    <Version>19.0.1</Version>
+    <PackageTags>Microfluidics, Control</PackageTags>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Mes Documents\Développement\Fluigent\SDKs\fgt-sdk-csharp\fgt_sdk_csharp\fgt_sdk_csharp\fgt_sdk.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\fgt_SDK.h" Link="fgt_sdk_dlls\fgt_SDK.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\fgt_SDK_32.dll" Link="fgt_sdk_dlls\fgt_SDK_32.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\fgt_SDK_64.dll" Link="fgt_sdk_dlls\fgt_SDK_64.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\frp_c_32.dll" Link="fgt_sdk_dlls\frp_c_32.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\frp_c_64.dll" Link="fgt_sdk_dlls\frp_c_64.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\LineUP_c_32.dll" Link="fgt_sdk_dlls\LineUP_c_32.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\LineUP_c_64.dll" Link="fgt_sdk_dlls\LineUP_c_64.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\mfcs_c_32.dll" Link="fgt_sdk_dlls\mfcs_c_32.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\StaticFiles\fgt_sdk_dlls\mfcs_c_64.dll" Link="fgt_sdk_dlls\mfcs_c_64.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+	<None Include="fgt_sdk.targets" Pack="true" PackagePath="build\">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+  </ItemGroup>
+
+</Project>
