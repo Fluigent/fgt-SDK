@@ -42,21 +42,21 @@ int main()
 	controller_number = Fgt_detect(SN, instrument_type);
 	std::cout << "Total number of controller(s): " << int(controller_number) << std::endl;
 
-	// List all found controllers serial number and type
+	// List all found controllers' serial number and type
 	for (unsigned char loop = 0; loop < controller_number; loop++)
 	{
 		std::cout << "Detected instrument at index: " << int(loop) << ", ControllerSN: " << SN[loop] << ", type: " << instrument_type[loop] << std::endl;
 	}
 
 	Fgt_initEx(SN);				// Initialize only specific instrument controllers here
-								// If you do not want a controller in the list or if you want a specific order (e.g. LineUP before MFCS instruments)
+								// If you do not want a controller in the list or if you want a specific order (e.g. LineUP before MFCS instruments),
 								//	rearrange parsed SN table
 
 	// Get total number of initialized pressure channel(s)
 	Fgt_get_pressureChannelCount(&pressure_number);
 	std::cout << "Total number of pressure channels: " << int(pressure_number) << std::endl;
 
-	// Get total number of initialized pressure channel(s)
+	// Get total number of initialized sensor channel(s)
 	Fgt_get_sensorChannelCount(&sensor_number);
 	std::cout << "Total number of sensor channels: " << int(sensor_number) << std::endl;
 
@@ -94,7 +94,7 @@ int main()
 			<< " ID: " << sensor_info[loop].indexID << " InstrType: " << sensor_info[loop].InstrType << " sensor SensorType: " << sensor_type[loop] << std::endl;
 	}
 
-	// Get detailed information about all ttl channels
+	// Get detailed information about all TTL channels
 	Fgt_get_TtlChannelsInfo(Ttl_info);
 	for (unsigned char loop = 0; loop < ttl_number; loop++)
 	{

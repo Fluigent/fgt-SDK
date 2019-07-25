@@ -1,18 +1,18 @@
 # Fluigent Software Developement Kit - Beta version 19.0.0
 
 # Overview
-Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been declined in several languages, among the most popular ones in the instrumentation field (e.g. LabVIEW, C++, C# .NET, Python…).
+The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been ported to the most popular programming language within the instrumentation field (e.g. LabVIEW, C++, C# .NET, Python…).
 
-This SDK regroups all Fluigent pressure and sensor instruments as well as an advanced regulation loop. 
+This SDK merge all Fluigent pressure controllers and sensor instruments and provide an advanced regulation loop.
+You can still use independent SDK (MFCS, FRP, LineUP) for simple hardware set-ups or for specific software requirements.
 
-You can still use independent SDK (MFCS, FRP, LineUP) for basic hardware set-ups or for specific software requirements. 
-
-Main advantages of using this SDK:
-* all Fluigent instruments (pressure and sensor) are managed by one instance (instead of one instance per intrument type)
-* if hardware is changed in many cases software code does not need to be adapted
-* embedded regulation allow powerful and custom loop feedback between any pressure and sensor
-* custom sensors (other than Fluigent ones) can also be pressure regulated
-* features such as limits, units, calibration and detailed errors allow advanced functionalities
+Main advantages this newest version of our SDK, helps you to:
+* Code faster by providing a single API for all instruments
+* Save memory footprint using a single instance for all devices 
+* Ensure the interchangeability between Fluigent’s instruments
+* Get the best performances with the embedded regulation allows powerful and custom loop feedback between any pressure and sensor
+* Use third party sensors that can be regulated by our pressure controllers
+* Save time including features such as limits, units, calibration and detailed errors allow advanced functionalities
 
 # Supported hardware
 By using Fluigent SDK, you have direct access to following Fluigent devices:
@@ -51,8 +51,10 @@ Each programming language has it's own specificities however SDK Wrapper tries a
 Supported packages:
 
 | Language | Package |
-| --- | --- |
-| C++ | fgt_SDK_Cpp.cpp middleware file.  fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
+| ------- | --- |
+| C++     | fgt_SDK_Cpp.cpp middleware file.  fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
+| C#      | fgt_sdk.cs middleware file.  fgt_sdk_csharp.sln  Visual Studio complete solution containing middleware and examples |
+| LabVIEW | fgt_SDK.lvlib middleware file.  fgt-SDK.lvproj LabVIEW project containing middleware and examples |
 
 # Documentation
 Refer to Fluigent SDK.pdf file for detailed documentation.
@@ -68,3 +70,5 @@ You can use this GitHub repository to find the source code, report issues, and c
 * **Fluigent SDK.pdf** file - Detailed documentation explaining global philosophy, functions and examples.
 * **Shared** folder - Contains dll file and dependencies for 32 and 64 windows operating systems.
 * **C++** folder - Contains C++ console application examples.
+* **C#** folder - Contains C# console application examples.
+* **LabVIEW** folder - Contains LabVIEW examples.

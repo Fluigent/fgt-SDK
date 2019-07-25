@@ -97,10 +97,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_32.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_32.dll"
-copy /Y "$(SolutionDir)frp_c_32.dll" "$(SolutionDir)$(ProjectName)\frp_c_32.dll"
-copy /Y "$(SolutionDir)LineUP_c_32.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_32.dll"
-copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dll"</Command>
+      <Command>copy /Y "$(SolutionDir)*_$(PlatformArchitecture).dll" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,10 +115,7 @@ copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dl
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_64.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_64.dll"
-copy /Y "$(SolutionDir)frp_c_64.dll" "$(SolutionDir)$(ProjectName)\frp_c_64.dll"
-copy /Y "$(SolutionDir)LineUP_c_64.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_64.dll"
-copy /Y "$(SolutionDir)mfcs_c_64.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_64.dll"</Command>
+      <Command>copy /Y "$(SolutionDir)*_$(PlatformArchitecture).dll" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,10 +137,7 @@ copy /Y "$(SolutionDir)mfcs_c_64.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_64.dl
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_32.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_32.dll"
-copy /Y "$(SolutionDir)frp_c_32.dll" "$(SolutionDir)$(ProjectName)\frp_c_32.dll"
-copy /Y "$(SolutionDir)LineUP_c_32.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_32.dll"
-copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dll"</Command>
+      <Command>copy /Y "$(SolutionDir)*_$(PlatformArchitecture).dll" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,10 +159,7 @@ copy /Y "$(SolutionDir)mfcs_c_32.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_32.dl
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)fgt_SDK_64.dll" "$(SolutionDir)$(ProjectName)\fgt_SDK_64.dll"
-copy /Y "$(SolutionDir)frp_c_64.dll" "$(SolutionDir)$(ProjectName)\frp_c_64.dll"
-copy /Y "$(SolutionDir)LineUP_c_64.dll" "$(SolutionDir)$(ProjectName)\LineUP_c_64.dll"
-copy /Y "$(SolutionDir)mfcs_c_64.dll" "$(SolutionDir)$(ProjectName)\mfcs_c_64.dll"</Command>
+      <Command>copy /Y "$(SolutionDir)*_$(PlatformArchitecture).dll" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

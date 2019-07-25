@@ -1,20 +1,69 @@
-// Basic Set Pressure.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+/*============================================================================
+*               Fluigent Software Developement Kit for C++                   
+*----------------------------------------------------------------------------
+*         Copyright (c) Fluigent 2019.  All Rights Reserved.                 
+*----------------------------------------------------------------------------
+*                                                                            
+* Title:   Basic Set Pressure.cpp                                            
+* Purpose: This example shows how to set a pressure order and generate a ramp
+*			on the first pressure module of the chain			  									  
+*			
+* Software: fgt_SDK_*.dll is the dynamic linked library managing all Fluigent 
+*			 instruments (pressure and sensors)
+*			"fgt_SDK_Cpp.h" is the wrapper to fgt_SDK dll	
+* Hardware setup: At least one Fluigent pressure controller (MFCS, MFCS-EZ or Flow EZ)
+* Version: 19.0.0.0                                                          
+* Date:	06/2019															  
+*============================================================================*/
+
 
 #include <iostream>
-#include "../fgt_SDK_Cpp.h"
+#include "../fgt_SDK_Cpp.h"			// include wrapper to fgt_SDK dll, functions can also be accessed by loading the dll
 
 int main()
 {
-	std::string unit = "";
-	Fgt_set_pressure(0, 10000);
+	// Variables declaration
+	float pressure;					// used to read returned pressure value
+	float maxPressure;				// min/max pressure controller range
+	float minPressure;
 
-	Fgt_get_pressureUnit(0, &unit);
-	std::cout << "pressure unit: " << unit << std::endl;
+	Fgt_init();						// Initialize session with all detected Fluigent instrument(s)
+									// This step is optional, if not called session will be automatically created
 
-	Fgt_set_pressureUnit(0, "PSI");
-	Fgt_get_pressureUnit(0, &unit);
-	std::cout << "pressure unit: " << unit << std::endl;
+	// Set pressure to 20 (mbar in default unit) on first pressure channel of the list
+	std::cout << "Set pressure to 20 (mbar is the default unit) on first pressure channel of the list" << std::endl;
+	Fgt_set_pressure(0, 20);
 
-	Fgt_close();
+	// Wait 5 seconds for the pressure to settle
+	std::cout << "Waiting 5 seconds..." << std::endl;
+	Sleep(5000);
+
+	// Read pressure value
+	Fgt_get_pressure(0, &pressure);
+	std::cout << "Read pressure: " << pressure << std::endl;
+
+	// Get pressure controller range
+	Fgt_get_pressureRange(0, &minPressure, &maxPressure);
+
+	// Create a pressure ramp profile from device minimal to maximal pressure range
+	std::cout << "Send a pressure ramp from device minimal to maximal pressure range" << std::endl;
+	for(float loop = minPressure; loop <= maxPressure; loop += (max(maxPressure, abs(minPressure))/10))		// (max(maxPressure, abs(minPressure))/10 increment allows example to run on both positive and vacuum pressure controllers
+	{ 
+		// Set pressure
+		std::cout << "Set pressure: " << loop << std::endl;
+		Fgt_set_pressure(0, loop);
+
+		// Wait 1 second
+		Sleep(1000);
+
+		// Read pressure
+		Fgt_get_pressure(0, &pressure);
+		std::cout << "Read pressure: " << pressure << std::endl;
+	}
+
+	Fgt_set_pressure(0, 0);	// Set pressure to 0 before close
+
+	Fgt_close();								// Close session
+
+	system("PAUSE");
 }

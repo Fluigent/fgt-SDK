@@ -47,7 +47,7 @@ int main()
 	Fgt_initEx(SN);				// Initialize only specific instrument controllers here
 								// If you do not want a controller in the list or if you want a specific order (e.g. LineUP before MFCS instruments)
 								//	rearrange parsed SN table
-	// Function Fgt_initEx can be called again, without need of Fgt_close() before. 
+	// Function Fgt_initEx can be called again, without the need of calling Fgt_close() before. 
 
 	// Get total number of initialized pressure channel(s)
 	Fgt_get_pressureChannelCount(&pressure_number);

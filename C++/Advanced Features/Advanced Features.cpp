@@ -78,7 +78,7 @@ int main()
 	// Calibrate pressure channel
 	Fgt_calibratePressure(pressure_index);
 	std::cout << "Calibrating pressure channel... trying to send pressure order in same time" << std::endl;
-	Fgt_set_pressure(pressure_index, maxPressure/2);			// An error is thrown, during calibration step pressure orders are not excepted
+	Fgt_set_pressure(pressure_index, maxPressure/2);			// An error is thrown, set pressure orders are not accepted during calibration
 	std::cout << std::endl;
 
 	// Read sensor calibration table
@@ -88,10 +88,11 @@ int main()
 	// Change sensor calibration
 	Fgt_set_sensorCalibration(sensor_index, fgt_SENSOR_CALIBRATION::H2O);	// Note that if calibration is not supported, an error is thrown
 	std::cout << "Setting sensor calibration..." << std::endl;
-	Sleep(1000);										// As for pressure calibration, this step needs few moments before read values are correct. Same error is thrown.
+	Sleep(1000);										// As for pressure calibration, this step needs a few moments before the read values are correct. The same error is thrown.
 	returnCode = Fgt_get_sensorCalibration(sensor_index, &sensor_calibration);	// Note that each function returns a number, it can be managed locally or globally by "Fgt_Manage_Sensor_Status" function of fgt_SDK_Cpp.cpp file
 	std::cout << "Read sensor calibration: " << sensor_calibration << " ,error code: " << returnCode << std::endl;
 
+	Fgt_set_pressure(pressure_index, 0);						// Set pressure to 0 before close
 	Fgt_close();								// Close session
 
 	system("PAUSE");

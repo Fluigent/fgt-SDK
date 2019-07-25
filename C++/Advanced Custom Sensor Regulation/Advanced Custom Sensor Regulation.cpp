@@ -6,18 +6,18 @@
 *
 * Title:   Advanced Custom Sensor Regulation.cpp
 * Purpose: This example shows how to use a custom sensor, different from
-*			Fluigent ones and regulate pressure in order to reach setpoint.
-*			Different sensor type and range can be used (e.g. liquid pressure,
-*			water level, l/min flow meter...) however we do not guarantee 
+*			Fluigent ones and regulate pressure in order to reach the setpoint.
+*			Different sensor types and ranges can be used (e.g. liquid pressure,
+*			water level, l/min flow meter...), however, we do not guarantee 
 *			full compatibility with all sensors.
-*			For this demonstration a Fluigent flow-unit is used for more simplicity.
+*			For this demonstration, a Fluigent Flow Unit is used for more simplicity.
 *
 * Software: fgt_SDK_*.dll is the dynamic linked library managing all Fluigent
 *			 instruments (pressure and sensors)
 *			"fgt_SDK_Cpp.h" is the wrapper to fgt_SDK dll
-* Hardware setup: At least one Fluigent pressure controller (MFCS, MFCS-EZ or FlowEZ)
-*					and at least one Fluigent sensor (flow-unit connected to
-*					FRP or FlowEZ
+* Hardware setup: At least one Fluigent pressure controller (MFCS, MFCS-EZ or Flow EZ)
+*					and at least one Fluigent sensor (Flow Unit connected to
+*					FRP or Flow EZ
 * Version: 19.0.0.0
 * Date:	06/2019
 *============================================================================*/
@@ -31,14 +31,14 @@ int main()
 {
 	// Variables declaration
 	float sensorRead;				// used to read returned sensor value
-	float maxSensor;				// min/max pressure controller range
+	float maxSensor;				// min/max custom sensor range
 	float minSensor;
 
 	Fgt_init();						// Initialize session with all detected Fluigent instrument(s)
 									// This step is optional, if not called session will be automatically created
 
 	// Get sensor range
-	Fgt_get_sensorRange(0, &minSensor, &maxSensor);		// When using a custom sensor, it's range has to be known.
+	Fgt_get_sensorRange(0, &minSensor, &maxSensor);		// When using a custom sensor, its range has to be known.
 																	// Replace this function with your custom sensor interface
 	// Loop for 10 seconds waiting 100ms between each sensor update
 	for(unsigned int loop = 0; loop < 100; loop++)
