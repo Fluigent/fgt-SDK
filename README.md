@@ -55,6 +55,8 @@ Supported packages:
 | C++     | fgt_SDK_Cpp.cpp middleware file.  fgt_SDK_Cpp.sln Visual Studio complete solution containing middleware and examples |
 | C#      | fgt_sdk.cs middleware file.  fgt_sdk_csharp.sln  Visual Studio complete solution containing middleware and examples |
 | LabVIEW | fgt_SDK.lvlib middleware file.  fgt-SDK.lvproj LabVIEW project containing middleware and examples |
+| Python  | Fluigent.SDK package and pip installer containing middleware and examples |
+| MATLAB  | Toolbox installer package containing middleware and examples |
 
 # Documentation
 Refer to Fluigent SDK.pdf file for detailed documentation.
@@ -72,3 +74,5 @@ You can use this GitHub repository to find the source code, report issues, and c
 * **C++** folder - Contains C++ console application examples.
 * **C#** folder - Contains C# console application examples.
 * **LabVIEW** folder - Contains LabVIEW examples.
+* **Python** folder - Contains python console application examples.
+* **MATLAB** folder - Contains MATLAB application examples.
