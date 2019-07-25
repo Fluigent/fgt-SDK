@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding="utf-8"?>
+
+<toc version="2.0">
+<!-- First tocitem specifies top level in Help browser Contents pane -->
+<!-- This can be a roadmap page, as shown below, or a content page -->
+    <tocitem target="FluigentSDK.html">Fluigent SDK Toolbox
+        <!-- Nest tocitems to create hierarchical entries in  Contents-->
+        <!-- To include icons, use the following syntax for tocitems: -->
+        <!-- <tocitem target="foo.html" image="HelpIcon.NAME"> -->
+        <!-- Title-of-Section </tocitem> -->
+        <!-- where NAME is one of the following (use capital letters): -->
+        <!-- FUNCTION, USER_GUIDE, EXAMPLES, BLOCK, GETTING_STARTED, -->
+        <!-- DEMOS, RELEASE_NOTES --> 
+        <!-- Icon images used for these entries are also stored in -->
+        <!-- matlabroot/toolbox/matlab/icons -->
+        <!-- A Getting Started Guide usually comes first -->
+        <tocitem target="GettingStarted.html" image="HelpIcon.GETTING_STARTED">
+            Getting Started with the Fluigent SDK Toolbox
+        </tocitem>
+        <!-- Function reference next -->
+        <!-- First item is page describing function categories, if any -->
+        <!--<tocitem target="Classes.html" 
+                 image="HelpIcon.FUNCTION">Class Reference
+        </tocitem>-->
+        <!-- Optional List of Examples, with hyperlinks to examples in other files -->
+        <tocitem target="Examples.html" 
+                 image="HelpIcon.HelpIcon.EXAMPLES">Examples
+        </tocitem>
+        <!-- Optional link or links to your or other Web sites -->
+        <tocitem target="http://www.fluigent.com" 
+                 image="$toolbox/matlab/icons/webicon.gif">
+        Fluigent Website
+        </tocitem>
+    </tocitem>
+</toc>

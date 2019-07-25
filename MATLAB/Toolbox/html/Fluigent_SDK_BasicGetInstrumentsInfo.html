@@ -1,0 +1,190 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Basic Get Instruments Info</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-07-23"><meta name="DC.source" content="Fluigent_SDK_BasicGetInstrumentsInfo.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Basic Get Instruments Info</h1><!--introduction--><p>This example shows how to retrieve information about Fluigent instruments: type, controller, serial number, unique ID...</p><p>Requires at least one Fluigent pressure or sensor module</p><p><a href="matlab:edit('Fluigent_SDK_BasicGetInstrumentsInfo')">Open this M File</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Get serial numbers and types of detected Fluigent controllers</a></li><li><a href="#2">Initialize specific instruments</a></li><li><a href="#3">Get the number of channels of each type</a></li><li><a href="#4">Get detailed information about all controllers</a></li><li><a href="#5">Get detailed information about all pressure channels</a></li><li><a href="#6">Get detailed information about all sensor channels</a></li><li><a href="#7">Get detailed information about all TTL channels</a></li><li><a href="#8">Close the session</a></li></ul></div><h2>Get serial numbers and types of detected Fluigent controllers<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Detect all controllers</span>
+[SNs, types] = fgt_detect;
+controllerCount = numel(SNs);
+fprintf(<span class="string">'Number of controllers detected: %d\n'</span>, controllerCount);
+
+<span class="comment">% List all found controllers' serial number and type</span>
+<span class="keyword">for</span> i=1:numel(SNs)
+    fprintf(<span class="string">'Detected instrument at index: %d, ControllerSN: %d, type: %s\n'</span>,<span class="keyword">...</span>
+        i-1, SNs(i), char(types(i)));
+<span class="keyword">end</span>
+</pre><h2>Initialize specific instruments<a name="2"></a></h2><pre>Initialize only specific instrument controllers here If you do not want
+a controller in the list or if you want a specific order (e.g. LineUP
+before MFCS instruments), rearrange parsed SN table</pre><pre class="codeinput">fgt_init(SNs)
+</pre><h2>Get the number of channels of each type<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Get total number of initialized pressure channels</span>
+fprintf(<span class="string">'Total number of pressure channels: %d\n'</span>, fgt_get_pressureChannelCount);
+
+<span class="comment">% Get total number of initialized pressure channels</span>
+fprintf(<span class="string">'Total number of sensor channels: %d\n'</span>, fgt_get_sensorChannelCount);
+
+<span class="comment">% Get total number of initialized TTL channels</span>
+fprintf(<span class="string">'Total number of TTL channels: %d\n'</span>, fgt_get_TtlChannelCount);
+</pre><h2>Get detailed information about all controllers<a name="4"></a></h2><pre class="codeinput">controllerInfoArray = fgt_get_controllersInfo;
+<span class="keyword">for</span> i=1:numel(controllerInfoArray)
+    fprintf(<span class="string">'Controller info at index: %d\n'</span>, i-1);
+    disp(controllerInfoArray(i));
+<span class="keyword">end</span>
+</pre><h2>Get detailed information about all pressure channels<a name="5"></a></h2><pre class="codeinput">pressureInfoArray = fgt_get_pressureChannelsInfo;
+<span class="keyword">for</span> i=1:numel(pressureInfoArray)
+    fprintf(<span class="string">'Pressure channel info at index: %d\n'</span>, i-1);
+    disp(pressureInfoArray(i));
+<span class="keyword">end</span>
+</pre><h2>Get detailed information about all sensor channels<a name="6"></a></h2><pre class="codeinput">sensorInfoArray = fgt_get_sensorChannelsInfo;
+<span class="keyword">for</span> i=1:numel(sensorInfoArray)
+    fprintf(<span class="string">'Sensor channel info at index: %d\n'</span>, i-1);
+    disp(sensorInfoArray(i));
+<span class="keyword">end</span>
+</pre><h2>Get detailed information about all TTL channels<a name="7"></a></h2><pre class="codeinput">ttlInfoArray = fgt_get_TtlChannelsInfo;
+<span class="keyword">for</span> i=1:numel(ttlInfoArray)
+    fprintf(<span class="string">'TTL channel info at index: %d\n'</span>, i-1);
+    disp(ttlInfoArray(i));
+<span class="keyword">end</span>
+</pre><h2>Close the session<a name="8"></a></h2><pre class="codeinput">fgt_close
+</pre><p>Copyright (c) Fluigent 2019.  All Rights Reserved.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Basic Get Instruments Info
+% This example shows how to retrieve information about Fluigent 
+% instruments: type, controller, serial number, unique ID...
+% 			
+% Requires at least one Fluigent pressure or sensor module
+%
+% <matlab:edit('Fluigent_SDK_BasicGetInstrumentsInfo') Open this M File>
+
+%% Get serial numbers and types of detected Fluigent controllers
+
+% Detect all controllers
+[SNs, types] = fgt_detect;
+controllerCount = numel(SNs);
+fprintf('Number of controllers detected: %d\n', controllerCount);
+
+% List all found controllers' serial number and type
+for i=1:numel(SNs)
+    fprintf('Detected instrument at index: %d, ControllerSN: %d, type: %s\n',...
+        i-1, SNs(i), char(types(i)));
+end
+
+%% Initialize specific instruments
+%  Initialize only specific instrument controllers here If you do not want
+%  a controller in the list or if you want a specific order (e.g. LineUP
+%  before MFCS instruments), rearrange parsed SN table
+fgt_init(SNs)
+
+%% Get the number of channels of each type
+
+% Get total number of initialized pressure channels
+fprintf('Total number of pressure channels: %d\n', fgt_get_pressureChannelCount);
+
+% Get total number of initialized pressure channels
+fprintf('Total number of sensor channels: %d\n', fgt_get_sensorChannelCount);
+
+% Get total number of initialized TTL channels
+fprintf('Total number of TTL channels: %d\n', fgt_get_TtlChannelCount);
+    
+%% Get detailed information about all controllers
+
+controllerInfoArray = fgt_get_controllersInfo;
+for i=1:numel(controllerInfoArray)
+    fprintf('Controller info at index: %d\n', i-1);
+    disp(controllerInfoArray(i));
+end
+
+%% Get detailed information about all pressure channels
+
+pressureInfoArray = fgt_get_pressureChannelsInfo;
+for i=1:numel(pressureInfoArray)
+    fprintf('Pressure channel info at index: %d\n', i-1);
+    disp(pressureInfoArray(i));
+end
+
+%% Get detailed information about all sensor channels
+
+sensorInfoArray = fgt_get_sensorChannelsInfo;
+for i=1:numel(sensorInfoArray)
+    fprintf('Sensor channel info at index: %d\n', i-1);
+    disp(sensorInfoArray(i));
+end
+
+%% Get detailed information about all TTL channels
+
+ttlInfoArray = fgt_get_TtlChannelsInfo;
+for i=1:numel(ttlInfoArray)
+    fprintf('TTL channel info at index: %d\n', i-1);
+    disp(ttlInfoArray(i));
+end
+
+%% Close the session
+fgt_close
+
+%%
+% Copyright (c) Fluigent 2019.  All Rights Reserved.
+
+##### SOURCE END #####
+--></body></html>
