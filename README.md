@@ -1,4 +1,4 @@
-# Fluigent Software Developement Kit - Beta version 19.0.0
+# Fluigent Software Developement Kit - version 19.0.0
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been ported to the most popular programming language within the instrumentation field (e.g. LabVIEW, C++, C# .NET, Python…).
