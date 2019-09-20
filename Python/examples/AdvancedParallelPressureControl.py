@@ -20,6 +20,7 @@ from threading import Thread
 
 from Fluigent.SDK import fgt_init, fgt_close
 from Fluigent.SDK import fgt_set_pressure, fgt_get_pressureRange
+from Fluigent.SDK import fgt_get_pressureChannelCount
 
 cancellationToken = False
 
@@ -53,5 +54,8 @@ finally:
     cancellationToken = True;
     thread1.join();
     thread2.join();
+    # Reset pressure on all channels
+    for pressure_index in range(fgt_get_pressureChannelCount()):
+        fgt_set_pressure(pressure_index, 0)
     ## Close the session
     fgt_close()
