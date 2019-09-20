@@ -17,8 +17,8 @@
 			<Item Name="Advanced Parallel Pressure Control.vi" Type="VI" URL="../Examples/Advanced Parallel Pressure Control.vi"/>
 			<Item Name="Advanced Specific Multiple Instruments.vi" Type="VI" URL="../Examples/Advanced Specific Multiple Instruments.vi"/>
 			<Item Name="Basic Get Instruments Info.vi" Type="VI" URL="../Examples/Basic Get Instruments Info.vi"/>
+			<Item Name="Basic Sensor Regulation.vi" Type="VI" URL="../Examples/Basic Sensor Regulation.vi"/>
 			<Item Name="Basic Set Pressure.vi" Type="VI" URL="../Examples/Basic Set Pressure.vi"/>
-			<Item Name="Basic Set Regulation.vi" Type="VI" URL="../Examples/Basic Set Regulation.vi"/>
 		</Item>
 		<Item Name="fgt_SDK.lvlib" Type="Library" URL="../fgt_SDK.lvlib"/>
 		<Item Name="Dependencies" Type="Dependencies">

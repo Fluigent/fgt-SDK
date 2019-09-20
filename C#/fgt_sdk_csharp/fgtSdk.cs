@@ -500,14 +500,11 @@ namespace fgt_sdk
         /// <param name="errorCode">Error code returned by a low level call</param>
         /// <param name="type">Type of check to perform</param>
         /// <param name="index">Pressure or sensor index the low level function used</param>
+        /// <param name="memberName"></param>
         /// <returns>The error code <see cref="fgt_ERROR_CODE"/> that was returned by the low level function</returns>
-        private static fgt_ERROR_CODE ErrCheck(fgt_ERROR_CODE errorCode, fgt_ERRCHECK_TYPE type, uint index = 0)
+        private static fgt_ERROR_CODE ErrCheck(fgt_ERROR_CODE errorCode, fgt_ERRCHECK_TYPE type, uint index = 0, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
         {
             if (errorCode == fgt_ERROR_CODE.OK) return errorCode;
-
-            var st = new StackTrace();
-            var sf = st.GetFrame(1);
-            var callerName = sf.GetMethod().Name;
 
             fgt_ERROR_CODE localErrorCode;
             fgt_INSTRUMENT_TYPE instrumentType;
@@ -518,15 +515,15 @@ namespace fgt_sdk
             switch (type)
             {
                 case fgt_ERRCHECK_TYPE.Generic:
-                    Console.WriteLine($"{callerName} method returned {errorCode} error");
+                    Console.WriteLine($"{memberName} method returned {errorCode} error");
                     break;
                 case fgt_ERRCHECK_TYPE.Pressure:
                     (localErrorCode, instrumentType, controllerSerialNumber, locallyControlled, details) = Fgt_get_pressureStatus(index);
-                    Console.WriteLine($"{callerName} method called on pressure channel {index} of type {instrumentType} returned an error {localErrorCode}. Details: {details}, Controller S/N: {controllerSerialNumber} was {(locallyControlled ? "locally" : "remotely")} controlled");
+                    Console.WriteLine($"{memberName} method called on pressure channel {index} of type {instrumentType} returned an error {localErrorCode}. Details: {details}, Controller S/N: {controllerSerialNumber} was {(locallyControlled ? "locally" : "remotely")} controlled");
                     break;
                 case fgt_ERRCHECK_TYPE.Sensor:
                     (localErrorCode, instrumentType, controllerSerialNumber, locallyControlled, details) = Fgt_get_sensorStatus(index);
-                    Console.WriteLine($"{callerName} method called on pressure channel {index} of type {instrumentType} returned an error {localErrorCode}. Details: {details}, Controller S/N: {controllerSerialNumber} was {(locallyControlled ? "locally" : "remotely")} controlled");
+                    Console.WriteLine($"{memberName} method called on pressure channel {index} of type {instrumentType} returned an error {localErrorCode}. Details: {details}, Controller S/N: {controllerSerialNumber} was {(locallyControlled ? "locally" : "remotely")} controlled");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

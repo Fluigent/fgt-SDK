@@ -22,6 +22,7 @@ import time
 from Fluigent.SDK import fgt_init, fgt_close
 from Fluigent.SDK import fgt_get_sensorRange, fgt_get_sensorValue
 from Fluigent.SDK import fgt_set_customSensorRegulation
+from Fluigent.SDK import fgt_set_pressure
 
 ## Initialize the session
 # This step is optional, if not called session will be automatically
@@ -51,6 +52,8 @@ for i in range(100):
     # should be 1 seconds or less, otherwise pressure regulation is
     # stopped
     time.sleep(0.1)
+    
+fgt_set_pressure(0, 0)
 
 ## Close the session
 fgt_close()

@@ -34,13 +34,14 @@
             TTL setting mode
             </summary>
         </member>
-        <member name="M:fgt_sdk.fgtSdk.ErrCheck(fgt_sdk.Enums.fgt_ERROR_CODE,fgt_sdk.Enums.fgt_ERRCHECK_TYPE,System.UInt32)">
+        <member name="M:fgt_sdk.fgtSdk.ErrCheck(fgt_sdk.Enums.fgt_ERROR_CODE,fgt_sdk.Enums.fgt_ERRCHECK_TYPE,System.UInt32,System.String)">
             <summary>
             This method logs to the console detailed information in case an error code has been returned by a low level function
             </summary>
             <param name="errorCode">Error code returned by a low level call</param>
             <param name="type">Type of check to perform</param>
             <param name="index">Pressure or sensor index the low level function used</param>
+            <param name="memberName"></param>
             <returns>The error code <see cref="T:fgt_sdk.Enums.fgt_ERROR_CODE"/> that was returned by the low level function</returns>
         </member>
         <member name="M:fgt_sdk.fgtSdk.Fgt_init">
