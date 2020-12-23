@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Advanced Specific Multiple 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Sensor Regulation", "Basic Sensor Regulation\Basic Sensor Regulation.vcxproj", "{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic Read Sensor Data", "Basic Read Sensor Data\Basic Read Sensor Data.vcxproj", "{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -81,6 +83,14 @@ Global
 		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x64.Build.0 = Release|x64
 		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x86.ActiveCfg = Release|Win32
 		{FF001F6A-7C02-4870-AE09-9CCEFDE60F41}.Release|x86.Build.0 = Release|Win32
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Debug|x64.ActiveCfg = Debug|x64
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Debug|x64.Build.0 = Debug|x64
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Debug|x86.ActiveCfg = Debug|Win32
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Debug|x86.Build.0 = Debug|Win32
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Release|x64.ActiveCfg = Release|x64
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Release|x64.Build.0 = Release|x64
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Release|x86.ActiveCfg = Release|Win32
+		{9273ACE1-10DD-4521-9CE8-60EDF2C15CEC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

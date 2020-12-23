@@ -9,6 +9,7 @@
         MFCS,
         MFCS_EZ,
         FRP,
-        LineUP
+        LineUP,
+        IPS
     }
 }

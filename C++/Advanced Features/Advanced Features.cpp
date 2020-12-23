@@ -86,6 +86,7 @@ int main()
 	std::cout << "Read sensor calibration: " << sensor_calibration << std::endl;
 
 	// Change sensor calibration
+	// WARNING: For IPS use only when current pressure is 0 mbar. This function will set current pressure as a reference point. Enum parameter fgt_SENSOR_CALIBRATION is irrelevant for IPS
 	Fgt_set_sensorCalibration(sensor_index, fgt_SENSOR_CALIBRATION::H2O);	// Note that if calibration is not supported, an error is thrown
 	std::cout << "Setting sensor calibration..." << std::endl;
 	Sleep(1000);										// As for pressure calibration, this step needs a few moments before the read values are correct. The same error is thrown.

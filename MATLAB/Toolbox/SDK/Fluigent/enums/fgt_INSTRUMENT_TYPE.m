@@ -6,7 +6,8 @@ classdef fgt_INSTRUMENT_TYPE < uint8
         MFCS (1),
         MFCS_EZ (2),
         FRP (3),
-        LineUP (4)
+        LineUP (4),
+        IPS (5)
     end
     
     properties

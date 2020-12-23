@@ -3,7 +3,8 @@ function [ nbQChan ] = fgt_get_sensorChannelCount( )
 % 
 % nbPChan = fgt_get_pressureChannelCount returns the total number of
 % pressure channels.
-% It is the sum of all connected Flow Units on Flowboard and Flow EZ
+% It is the sum of all connected Flow Units on Flowboard and Flow EZ,
+% and IPS modules.
 %
 % See also:
 %     fgt_get_sensorChannelsInfo

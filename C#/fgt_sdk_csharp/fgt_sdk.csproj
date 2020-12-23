@@ -5,11 +5,11 @@
     <Authors>Fluigent</Authors>
     <Product>Fluigent Software Development Kit</Product>
     <Description>Software Development Kit for Fluigent pressure controllers and sensors.</Description>
-    <Version>19.0.0.6</Version>
+    <Version>20.0.0.0</Version>
     <PackageTags>Microfluidics, Control</PackageTags>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>19.0.0.6</AssemblyVersion>
+    <AssemblyVersion>20.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -41,6 +41,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\StaticFiles\fgt_sdk_dlls\mfcs_c_64.dll" Link="fgt_sdk_dlls\mfcs_c_64.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+	    <None Include="..\StaticFiles\fgt_sdk_dlls\ips_c_64.dll" Link="fgt_sdk_dlls\ips_c_64.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+	    <None Include="..\StaticFiles\fgt_sdk_dlls\ips_c_32.dll" Link="fgt_sdk_dlls\ips_c_32.dll" Pack="true" PackagePath="build\fgt_sdk_dlls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
 	<None Include="fgt_sdk.targets" Pack="true" PackagePath="build\">
