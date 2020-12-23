@@ -1,4 +1,4 @@
-# Fluigent Software Developement Kit - version 19.0.0
+# Fluigent Software Developement Kit - version 20.0.0
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application; it has been ported to the most popular programming language within the instrumentation field (e.g. LabVIEW, C++, C# .NET, Python…).
@@ -19,6 +19,7 @@ By using Fluigent SDK, you have direct access to following Fluigent devices:
 * MFCS Series: MFCS, MFCS-EZ, MFCS-EX and PX pressure controllers
 * LineUP Series: Link, Flow EZ pressure controller, flow-units XS, S, M, L and XL connected to Flow EZ
 * Flowboard: XS, S, M, L and XL flow-units
+* Inline Pressure Sensor (IPS)
 
 # Software layers
 
@@ -36,6 +37,8 @@ Additionally, as Fluigent SDK interacts with Fluigent devices following dependen
 * frp_c_64.dll
 * LineUP_c_32.dll
 * LineUP_c_64.dll
+* ips_c_32.dll
+* ips_c_64.dll
 
 ## Dll wrappers
 

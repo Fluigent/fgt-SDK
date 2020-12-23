@@ -108,10 +108,11 @@ fgt_TTL_MODE = make_enum("fgt_TTL_MODE",
 fgt_SENSOR_TYPE = make_enum("fgt_SENSOR_TYPE",
                        "NONE", "Flow_XS_single", "Flow_S_single", 
                        "Flow_S_dual", "Flow_M_single", "Flow_M_dual", 
-                       "Flow_L_single", "Flow_L_dual", "Flow_XL_single")
+                       "Flow_L_single", "Flow_L_dual", "Flow_XL_single",
+                       "Pressure")
  
 fgt_INSTRUMENT_TYPE = make_enum("fgt_INSTRUMENT_TYPE",
-                           "NONE","MFCS","MFCS_EZ","FRP","LineUP")
+                           "NONE","MFCS","MFCS_EZ","FRP","LineUP", "IPS")
 
 fgt_SENSOR_CALIBRATION = make_enum("fgt_SENSOR_CALIBRATION",
                                       "NONE", "H2O", "IPA", "HFE", "FC40", 
@@ -299,7 +300,7 @@ def fgt_set_sensorUnit(sensor_index, unit):
     return c_error.value,
 
 def fgt_get_sensorUnit(sensor_index):
-    """Returns the flow rate unit being used for the specified channel"""
+    """Returns the measurement unit being used for the specified channel"""
     unit_array = (c_char * 140)()
     c_error = c_ubyte(lib.fgt_get_sensorUnit(c_uint(sensor_index), unit_array))
     try:
@@ -374,7 +375,7 @@ def fgt_get_sensorValue(sensor_index):
 
 def fgt_get_sensorValueEx(sensor_index):
     """Returns the measurement on the specified sensor, as well as the
-    timestamp"""
+    timestamp. The IPS always returns 0 for the timestamp."""
     sensorValue = c_float(0)
     timestamp = c_ushort(0)
     c_error = c_ubyte(lib.fgt_get_sensorValueEx(c_uint(sensor_index),

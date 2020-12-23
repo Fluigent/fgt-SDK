@@ -13,6 +13,7 @@
         Flow_M_dual,
         Flow_L_single,
         Flow_L_dual,
-        Flow_XL_single
+        Flow_XL_single,
+        Pressure
     }
 }

@@ -13,7 +13,7 @@ function [] = manage_sensor_status( function_name, sensor_index )
 % generate errors (which will stop execution of the program if not
 % handled).
 
-instr_types = {'None', 'MFCS', 'MFCS-EZ', 'FRP', 'LineUP'};
+instr_types = {'None', 'MFCS', 'MFCS-EZ', 'FRP', 'LineUP', 'IPS'};
 
 [error_code, type, instrSN, infoCode, detail] = LowLevel.fgt_get_sensorStatus(sensor_index);
 

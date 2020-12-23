@@ -1,13 +1,13 @@
 /*============================================================================
-*                   Fluigent Software Developement Kit                       
+*                   Fluigent Software Developement Kit
 *----------------------------------------------------------------------------
-*         Copyright (c) Fluigent 2019.  All Rights Reserved.                 
+*         Copyright (c) Fluigent 2020.  All Rights Reserved.
 *----------------------------------------------------------------------------
-*                                                                            
-* Title:   fgt_SDK.h                                                         
-* Purpose: Functions API for Fluigent instruments                            
-* Version: 19.0.0.0                                                          
-* Date:	06/2019															  
+*
+* Title:   fgt_SDK.h
+* Purpose: Functions API for Fluigent instruments
+* Version: 20.0.0.0
+* Date:	12/2020
 *============================================================================*/
 
 #ifndef _FGT_SDK_H
@@ -44,10 +44,10 @@ extern "C"
 	};
 
 	/** @Description Instrument controller type */
-	enum class fgt_INSTRUMENT_TYPE { None, MFCS, MFCS_EZ, FRP, LineUP };
+	enum class fgt_INSTRUMENT_TYPE { None, MFCS, MFCS_EZ, FRP, LineUP, IPS };
 
 	/** @Description Sensor type */
-	enum class fgt_SENSOR_TYPE { None, Flow_XS_single, Flow_S_single, Flow_S_dual, Flow_M_single, Flow_M_dual, Flow_L_single, Flow_L_dual, Flow_XL_single };
+	enum class fgt_SENSOR_TYPE { None, Flow_XS_single, Flow_S_single, Flow_S_dual, Flow_M_single, Flow_M_dual, Flow_L_single, Flow_L_dual, Flow_XL_single, Pressure };
 
 	/** @Description Sensor calibration table */
 	enum class fgt_SENSOR_CALIBRATION { None, H2O, IPA, HFE, FC40, OIL };
@@ -62,7 +62,7 @@ extern "C"
 	struct fgt_CHANNEL_INFO
 	{
 		/** Serial number of this channel's controller */
-		unsigned short ControllerSN; 
+		unsigned short ControllerSN;
 		/** Firmware version of this channel (0 if not applicable) */
 		unsigned short firmware;
 		/** Serial number of this channel (0 if not applicable) */
@@ -95,7 +95,7 @@ extern "C"
 	/*============================================================================*/
 
 	/**
-	 * @Description Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP) are initialized.
+	 * @Description Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP, IPS) are initialized.
 	 * This function is optional, directly calling a function will automatically creates the instance.
 	 * Only one instance can be opened at once. If called again, session is reinitialized.
 	 * @param void
@@ -135,7 +135,7 @@ extern "C"
 	/*============================================================================*/
 
 	/**
-	 * @Description Retrieve information about session controllers. Controllers are MFCS, Flowboard, Link in an array.
+	 * @Description Retrieve information about session controllers. Controllers are MFCS, Flowboard, Link, IPS in an array.
 	 * @out [info] Array of structure of fgt_CONTROLLER_INFO
 	 * @return fgt_ERROR_CODE
 	 */
@@ -150,7 +150,7 @@ extern "C"
 	unsigned char __stdcall fgt_get_pressureChannelCount(unsigned char* nbPChan);
 
 	/**
-	 * @Description Get total number of initialized sensor channels. It is the sum of all connected flow-units on Flowboard and FlowEZ
+	 * @Description Get total number of initialized sensor channels. It is the sum of all connected flow-units on Flowboard and FlowEZ, and IPS sensors.
 	 * @param *nbQChan Total number of initialized sensor channels
 	 * @return fgt_ERROR_CODE
 	 * @see fgt_get_sensorChannelsInfo array size is equal to nbSChan
@@ -176,9 +176,9 @@ extern "C"
 
 	/**
 	 * @Description: Retrieve information about each initialized sensor channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
-	 * By default this array is built with FRP first then FlowEZ and contains flow-units. If only one instrument is used, index is the default channel indexing starting at 0.
+	 * By default this array is built with FRP Flow Units first, followed by Flow EZ Flow Units, followed by IPS modules. If only one instrument is used, index is the default channel indexing starting at 0.
 	 * You can initialize instruments in specific order using fgt_initEx function
-	 * @param info Array of structure of fgt_CHANNEL_INFO 
+	 * @param info Array of structure of fgt_CHANNEL_INFO
 	 * @param sensorType Array of fgt_SENSOR_TYPE
 	 * @return fgt_ERROR_CODE
 	 */
@@ -187,7 +187,7 @@ extern "C"
 	/**
 	 * @Description: Retrieve information about each initialized TTL channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
 	 * TTL channels are only available for LineUP Series, 2 ports for each connected Link
-	 * @param info Array of structure of fgt_CHANNEL_INFO 
+	 * @param info Array of structure of fgt_CHANNEL_INFO
 	 * @return fgt_ERROR_CODE
 	 */
 	unsigned char __stdcall fgt_get_TtlChannelsInfo(fgt_CHANNEL_INFO info[256]);
@@ -229,7 +229,7 @@ extern "C"
 	unsigned char __stdcall fgt_get_pressureEx(unsigned int pressureIndex, float* pressure, unsigned short* timeStamp);
 
 	/**
-	 * @Description Start closed loop regulation between a sensor and a pressure controller. Pressure will be regulated in order to reach sensor setpoint.
+	 * @Description Start closed loop regulation between a flowrate sensor and a pressure controller. Pressure will be regulated in order to reach sensor setpoint.
 	 * Call again this function in order to change the setpoint. Calling fgt_set_pressure on same pressureIndex will stop regulation.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param pressureIndex Index of pressure channel or unique ID
@@ -244,14 +244,14 @@ extern "C"
 	/**
 	 * @Description Read sensor value of selected device
 	 * @param sensorIndex Index of sensor channel or unique ID
-	 * @out value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
+	 * @out value Read sensor value in selected unit, default is "µl/min" for flowrate sensors and 'mbar' for pressure sensors
 	 * @return fgt_ERROR_CODE
 	 * @see fgt_get_sensorStatus
 	 */
 	unsigned char __stdcall fgt_get_sensorValue(unsigned int sensorIndex, float* value);
 
 	/**
-	 * @Description Read sensor value and timestamp of selected device. Time stamp is the device internal timer.
+	 * @Description Read flowrate sensor value and timestamp of selected device. Time stamp is the device internal timer.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @out value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
 	 * @out timeStamp Hardware timer in ms
@@ -295,7 +295,7 @@ extern "C"
 	unsigned char __stdcall fgt_get_pressureUnit(unsigned int pressureIndex, char unit[140]);
 
 	/**
-	 * @Description Set sensor unit on selected sensor device, default value is "µl/min" for flowunits. If type is invalid an error is returned.
+	 * @Description Set sensor unit on selected sensor device, default value is "µl/min" for flowrate sensors and "mbar" for pressure sensors. If type is invalid an error is returned.
 	 * Every sensor read value and regulation command will then use this unit.
 	 * Example: "µl/h", "ulperDay", "microliter/hour" ...
 	 * @param sensorIndex Index of sensor channel or unique ID
@@ -306,7 +306,7 @@ extern "C"
 	unsigned char __stdcall fgt_set_sensorUnit(unsigned int sensorIndex, char unit[140]);
 
 	/**
-	 * @Description Get current unit on selected sensor device, default value is "µl/min" for flowunits.
+	 * @Description Get current unit on selected sensor device, default value is "µl/min" for flowunits and 'mbar' for pressure sensors.
 	 * Every sensor read value and regulation command use this unit.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @out unit[] Array of char containing a unit string
@@ -315,7 +315,7 @@ extern "C"
 	unsigned char __stdcall fgt_get_sensorUnit(unsigned int sensorIndex, char unit[140]);
 
 	/**
-	 * @Description Set used sensor internal calibration table. Function is only available for specific sensors (dual type) such as the flow-unit M accepting H2O and IPA
+	 * @Description Set sensor internal calibration table. Function is only available for IPS (to set new reference value "zero") and specific flowrate sensors (dual type) such as the flow-unit M accepting H2O and IPA
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param calibration fgt_SENSOR_CALIBRATION
 	 * @return fgt_ERROR_CODE
@@ -323,7 +323,7 @@ extern "C"
 	unsigned char __stdcall fgt_set_sensorCalibration(unsigned int sensorIndex, int calibration);
 
 	/**
-	 * @Description Get sensor's current calibration table.
+	 * @Description Get sensor's current calibration table. Not supported by IPS.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @out *calibration fgt_SENSOR_CALIBRATION
 	 * @return fgt_ERROR_CODE
@@ -334,7 +334,7 @@ extern "C"
 	 * @Description Apply a custom scale factor on sensor read value. This function is useful in order to adapt read sensor value to physical measurement.
 	 * For example if a flow-unit is used with a special oil and it's calibration table is set to H2O, read flowrate is not correct.
 	 * Scale factor is applied using following formula: scaled_value = a*sensor_value + b*sensor_value^2 + c*sensor_value^3
-	 * Note that this scale is also used for the regulation.
+	 * Note that this scale is also used for the regulation. Not supported by IPS.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param float a proportional multiplier value
 	 * @param float b square multiplier value
@@ -345,11 +345,11 @@ extern "C"
 	unsigned char __stdcall fgt_set_sensorCustomScale(unsigned int sensorIndex, float a, float b, float c);
 
 	/**
-	 * @Description Apply a custom scale factor on sensor measurement. This function is useful in order to adapt read sensor value to physical measurement.
+	 * @Description Apply a custom scale factor on flowrate sensor measurement. This function is useful in order to adapt read sensor value to physical measurement.
 	 * For example if a flow-unit is used with a special oil and it's calibration table is set to H2O, read flowrate is not correct.
 	 * Scale factor is applied using following formula: scaled_value = a*sensor_value + b*sensor_value^2 + c*sensor_value^3
 	 * When applying a custom scale factor, sensor range may increase very rapidly, SMax parameter is meant to limit this maximal value.
-	 * This function purpose is to be used with the regulation in order to avoid too high maximum range on the sensor.
+	 * This function purpose is to be used with the regulation in order to avoid too high maximum range on the sensor. Not supported by IPS.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param float a proportional multiplier value
 	 * @param float b square multiplier value
@@ -374,7 +374,7 @@ extern "C"
 	 * Custom sensors, outside Fluigent ones, can be used such as different flow-units, pressure, level ...
 	 * However we do not guarantee full compatibility with all sensors. Regulation quality is linked to sensor precision and your set-up.
 	 * In order to use this function, custom used sensor maximum range and measured values has to be updated at least once per second.
-	 * Directly setting pressure on same pressureIndex will stop regulation.
+	 * Directly setting pressure on same pressureIndex will stop regulation. Not supported by IPS.
 	 * This function must be called at 1Hz minimum or the regulation will stop.
 	 * @param measure custom sensor measured value, no unit is required
 	 * @param setpoint custom sensor regulation goal value, no unit is required
@@ -394,7 +394,7 @@ extern "C"
 	unsigned char __stdcall fgt_get_pressureRange(unsigned int pressureIndex, float* Pmin, float* Pmax);
 
 	/**
-	 * @Description Get sensor minimum and maximum range. Returned values takes into account set unit, default value is 'µl/min' in case of flow-units.
+	 * @Description Get sensor minimum and maximum range. Returned values takes into account set unit, default value is 'µl/min' in case of flow-units and 'mbar' for pressure sensors.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @out Smin minimum measured sensor value
 	 * @out Smax maximum measured sensor value
@@ -418,7 +418,7 @@ extern "C"
 
 	/**
 	 * @Description Set on a running regulation pressure response time. Minimal value is 2 for FlowEZ, 6 for MFCS controllers.
-	 * This function is useful if a more smooth response is wanted.
+	 * This function is useful if a more smooth response is wanted. Not supported by IPS.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param responseTime pressure response time in seconds
 	 * @return fgt_ERROR_CODE
@@ -444,7 +444,7 @@ extern "C"
 	 * Retrieved information of last error contains controller position and a string detail.
 	 * @param pressureIndex Index of pressure channel or unique ID
 	 * @out type fgt_INSTRUMENT_TYPE, controller type
-	 * @out controllerSN serial number of controller (such as Link, MFCS) 
+	 * @out controllerSN serial number of controller (such as Link, MFCS)
 	 * @out information information status code, 1 if pressure module is controller locally
 	 * @out detail array of characters which details the error
 	 * @return fgt_ERROR_CODE
@@ -464,7 +464,7 @@ extern "C"
 	unsigned char __stdcall fgt_get_sensorStatus(unsigned int sensorIndex, int* type, unsigned short* controllerSN, unsigned char* infoCode, char detail[140]);
 
 	/**
-	 * @Description Set power ON or OFF on a controller (such as Link, MFCS, Flowboard). 
+	 * @Description Set power ON or OFF on a controller (such as Link, MFCS, Flowboard).
 	 * Not all controllers support this functionality.
 	 * @param controllerIndex Index of controller or unique ID
 	 * @param powerState fgt_POWER
@@ -473,7 +473,7 @@ extern "C"
 	unsigned char __stdcall fgt_set_power(unsigned int controllerIndex, unsigned char powerState);
 
 	/**
-	 * @Description Get power information about a controller (such as Link, MFCS, Flowboard). 
+	 * @Description Get power information about a controller (such as Link, MFCS, Flowboard).
 	 * Not all controllers support this functionality.
 	 * @param controllerIndex Index of controller or unique ID
 	 * @out powerState fgt_POWER

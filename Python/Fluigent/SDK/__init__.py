@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "19.0.0"
+__version__ = "20.0.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -140,7 +140,7 @@ class fgt_CONTROLLER_INFO(object):
 def fgt_init(instruments = None):
     """Initialize or reinitialize the Fluigent SDK instance. 
     
-    All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP) are 
+    All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP, IPS) are 
     initialized.
     This function is optional, directly calling a function will automatically
     create the instance.
@@ -179,7 +179,7 @@ def fgt_close():
 def fgt_get_controllersInfo():
     """Retrieve information about session controllers. 
     
-    Controllers are MFCS, Flowboard and Link.
+    Controllers are MFCS, Flowboard, Link and IPS.
      Returns:
          List of structure of fgt_CONTROLLER_INFO
      """
@@ -207,6 +207,7 @@ def fgt_get_sensorChannelCount():
     """Get total number of initialized sensor channels. 
     
     It is the sum of all connected Flow Units on Flowboard and Flow EZ
+    and IPS modules.
     
     Returns:
         the total number of initialized sensor channels.
@@ -256,9 +257,9 @@ def fgt_get_sensorChannelsInfo():
     
     This function is useful in order to get channels order, controller, 
     unique ID and instrument type.
-    By default this array is built with FRP first, then Flow EZ, and contains 
-    Flow Units. If only one instrument is used, index is the default channel 
-    indexing starting at 0.
+    By default this array is built with FRP Flow Units first, then Flow EZ 
+    Flow Units, then IPS modules. If only one instrument is used, index is the 
+    default channel indexing starting at 0.
     You can initialize instruments in a specific order by passing the list of
     serial numbers to fgt_init.
     
@@ -346,10 +347,12 @@ def fgt_get_pressureUnit(pressure_index):
     
 def fgt_set_sensorUnit(sensor_index, unit):
     """Set sensor unit on selected sensor device.
-    Default value is "µl/min" for flowunits. 
+    Default value is "µl/min" for Flow Units. 
     If type is invalid an error is returned.
     Every sensor read value and regulation command will then use this unit.
     Example: "µl/h", "ulperDay", "microliter/hour" ...
+    
+    Not supported by the IPS.
     
     Args:
         sensor_index: Index of sensor channel or unique ID
@@ -369,7 +372,8 @@ def fgt_get_sensorUnit(sensor_index):
     Args:
         sensor_index: Index of sensor channel or unique ID
     Returns:
-        current unit as a string
+        current unit as a string. Default unit is 'µl/min' for Flow Units
+        and 'mbar' for IPS modules.
     """
     sensor_index = int(sensor_index)
     low_level_function = low_level.fgt_get_sensorUnit
@@ -378,13 +382,19 @@ def fgt_get_sensorUnit(sensor_index):
     return unit
     
 def fgt_set_sensorCalibration(sensor_index, calibration):
-    """Set used sensor internal calibration table. 
-    Function is only available for specific sensors (dual type) such as 
-    the Flow Unit M accepting H2O and IPA
+    """Set sensor calibration table or zero value. 
+    
+    For Flow Units supporting multiple calibration tables such as the Flow Unit
+    M accepting H2O and IPA, calling this function sets the calibration table
+    currently in use.
+    
+    For IPS modules, calling this function sets the current pressure
+    measurement as the sensor's zero value.
     
     Args:
         sensor_index: Index of sensor channel or unique ID
         calibration: value from the fgt_SENSOR_CALIBRATION enum
+                     If the sensor is not a Flow Unit, this argument is ignored
     """
     sensor_index = int(sensor_index)
     exceptions.check_enum_type("calibration", calibration, fgt_SENSOR_CALIBRATION)
@@ -393,13 +403,16 @@ def fgt_set_sensorCalibration(sensor_index, calibration):
     exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
     
 def fgt_get_sensorCalibration(sensor_index):
-    """Get sensor's current calibration table.
+    """Get sensor's current calibration table, if applicable.
+    
+    Not supported by the IPS.
     
     Args:
         sensor_index: Index of sensor channel or unique ID
     Returns:
         Current calibration table as a value from the 
         fgt_SENSOR_CALIBRATION enum
+        "None" if the sensor does not support calibration tables
     """
     sensor_index = int(sensor_index)
     low_level_function = low_level.fgt_get_sensorCalibration
@@ -420,6 +433,8 @@ def fgt_set_sensorCustomScale(sensor_index, a, b = 0, c = 0, smax = None):
     rapidly, SMax parameter is meant to limit this maximal value.
     This function purpose is to be used with the regulation in order to
     avoid too high maximum range on the sensor.
+    
+    Not supported by the IPS.
     
     Args:
         sensor_index: Index of sensor channel or unique ID
@@ -506,6 +521,8 @@ def fgt_set_sensorRegulation(sensor_index, pressure_index, setpoint):
     Call this function again in order to change the setpoint. 
     Calling fgt_set_pressure on the same pressure_index will stop regulation.
     
+    Not supported by the IPS.
+    
     Args:
         sensor_index: Index of sensor channel or unique ID
         pressure_index: Index of pressure channel or unique ID
@@ -526,6 +543,7 @@ def fgt_get_sensorValue(sensor_index, include_timestamp = False):
     """Read sensor value of selected device
     
      Optionally, also returns a timestamp from the device's internal timer.
+     Note: If the sensor is an IPS, the timestamp is always zero
     
     Args:
         sensor_index Index of sensor channel or unique ID
@@ -535,7 +553,7 @@ def fgt_get_sensorValue(sensor_index, include_timestamp = False):
     Returns:
         if include_timestamp is False:
             value Read sensor value in selected unit
-            Default is "µl/min" for flow rate sensors
+            Default is "µl/min" for flow rate sensors and "mbar" for the IPS
         if include_timestamp is True:
             tuple containing:
              value Read sensor value in selected unit
@@ -604,7 +622,7 @@ def fgt_get_sensorRange(sensor_index):
     """Get sensor minimum and maximum range. 
     
     Returned values takes into account set unit. Default value is 
-    'µl/min' in case of Flow Units.
+    'µl/min' in case of Flow Units and 'mbar' for IPS modules.
     
     Args:
         sensor_index: Index of sensor channel or unique ID
@@ -641,6 +659,8 @@ def fgt_set_sensorRegulationResponse(sensor_index, response_time):
     
     Minimal value is 2 for Flow EZ, 6 for MFCS controllers.
     This function is useful if a more smooth response is wanted.
+    
+    Not supported by the IPS.
     
     Args:
         sensor_index: Index of sensor channel or unique ID

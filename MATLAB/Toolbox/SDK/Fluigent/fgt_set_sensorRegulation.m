@@ -11,6 +11,8 @@ function [] = fgt_set_sensorRegulation( sensorIndex, pressureIndex, setpoint )
 % Calling fgt_set_pressure on the same pressure channel will stop
 % regulation.
 %
+% Not supported by the IPS.
+%
 % See also:
 %     fgt_set_pressure
 %     fgt_set_customSensorRegulation

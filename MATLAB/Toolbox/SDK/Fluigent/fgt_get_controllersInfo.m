@@ -9,7 +9,7 @@ function [infoArray] = fgt_get_controllersInfo( )
 % id: identifier
 % InstrType: type of Fluigent instrument
 %
-% Controllers are MFCS, Flowboard and Link.
+% Controllers are MFCS, Flowboard, Link, and IPS.
 
 [error_code, infoArray] = LowLevel.fgt_get_controllersInfo;
 for i=1:numel(infoArray)

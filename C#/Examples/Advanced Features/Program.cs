@@ -80,6 +80,7 @@ namespace Advanced_Features
                 Console.WriteLine($"Read sensor calibration: {table}");
 
                 // Change sensor calibration
+                // WARNING: For IPS use only when current pressure is 0 mbar. This function will set current pressure as a reference point. Enum parameter fgt_SENSOR_CALIBRATION is irrelevant for IPS
                 fgtSdk.Fgt_set_sensorCalibration(0, fgt_SENSOR_CALIBRATION.H2O); // Note that if calibration is not supported, an error is thrown
                 Console.WriteLine($"Setting sensor calibration to {fgt_SENSOR_CALIBRATION.H2O}...");
                 Thread.Sleep(1000); // As for pressure calibration, this step needs few moments before read values are correct. Same error is thrown.

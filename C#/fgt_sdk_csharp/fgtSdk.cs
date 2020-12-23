@@ -540,7 +540,7 @@ namespace fgt_sdk
         #region Init/close
 
         /// <summary>
-        /// Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP) are initialized.
+        /// Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP, IPS) are initialized.
         /// This function is optional, directly calling a function will automatically creates the instance.
         /// Only one instance can be opened at once.If called again, session is reinitialized.
         /// </summary>
@@ -616,7 +616,7 @@ namespace fgt_sdk
         #region Channels info
 
         /// <summary>
-        /// Retrieve information about session controllers. Controllers are MFCS, Flowboard, Link in an array.
+        /// Retrieve information about session controllers. Controllers are MFCS, Flowboard, Link, and IPS in an array.
         /// </summary>
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a list of <see cref="fgt_CONTROLLER_INFO"/></returns>
         public static (fgt_ERROR_CODE errCode, List<fgt_CONTROLLER_INFO> info) Fgt_get_controllersInfo()
@@ -639,7 +639,7 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Get total number of initialized sensor channels. It is the sum of all connected flow-units on Flowboard and FlowEZ
+        /// Get total number of initialized sensor channels. It is the sum of all connected flow-units on Flowboard and FlowEZ, and IPS sensors
         /// </summary>
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and sensor channels count</returns>
         public static (fgt_ERROR_CODE errCode, int count) Fgt_get_sensorChannelCount()
@@ -676,7 +676,7 @@ namespace fgt_sdk
 
         /// <summary>
         /// Retrieve information about each initialized sensor channel.This function is useful in order to get channels order, controller, unique ID and instrument type.
-        /// By default this array is built with FRP first then FlowEZ and contains flow-units.If only one instrument is used, index is the default channel indexing starting at 0.
+        /// By default this array is built with FRP Flow Units first, followed by Flow EZ Flow Units, followed by IPS modules. If only one instrument is used, index is the default channel indexing starting at 0.
         /// You can initialize instruments in specific order using <see cref="Fgt_initEx"/> function
         /// </summary>
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a list of <see cref="fgt_CHANNEL_INFO"/> <see cref="fgt_SENSOR_TYPE"/> tuples</returns>
@@ -752,7 +752,7 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Start closed loop regulation between a sensor and a pressure controller. Pressure will be regulated in order to reach sensor setpoint.
+        /// Start closed loop regulation between a flowrate sensor and a pressure controller. Pressure will be regulated in order to reach sensor setpoint.
         /// Call again this function in order to change the setpoint.Calling fgt_set_pressure on same pressureIndex will stop regulation.
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
@@ -769,7 +769,7 @@ namespace fgt_sdk
         /// Read sensor value of selected device
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
-        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and current sensor measurement</returns>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and current sensor measurement in selected unit, default is "µl/min" for flowrate sensors and 'mbar' for pressure sensors</returns>
         public static (fgt_ERROR_CODE errCode, float value) Fgt_get_sensorValue(uint sensorIndex)
         {
             var value = 0.0f;
@@ -861,7 +861,7 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Set sensor unit on selected sensor device, default value is "µl/min" for flowunits. If type is invalid an error is returned.
+        /// Set sensor unit on selected sensor device, default value is "µl/min" for flowrate sensors and "mbar" for pressure sensors. If type is invalid an error is returned.
         /// Every sensor read value and regulation command will then use this unit.
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
@@ -887,7 +887,7 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Get current unit on selected sensor device, default value is "µl/min" for flowunits.
+        /// Get current unit on selected sensor device, default value is "µl/min" for flowunits and 'mbar' for pressure sensors.
         /// Every sensor read value and regulation command use this unit.
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
@@ -902,8 +902,8 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Set used sensor internal calibration table.
-        /// Function is only available for specific sensors (dual type) such as the flow-unit M accepting H2O and IPA
+        /// Set sensor internal calibration table.
+        /// Function is only available for IPS (to set new reference value "zero") and specific flowrate sensors (dual type) such as the flow-unit M accepting H2O and IPA
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
         /// <param name="table">New calibration table</param>
@@ -915,7 +915,7 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Get sensor's current calibration table.
+        /// Get sensor's current calibration table. Not supported by IPS.
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and the current calibration table <see cref="fgt_SENSOR_CALIBRATION"/></returns>
@@ -931,7 +931,7 @@ namespace fgt_sdk
         /// Apply a custom scale factor on sensor read value. This function is useful in order to adapt read sensor value to physical measurement.
         /// For example if a flow-unit is used with a special oil and it's calibration table is set to H2O, read flowrate is not correct.
         /// Scale factor is applied using following formula: scaled_value = a* sensor_value + b* sensor_value^2 + c* sensor_value^3
-        /// Note that this scale is also used for the regulation.
+        /// Note that this scale is also used for the regulation. Not supported by IPS.
         /// </summary>
         /// <param name="sensorIndex">sensorIndex Index of sensor channel or unique ID</param>
         /// <param name="scale">New scale to use - a*x + b*x² + c*x³ </param>
@@ -947,7 +947,7 @@ namespace fgt_sdk
         /// For example if a flow-unit is used with a special oil and it's calibration table is set to H2O, read flowrate is not correct.
         /// Scale factor is applied using following formula: scaled_value = a* sensor_value + b* sensor_value^2 + c* sensor_value^3
         /// When applying a custom scale factor, sensor range may increase very rapidly, SMax parameter is meant to limit this maximal value.
-        /// This function purpose is to be used with the regulation in order to avoid too high maximum range on the sensor.
+        /// This function purpose is to be used with the regulation in order to avoid too high maximum range on the sensor. Not supported by IPS.
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
         /// <param name="scale">New scale to use - a*x + b*x² + c*x³ </param>
@@ -976,7 +976,7 @@ namespace fgt_sdk
         /// Custom sensors, outside Fluigent ones, can be used such as different flow-units, pressure, level ...
         /// However we do not guarantee full compatibility with all sensors.Regulation quality is linked to sensor precision and your set-up.
         /// In order to use this function, custom used sensor maximum range and measured values has to be updated at least once per second.
-        /// Directly setting pressure on same pressureIndex will stop regulation.
+        /// Directly setting pressure on same pressureIndex will stop regulation. Not supported by IPS.
         /// This function must be called at 1Hz minimum or the regulation will stop.
         /// </summary>
         /// <param name="measure">Custom sensor measured value, no unit is required</param>
@@ -1003,7 +1003,7 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Get sensor minimum and maximum range. Returned values takes into account set unit, default value is 'µl/min' in case of flow-units.
+        /// Get sensor minimum and maximum range. Returned values takes into account set unit, default value is 'µl/min' in case of flow-units and 'mbar' for pressure sensors.
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and sensor range min and max</returns>
@@ -1032,6 +1032,7 @@ namespace fgt_sdk
 
         /// <summary>
         /// Set on a running regulation pressure response time. Minimal value is 2 for FlowEZ, 6 for MFCS controllers.
+        /// This function is useful if a more smooth response is wanted. Not supported by IPS.
         /// </summary>
         /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
         /// <param name="responseTime">Pressure response time in seconds</param>

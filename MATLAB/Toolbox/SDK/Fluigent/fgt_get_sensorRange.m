@@ -3,7 +3,7 @@ function [SMin, SMax] = fgt_get_sensorRange( sensorIndex )
 % 
 % [SMin, SMax] = fgt_get_sensorRange( sensorIndex ) returns the sensor 
 % minimum and maximum value in the selected unit. Default unit is
-% 'µl/min' in case of Flow Units.
+% 'µl/min' for Flow Units and 'mbar' for IPS modules.
 
 [~, SMin, SMax] = LowLevel.fgt_get_sensorRange(sensorIndex);
 manage_sensor_status('fgt_get_sensorRange', sensorIndex);

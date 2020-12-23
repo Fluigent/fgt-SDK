@@ -22,6 +22,8 @@ function [ ] = fgt_set_sensorCustomScale(varargin)
 % For example if a Flow Unit is used with a special oil and its 
 % calibration table is set to H2O, the flowrate reading will not be correct.
 % Note that this scale is also used for the regulation.
+% 
+% Not supported by the IPS.
 
 if nargin > 5
     error('Too many input arguments.')

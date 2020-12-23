@@ -58,6 +58,7 @@ std::ostream& operator<<(std::ostream& str, fgt_INSTRUMENT_TYPE instrType)
 	case fgt_INSTRUMENT_TYPE::MFCS_EZ: str << "MFCS_EZ"; break;
 	case fgt_INSTRUMENT_TYPE::FRP: str << "FRP"; break;
 	case fgt_INSTRUMENT_TYPE::LineUP: str << "LineUP"; break;
+	case fgt_INSTRUMENT_TYPE::IPS: str << "IPS"; break;
 	default: str.setstate(std::ios_base::failbit);
 	}
 	return str;
@@ -77,6 +78,7 @@ std::ostream& operator<<(std::ostream& str, fgt_SENSOR_TYPE sensorType)
 	case fgt_SENSOR_TYPE::Flow_L_single: str << "Flow_L_single"; break;
 	case fgt_SENSOR_TYPE::Flow_L_dual: str << "Flow_L_dual"; break;
 	case fgt_SENSOR_TYPE::Flow_XL_single: str << "Flow_XL_single"; break;
+	case fgt_SENSOR_TYPE::Pressure: str << "Pressure"; break;
 	default: str.setstate(std::ios_base::failbit);
 	}
 	return str;

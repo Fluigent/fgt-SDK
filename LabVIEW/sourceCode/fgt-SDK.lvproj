@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
-<Project Type="Project" LVVersion="16008000">
+<Project Type="Project" LVVersion="17008000">
 	<Property Name="NI.LV.All.SourceOnly" Type="Bool">true</Property>
 	<Item Name="My Computer" Type="My Computer">
 		<Property Name="server.app.propertiesEnabled" Type="Bool">true</Property>
@@ -17,6 +17,7 @@
 			<Item Name="Advanced Parallel Pressure Control.vi" Type="VI" URL="../Examples/Advanced Parallel Pressure Control.vi"/>
 			<Item Name="Advanced Specific Multiple Instruments.vi" Type="VI" URL="../Examples/Advanced Specific Multiple Instruments.vi"/>
 			<Item Name="Basic Get Instruments Info.vi" Type="VI" URL="../Examples/Basic Get Instruments Info.vi"/>
+			<Item Name="Basic Read Sensor Data.vi" Type="VI" URL="../Examples/Basic Read Sensor Data.vi"/>
 			<Item Name="Basic Sensor Regulation.vi" Type="VI" URL="../Examples/Basic Sensor Regulation.vi"/>
 			<Item Name="Basic Set Pressure.vi" Type="VI" URL="../Examples/Basic Set Pressure.vi"/>
 		</Item>
