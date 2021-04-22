@@ -6,8 +6,8 @@
 *
 * Title:   fgt_SDK.h
 * Purpose: Functions API for Fluigent instruments
-* Version: 20.0.0.0
-* Date:	12/2020
+* Version: 20.0.1.0
+* Date:	04/2021
 *============================================================================*/
 
 #ifndef _FGT_SDK_H

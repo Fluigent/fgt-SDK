@@ -5,11 +5,11 @@
     <Authors>Fluigent</Authors>
     <Product>Fluigent Software Development Kit</Product>
     <Description>Software Development Kit for Fluigent pressure controllers and sensors.</Description>
-    <Version>20.0.0.0</Version>
+    <Version>20.0.1.0</Version>
     <PackageTags>Microfluidics, Control</PackageTags>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>20.0.0.0</AssemblyVersion>
+    <AssemblyVersion>20.0.1.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
