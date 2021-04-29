@@ -1,4 +1,4 @@
-function [] = fgt_init(varargin)
+function varargout = fgt_init(varargin)
 %FGT_INIT Initialize or reinitialize the Fluigent SDK instance. 
 % 
 % fgt_init initializes all of the detected Fluigent instruments (MFCS,
@@ -9,6 +9,9 @@ function [] = fgt_init(varargin)
 % fgt_init(SNs) initializes the instruments whose serial numbers are in the
 % array SNs. They are then indexed in the order in which they appear in the
 % array.
+%
+% error_code = fgt_init(...) also returns the error code returned by the
+% library function.
 %
 % This function is optional, directly calling a function will automatically
 % create the instance. In this case, all instruments are initialized.
@@ -24,5 +27,8 @@ else
 end
     
 manage_generic_status('fgt_init', error_code);
+if nargout > 0
+    varargout = {fgt_ERROR_CODE(error_code)};
+end
 end
 

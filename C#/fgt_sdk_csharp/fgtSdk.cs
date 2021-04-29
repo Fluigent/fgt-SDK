@@ -6,307 +6,267 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using fgt_sdk.Enums;
+using System.Reflection;
 
 namespace fgt_sdk
 {
+    /// <summary>
+    /// Contains the public functions of the Fluigent SDK
+    /// </summary>
     public static class fgtSdk
     {
-        #region Native calls
+        private const string FGT_SDK = "FGT_SDK";
+        private static IntPtr ArchResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+        {
+            var pDll = IntPtr.Zero;
 
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr LoadLibrary(string dllToLoad);
+            if (libraryName != FGT_SDK)
+                return pDll;
 
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+            var basePath = Path.Combine(assemblyPath, "fgt_sdk_dlls");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                if (Environment.Is64BitProcess)
+                    pDll = NativeLibrary.Load(Path.Combine(basePath, "windows", "x64", "fgt_SDK.dll"));
+                else
+                    pDll = NativeLibrary.Load(Path.Combine(basePath, "windows", "x86", "fgt_SDK.dll"));
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                pDll = NativeLibrary.Load(Path.Combine(basePath, "linux", "x64", "libfgt_SDK.so"));
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                pDll = NativeLibrary.Load(Path.Combine(basePath, "mac", "x64", "libfgt_SDK.dylib"));
+            else
+                throw new Exception("Operational system not supported!");
 
-        [DllImport("kernel32.dll")]
-        private static extern bool FreeLibrary(IntPtr hModule);
+            if(pDll == null)
+                throw new Exception("Error when loading library!");
 
-        #endregion
+            return pDll;
+        }
 
-        #region Delegates + pointers
+        #region Imported functions
 
         #region Init/close
 
-        //unsigned char __stdcall fgt_init(void);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_init();
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_init();
 
-        private static fgt_init _fgt_init;
-
-        // unsigned char __stdcall fgt_close(void);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_close();
-
-        private static fgt_close _fgt_close;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_close();
 
         // unsigned char __stdcall fgt_detect(unsigned short SN[256], int type[256]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_detect(ushort[] serialNumbers, int[] type);
-
-        private static fgt_detect _fgt_detect;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_detect(ushort[] serialNumbers, int[] type);
 
         //unsigned char __stdcall fgt_initEx(unsigned short SN[256]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_initEx(ushort[] serialNumbers);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_initEx(ushort[] serialNumbers);
 
-        private static fgt_initEx _fgt_initEx;
 
         #endregion
 
         #region Channels info
 
         // unsigned char __stdcall fgt_get_controllersInfo(fgt_CONTROLLER_INFO info[256]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_controllersInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CONTROLLER_INFO[] controllersInfo);
-
-        private static fgt_get_controllersInfo _fgt_get_controllersInfo;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_controllersInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CONTROLLER_INFO[] controllersInfo);
 
         // unsigned char __stdcall fgt_get_pressureChannelCount(unsigned char* nbPChan);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_pressureChannelCount(ref byte count);
-
-        private static fgt_get_pressureChannelCount _fgt_get_pressureChannelCount;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_pressureChannelCount(ref byte count);
 
         // unsigned char __stdcall fgt_get_sensorChannelCount(unsigned char* nbSChan);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorChannelCount(ref byte count);
-
-        private static fgt_get_sensorChannelCount _fgt_get_sensorChannelCount;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorChannelCount(ref byte count);
 
         // unsigned char __stdcall fgt_get_TtlChannelCount(unsigned char* nbTtlChan);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_TtlChannelCount(ref byte count);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_TtlChannelCount(ref byte count);
 
-        private static fgt_get_TtlChannelCount _fgt_get_TtlChannelCount;
+        // unsigned char FGT_API fgt_get_valveChannelCount(unsigned char* nbValveChan);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_valveChannelCount(ref byte count);
 
         // unsigned char __stdcall fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_pressureChannelsInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CHANNEL_INFO[] info);
-
-        private static fgt_get_pressureChannelsInfo _fgt_get_pressureChannelsInfo;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_pressureChannelsInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CHANNEL_INFO[] info);
 
         // unsigned char __stdcall fgt_get_sensorChannelsInfo(fgt_CHANNEL_INFO info[256], int sensorType[256]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorChannelsInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CHANNEL_INFO[] info, int[] type);
-
-        private static fgt_get_sensorChannelsInfo _fgt_get_sensorChannelsInfo;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorChannelsInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CHANNEL_INFO[] info, int[] type);
 
         // unsigned char __stdcall fgt_get_TtlChannelsInfo(fgt_CHANNEL_INFO info[256], int sensorType[256]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_TtlChannelsInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CHANNEL_INFO[] info);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_TtlChannelsInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CHANNEL_INFO[] info);
 
-        private static fgt_get_TtlChannelsInfo _fgt_get_TtlChannelsInfo;
+        // unsigned char FGT_API fgt_get_valveChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_VALVE_TYPE valveType[256]);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_valveChannelsInfo([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 256)] fgt_CHANNEL_INFO[] info, int[] type);
 
         #endregion
 
         #region Basic functions
 
         // unsigned char __stdcall fgt_set_pressure(unsigned int pressureIndex, float pressure);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_pressure(uint pressureIndex, float pressure);
-
-        private static fgt_set_pressure _fgt_set_pressure;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_pressure(uint pressureIndex, float pressure);
 
         // unsigned char __stdcall fgt_get_pressure(unsigned int pressureIndex, float* pressure);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_pressure(uint pressureIndex, ref float pressure);
-
-        private static fgt_get_pressure _fgt_get_pressure;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_pressure(uint pressureIndex, ref float pressure);
 
         // unsigned char __stdcall fgt_get_pressureEx(unsigned int pressureIndex, float* pressure, unsigned short* timeStamp);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_pressureEx(uint pressureIndex, ref float pressure, ref ushort timeStamp);
-
-        private static fgt_get_pressureEx _fgt_get_pressureEx;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_pressureEx(uint pressureIndex, ref float pressure, ref ushort timeStamp);
 
         // unsigned char __stdcall fgt_set_sensorRegulation(unsigned int sensorIndex, unsigned int pressureIndex, float setpoint);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_sensorRegulation(uint sensorIndex, uint pressureIndex, float setpoint);
-
-        private static fgt_set_sensorRegulation _fgt_set_sensorRegulation;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorRegulation(uint sensorIndex, uint pressureIndex, float setpoint);
 
         // unsigned char __stdcall fgt_get_sensorValue(unsigned int sensorIndex, float* value);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorValue(uint sensorIndex, ref float value);
-
-        private static fgt_get_sensorValue _fgt_get_sensorValue;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorValue(uint sensorIndex, ref float value);
 
         // unsigned char __stdcall fgt_get_sensorValueEx(unsigned int sensorIndex, float* value, unsigned short* timeStamp);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorValueEx(uint sensorIndex, ref float value, ref ushort timeStamp);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorValueEx(uint sensorIndex, ref float value, ref ushort timeStamp);
 
-        private static fgt_get_sensorValueEx _fgt_get_sensorValueEx;
+        // unsigned char FGT_API fgt_get_valvePosition(unsigned int valveIndex, int* position);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_valvePosition(uint valveIndex, ref int position);
+
+        // unsigned char FGT_API fgt_set_valvePosition(unsigned int valveIndex, int position, int direction, bool wait);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_valvePosition(uint valveIndex, int position, int direction, int wait);
+
+        // uunsigned char FGT_API fgt_set_allValves(unsigned int controllerIndex, unsigned int moduleIndex, int position);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_allValves(uint controllerIndex, uint moduleIndex, int position);
 
         #endregion
 
         #region Unit, calibration and limits
 
         // unsigned char __stdcall fgt_set_sessionPressureUnit(char unit[140]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_sessionPressureUnit(char[] unit);
-
-        private static fgt_set_sessionPressureUnit _fgt_set_sessionPressureUnit;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sessionPressureUnit(char[] unit);
 
         // unsigned char __stdcall fgt_set_pressureUnit(unsigned int presureIndex, char unit[140]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_pressureUnit(uint pressureIndex, char[] unit);
-
-        private static fgt_set_pressureUnit _fgt_set_pressureUnit;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_pressureUnit(uint pressureIndex, char[] unit);
 
         // unsigned char __stdcall fgt_get_pressureUnit(unsigned int pressureIndex, char unit[140]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_pressureUnit(uint pressureIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] unit);
-
-        private static fgt_get_pressureUnit _fgt_get_pressureUnit;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_pressureUnit(uint pressureIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] unit);
 
         // unsigned char __stdcall fgt_set_sensorUnit(unsigned int sensorIndex, char unit[140]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_sensorUnit(uint sensorIndex, char[] unit);
-
-        private static fgt_set_sensorUnit _fgt_set_sensorUnit;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorUnit(uint sensorIndex, char[] unit);
 
         // unsigned char __stdcall fgt_get_sensorUnit(unsigned int sensorIndex, char unit[140]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorUnit(uint sensorIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] unit);
-
-        private static fgt_get_sensorUnit _fgt_get_sensorUnit;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorUnit(uint sensorIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] unit);
 
         // unsigned char __stdcall fgt_set_sensorCalibration(unsigned int sensorIndex, int calibration);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_sensorCalibration(uint sensorIndex, int calibration);
-
-        private static fgt_set_sensorCalibration _fgt_set_sensorCalibration;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorCalibration(uint sensorIndex, int calibration);
 
         // unsigned char __stdcall fgt_get_sensorCalibration(unsigned int sensorIndex, int* calibration);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorCalibration(uint sensorIndex, ref int calibration);
-
-        private static fgt_get_sensorCalibration _fgt_get_sensorCalibration;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorCalibration(uint sensorIndex, ref int calibration);
 
         // unsigned char __stdcall fgt_set_sensorCustomScale(unsigned int sensorIndex, float a, float b, float c);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_sensorCustomScale(uint sensorIndex, float a, float b, float c);
-
-        private static fgt_set_sensorCustomScale _fgt_set_sensorCustomScale;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorCustomScale(uint sensorIndex, float a, float b, float c);
 
         // unsigned char __stdcall fgt_set_sensorCustomScaleEx(unsigned int sensorIndex, float a, float b, float c, float SMax);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_sensorCustomScaleEx(uint sensorIndex, float a, float b, float c, float sMax);
-
-        private static fgt_set_sensorCustomScaleEx _fgt_set_sensorCustomScaleEx;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorCustomScaleEx(uint sensorIndex, float a, float b, float c, float sMax);
 
         // unsigned char __stdcall fgt_calibratePressure(unsigned int pressureIndex);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_calibratePressure(uint pressureIndex);
-
-        private static fgt_calibratePressure _fgt_calibratePressure;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_calibratePressure(uint pressureIndex);
 
         // unsigned char __stdcall fgt_set_customSensorRegulation(float measure, float setpoint, float maxSensorRange, unsigned int pressureIndex);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_customSensorRegulation(float measure, float setpoint, float maxSensorRange, uint pressureIndex);
-
-        private static fgt_set_customSensorRegulation _fgt_set_customSensorRegulation;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_customSensorRegulation(float measure, float setpoint, float maxSensorRange, uint pressureIndex);
 
         // unsigned char __stdcall fgt_get_pressureRange(unsigned int pressureIndex, float* Pmin, float* Pmax);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_pressureRange(uint pressureIndex, ref float pMin, ref float pMax);
-
-        private static fgt_get_pressureRange _fgt_get_pressureRange;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_pressureRange(uint pressureIndex, ref float pMin, ref float pMax);
 
         // unsigned char __stdcall fgt_get_sensorRange(unsigned int sensorIndex, float* Smin, float* Smax);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorRange(uint sensorIndex, ref float sMin, ref float sMax);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorRange(uint sensorIndex, ref float sMin, ref float sMax);
 
-        private static fgt_get_sensorRange _fgt_get_sensorRange;
+        // unsigned char FGT_API fgt_get_valveRange(unsigned int valveIndex, int* posMax);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_valveRange(uint valveIndex, ref int posMax);
 
         // unsigned char __stdcall fgt_set_pressureLimit(unsigned int pressureIndex, float PlimMin, float PlimMax);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_pressureLimit(uint pressureIndex, float pLimMin, float pLimMax);
-
-        private static fgt_set_pressureLimit _fgt_set_pressureLimit;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_pressureLimit(uint pressureIndex, float pLimMin, float pLimMax);
 
         #endregion
 
         #region Regulation settings
 
         // unsigned char __stdcall fgt_set_sensorRegulationResponse(unsigned int sensorIndex, unsigned int responseTime);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_sensorRegulationResponse(uint sensorIndex, uint responseTime);
-
-        private static fgt_set_sensorRegulationResponse _fgt_set_sensorRegulationResponse;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorRegulationResponse(uint sensorIndex, uint responseTime);
 
         // unsigned char __stdcall fgt_set_pressureResponse(unsigned int pressureIndex, unsigned char value);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_pressureResponse(uint pressureIndex, byte value);
-
-        private static fgt_set_pressureResponse _fgt_set_pressureResponse;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_pressureResponse(uint pressureIndex, byte value);
 
         #endregion
 
         #region Status information
 
         // unsigned char __stdcall fgt_get_pressureStatus(unsigned int pressureIndex, int* type, unsigned short* controllerSN, unsigned char* infoCode, char detail[140]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_pressureStatus(uint pressureIndex, ref int type, ref ushort controllerSN, ref byte infoCode, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] detail);
-
-        private static fgt_get_pressureStatus _fgt_get_pressureStatus;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_pressureStatus(uint pressureIndex, ref int type, ref ushort controllerSN, ref byte infoCode, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] detail);
 
         // unsigned char __stdcall fgt_get_sensorStatus(unsigned int sensorIndex, int* type, unsigned short* controllerSN, unsigned char* infoCode, char detail[140]);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_sensorStatus(uint sensorIndex, ref int type, ref ushort controllerSN, ref byte infoCode, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] detail);
-
-        private static fgt_get_sensorStatus _fgt_get_sensorStatus;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorStatus(uint sensorIndex, ref int type, ref ushort controllerSN, ref byte infoCode, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] detail);
 
         // unsigned char __stdcall fgt_set_power(unsigned int controllerIndex, unsigned char powerState);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_power(uint controllerIndex, byte powerState);
-
-        private static fgt_set_power _fgt_set_power;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_power(uint controllerIndex, byte powerState);
 
         // unsigned char __stdcall fgt_get_power(unsigned int controllerIndex, unsigned char* powerState);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_get_power(uint controllerIndex, ref byte powerState);
-
-        private static fgt_get_power _fgt_get_power;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_power(uint controllerIndex, ref byte powerState);
 
         #endregion
 
         #region TTL functions
 
         // unsigned char __stdcall fgt_set_TtlMode(unsigned int TtlIndex, int mode);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_TtlMode(uint TtlIndex, int mode);
-
-        private static fgt_set_TtlMode _fgt_set_TtlMode;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_TtlMode(uint TtlIndex, int mode);
 
         // unsigned char __stdcall fgt_read_Ttl(unsigned int TtlIndex, unsigned int* state);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_read_Ttl(uint TtlIndex, ref uint state);
-
-        private static fgt_read_Ttl _fgt_read_Ttl;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_read_Ttl(uint TtlIndex, ref uint state);
 
         // unsigned char __stdcall fgt_trigger_Ttl(unsigned int TtlIndex);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_trigger_Ttl(uint TtlIndex);
-
-        private static fgt_trigger_Ttl _fgt_trigger_Ttl;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_trigger_Ttl(uint TtlIndex);
 
         #endregion
 
         #region Specific functions
 
         // unsigned char __stdcall fgt_set_purge(unsigned int controllerIndex, unsigned char purge);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_purge(uint controllerIndex, byte purge);
-
-        private static fgt_set_purge _fgt_set_purge;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_purge(uint controllerIndex, byte purge);
 
         // unsigned char __stdcall fgt_set_manual(unsigned int pressureIndex, float value);
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate byte fgt_set_manual(uint pressureIndex, float value);
-
-        private static fgt_set_manual _fgt_set_manual;
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_manual(uint pressureIndex, float value);
 
         #endregion
 
@@ -314,182 +274,7 @@ namespace fgt_sdk
 
         static fgtSdk()
         {
-            var libname = $"fgt_sdk_{(Environment.Is64BitProcess ? "64" : "32")}.dll";
-
-            try
-            {
-                var pDll = LoadLibrary(Path.Combine("fgt_sdk_dlls", libname));
-
-                if (pDll == IntPtr.Zero)
-                    throw new Exception($"Unable to load library {libname}. The file is probable missing");
-
-                #region Pointers retrieval
-
-                #region Init/Close
-
-                var p_fgt_init = GetProcAddress(pDll, "fgt_init");
-                _fgt_init = (fgt_init) Marshal.GetDelegateForFunctionPointer(p_fgt_init, typeof(fgt_init));
-
-                var p_fgt_close = GetProcAddress(pDll, "fgt_close");
-                _fgt_close = (fgt_close) Marshal.GetDelegateForFunctionPointer(p_fgt_close, typeof(fgt_close));
-
-                var p_fgt_detect = GetProcAddress(pDll, "fgt_detect");
-                _fgt_detect = (fgt_detect) Marshal.GetDelegateForFunctionPointer(p_fgt_detect, typeof(fgt_detect));
-
-                var p_fgt_initEx = GetProcAddress(pDll, "fgt_initEx");
-                _fgt_initEx = (fgt_initEx) Marshal.GetDelegateForFunctionPointer(p_fgt_initEx, typeof(fgt_initEx));
-
-                #endregion
-
-                #region Channels info
-
-                var p_fgt_get_controllersInfo = GetProcAddress(pDll, "fgt_get_controllersInfo");
-                _fgt_get_controllersInfo = Marshal.GetDelegateForFunctionPointer<fgt_get_controllersInfo>(p_fgt_get_controllersInfo);
-
-                var p_fgt_get_pressureChannelCount = GetProcAddress(pDll, "fgt_get_pressureChannelCount");
-                _fgt_get_pressureChannelCount = Marshal.GetDelegateForFunctionPointer<fgt_get_pressureChannelCount>(p_fgt_get_pressureChannelCount);
-
-                var p_fgt_get_sensorChannelCount = GetProcAddress(pDll, "fgt_get_sensorChannelCount");
-                _fgt_get_sensorChannelCount = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorChannelCount>(p_fgt_get_sensorChannelCount);
-
-                var p_fgt_get_TtlChannelCount = GetProcAddress(pDll, "fgt_get_TtlChannelCount");
-                _fgt_get_TtlChannelCount = Marshal.GetDelegateForFunctionPointer<fgt_get_TtlChannelCount>(p_fgt_get_TtlChannelCount);
-
-                var p_fgt_get_pressureChannelsInfo = GetProcAddress(pDll, "fgt_get_pressureChannelsInfo");
-                _fgt_get_pressureChannelsInfo = Marshal.GetDelegateForFunctionPointer<fgt_get_pressureChannelsInfo>(p_fgt_get_pressureChannelsInfo);
-
-                var p_fgt_get_sensorChannelsInfo = GetProcAddress(pDll, "fgt_get_sensorChannelsInfo");
-                _fgt_get_sensorChannelsInfo = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorChannelsInfo>(p_fgt_get_sensorChannelsInfo);
-
-                var p_fgt_get_TtlChannelsInfo = GetProcAddress(pDll, "fgt_get_TtlChannelsInfo");
-                _fgt_get_TtlChannelsInfo = Marshal.GetDelegateForFunctionPointer<fgt_get_TtlChannelsInfo>(p_fgt_get_TtlChannelsInfo);
-
-                #endregion
-
-                #region Basic functions
-
-                var p_fgt_set_pressure = GetProcAddress(pDll, "fgt_set_pressure");
-                _fgt_set_pressure = Marshal.GetDelegateForFunctionPointer<fgt_set_pressure>(p_fgt_set_pressure);
-
-                var p_fgt_get_pressure = GetProcAddress(pDll, "fgt_get_pressure");
-                _fgt_get_pressure = Marshal.GetDelegateForFunctionPointer<fgt_get_pressure>(p_fgt_get_pressure);
-
-                var p_fgt_get_pressureEx = GetProcAddress(pDll, "fgt_get_pressureEx");
-                _fgt_get_pressureEx = Marshal.GetDelegateForFunctionPointer<fgt_get_pressureEx>(p_fgt_get_pressureEx);
-
-                var p_fgt_set_sensorRegulation = GetProcAddress(pDll, "fgt_set_sensorRegulation");
-                _fgt_set_sensorRegulation = Marshal.GetDelegateForFunctionPointer<fgt_set_sensorRegulation>(p_fgt_set_sensorRegulation);
-
-                var p_fgt_get_sensorValue = GetProcAddress(pDll, "fgt_get_sensorValue");
-                _fgt_get_sensorValue = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorValue>(p_fgt_get_sensorValue);
-
-                var p_fgt_get_sensorValueEx = GetProcAddress(pDll, "fgt_get_sensorValueEx");
-                _fgt_get_sensorValueEx = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorValueEx>(p_fgt_get_sensorValueEx);
-
-                #endregion
-
-                #region Unit, calibration and limits
-
-                var p_fgt_set_sessionPressureUnit = GetProcAddress(pDll, "fgt_set_sessionPressureUnit");
-                _fgt_set_sessionPressureUnit = Marshal.GetDelegateForFunctionPointer<fgt_set_sessionPressureUnit>(p_fgt_set_sessionPressureUnit);
-
-                var p_fgt_set_pressureUnit = GetProcAddress(pDll, "fgt_set_pressureUnit");
-                _fgt_set_pressureUnit = Marshal.GetDelegateForFunctionPointer<fgt_set_pressureUnit>(p_fgt_set_pressureUnit);
-
-                var p_fgt_get_pressureUnit = GetProcAddress(pDll, "fgt_get_pressureUnit");
-                _fgt_get_pressureUnit = Marshal.GetDelegateForFunctionPointer<fgt_get_pressureUnit>(p_fgt_get_pressureUnit);
-
-                var p_fgt_set_sensorUnit = GetProcAddress(pDll, "fgt_set_sensorUnit");
-                _fgt_set_sensorUnit = Marshal.GetDelegateForFunctionPointer<fgt_set_sensorUnit>(p_fgt_set_sensorUnit);
-
-                var p_fgt_get_sensorUnit = GetProcAddress(pDll, "fgt_get_sensorUnit");
-                _fgt_get_sensorUnit = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorUnit>(p_fgt_get_sensorUnit);
-
-                var p_fgt_set_sensorCalibration = GetProcAddress(pDll, "fgt_set_sensorCalibration");
-                _fgt_set_sensorCalibration = Marshal.GetDelegateForFunctionPointer<fgt_set_sensorCalibration>(p_fgt_set_sensorCalibration);
-
-                var p_fgt_get_sensorCalibration = GetProcAddress(pDll, "fgt_get_sensorCalibration");
-                _fgt_get_sensorCalibration = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorCalibration>(p_fgt_get_sensorCalibration);
-
-                var p_fgt_set_sensorCustomScale = GetProcAddress(pDll, "fgt_set_sensorCustomScale");
-                _fgt_set_sensorCustomScale = Marshal.GetDelegateForFunctionPointer<fgt_set_sensorCustomScale>(p_fgt_set_sensorCustomScale);
-
-                var p_fgt_set_sensorCustomScaleEx = GetProcAddress(pDll, "fgt_set_sensorCustomScaleEx");
-                _fgt_set_sensorCustomScaleEx = Marshal.GetDelegateForFunctionPointer<fgt_set_sensorCustomScaleEx>(p_fgt_set_sensorCustomScaleEx);
-
-                var p_fgt_calibratePressure = GetProcAddress(pDll, "fgt_calibratePressure");
-                _fgt_calibratePressure = Marshal.GetDelegateForFunctionPointer<fgt_calibratePressure>(p_fgt_calibratePressure);
-
-                var p_fgt_set_customSensorRegulation = GetProcAddress(pDll, "fgt_set_customSensorRegulation");
-                _fgt_set_customSensorRegulation = Marshal.GetDelegateForFunctionPointer<fgt_set_customSensorRegulation>(p_fgt_set_customSensorRegulation);
-
-                var p_fgt_get_pressureRange = GetProcAddress(pDll, "fgt_get_pressureRange");
-                _fgt_get_pressureRange = Marshal.GetDelegateForFunctionPointer<fgt_get_pressureRange>(p_fgt_get_pressureRange);
-
-                var p_fgt_get_sensorRange = GetProcAddress(pDll, "fgt_get_sensorRange");
-                _fgt_get_sensorRange = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorRange>(p_fgt_get_sensorRange);
-
-                var p_fgt_set_pressureLimit = GetProcAddress(pDll, "fgt_set_pressureLimit");
-                _fgt_set_pressureLimit = Marshal.GetDelegateForFunctionPointer<fgt_set_pressureLimit>(p_fgt_set_pressureLimit);
-
-                #endregion
-
-                #region Regulation settings
-
-                var p_fgt_set_sensorRegulationResponse = GetProcAddress(pDll, "fgt_set_sensorRegulationResponse");
-                _fgt_set_sensorRegulationResponse = Marshal.GetDelegateForFunctionPointer<fgt_set_sensorRegulationResponse>(p_fgt_set_sensorRegulationResponse);
-
-                var p_fgt_set_pressureResponse = GetProcAddress(pDll, "fgt_set_pressureResponse");
-                _fgt_set_pressureResponse = Marshal.GetDelegateForFunctionPointer<fgt_set_pressureResponse>(p_fgt_set_pressureResponse);
-
-                #endregion
-
-                #region Status information
-
-                var p_fgt_get_pressureStatus = GetProcAddress(pDll, "fgt_get_pressureStatus");
-                _fgt_get_pressureStatus = Marshal.GetDelegateForFunctionPointer<fgt_get_pressureStatus>(p_fgt_get_pressureStatus);
-
-                var p_fgt_get_sensorStatus = GetProcAddress(pDll, "fgt_get_sensorStatus");
-                _fgt_get_sensorStatus = Marshal.GetDelegateForFunctionPointer<fgt_get_sensorStatus>(p_fgt_get_sensorStatus);
-
-                var p_fgt_set_power = GetProcAddress(pDll, "fgt_set_power");
-                _fgt_set_power = Marshal.GetDelegateForFunctionPointer<fgt_set_power>(p_fgt_set_power);
-
-                var p_fgt_get_power = GetProcAddress(pDll, "fgt_get_power");
-                _fgt_get_power = Marshal.GetDelegateForFunctionPointer<fgt_get_power>(p_fgt_get_power);
-
-                #endregion
-
-                #region TTL functions
-
-                var p_fgt_set_TtlMode = GetProcAddress(pDll, "fgt_set_TtlMode");
-                _fgt_set_TtlMode = Marshal.GetDelegateForFunctionPointer<fgt_set_TtlMode>(p_fgt_set_TtlMode);
-
-                var p_fgt_read_Ttl = GetProcAddress(pDll, "fgt_read_Ttl");
-                _fgt_read_Ttl = Marshal.GetDelegateForFunctionPointer<fgt_read_Ttl>(p_fgt_read_Ttl);
-
-                var p_fgt_trigger_Ttl = GetProcAddress(pDll, "fgt_trigger_Ttl");
-                _fgt_trigger_Ttl = Marshal.GetDelegateForFunctionPointer<fgt_trigger_Ttl>(p_fgt_trigger_Ttl);
-
-                #endregion
-
-                #region Specific functions
-
-                var p_fgt_set_purge = GetProcAddress(pDll, "fgt_set_purge");
-                _fgt_set_purge = Marshal.GetDelegateForFunctionPointer<fgt_set_purge>(p_fgt_set_purge);
-
-                var p_fgt_set_manual = GetProcAddress(pDll, "fgt_set_manual");
-                _fgt_set_manual = Marshal.GetDelegateForFunctionPointer<fgt_set_manual>(p_fgt_set_manual);
-
-                #endregion
-            }
-            catch (Exception e)
-            {
-                Console.Write(e);
-                throw;
-            }
-
-            #endregion
+            NativeLibrary.SetDllImportResolver(typeof(fgtSdk).Assembly, ArchResolver);
         }
 
         #region Private methods
@@ -547,7 +332,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_init()
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_init(), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_init(), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -559,7 +344,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_close()
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_close(), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_close(), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -571,7 +356,7 @@ namespace fgt_sdk
         {
             var serialNumbers = new ushort[256];
             var types = new int[256];
-            var count = _fgt_detect(serialNumbers, types);
+            var count = fgt_detect(serialNumbers, types);
 
             var tuplesList = new List<(ushort, fgt_INSTRUMENT_TYPE)>();
 
@@ -608,7 +393,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            return ErrCheck((fgt_ERROR_CODE) _fgt_initEx(sns), fgt_ERRCHECK_TYPE.Generic);
+            return ErrCheck((fgt_ERROR_CODE) fgt_initEx(sns), fgt_ERRCHECK_TYPE.Generic);
         }
 
         #endregion
@@ -616,13 +401,13 @@ namespace fgt_sdk
         #region Channels info
 
         /// <summary>
-        /// Retrieve information about session controllers. Controllers are MFCS, Flowboard, Link, and IPS in an array.
+        /// Retrieve information about session controllers. Controllers are MFCS, Flowboard, Link, IPS, and Switchboard.
         /// </summary>
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a list of <see cref="fgt_CONTROLLER_INFO"/></returns>
         public static (fgt_ERROR_CODE errCode, List<fgt_CONTROLLER_INFO> info) Fgt_get_controllersInfo()
         {
             var controllersInfo = new fgt_CONTROLLER_INFO[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_controllersInfo(controllersInfo), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_controllersInfo(controllersInfo), fgt_ERRCHECK_TYPE.Generic);
             var controllersInfoList = controllersInfo.Where(c => c.SN != 0).ToList();
             return (errCode, controllersInfoList);
         }
@@ -634,7 +419,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, int count) Fgt_get_pressureChannelCount()
         {
             byte count = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_pressureChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_pressureChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
             return (errCode, count);
         }
 
@@ -645,7 +430,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, int count) Fgt_get_sensorChannelCount()
         {
             byte count = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_sensorChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
             return (errCode, (int) count);
         }
 
@@ -656,8 +441,21 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, int count) Fgt_get_TtlChannelCount()
         {
             byte count = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_TtlChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_TtlChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
             return (errCode, (int) count);
+        }
+
+        /// <summary>
+        /// Get total number of initialized valve channels. It is the sum of all connected Two-Switch,
+        /// L-Switch and M-Switch valves connected to Switchboard or Switch EZ devices, as well
+        /// as individual P-Switch outputs(8 per device).
+        /// </summary>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and valve channels count</returns>
+        public static (fgt_ERROR_CODE errCode, int count) Fgt_get_valveChannelCount()
+        {
+            byte count = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_valveChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
+            return (errCode, (int)count);
         }
 
         /// <summary>
@@ -669,7 +467,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, List<fgt_CHANNEL_INFO> info) Fgt_get_pressureChannelsInfo()
         {
             var info = new fgt_CHANNEL_INFO[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_pressureChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
             var controllersInfoList = info.Where(c => c.ControllerSN != 0).ToList();
             return (errCode, controllersInfoList);
         }
@@ -684,7 +482,7 @@ namespace fgt_sdk
         {
             var info = new fgt_CHANNEL_INFO[256];
             var type = new int[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_sensorChannelsInfo(info, type), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorChannelsInfo(info, type), fgt_ERRCHECK_TYPE.Generic);
             var tuplesList = new List<(fgt_CHANNEL_INFO, fgt_SENSOR_TYPE)>();
             for (var index = 0; index < info.Length; index++)
             {
@@ -705,9 +503,31 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, List<fgt_CHANNEL_INFO> info) Fgt_get_TtlChannelsInfo()
         {
             var info = new fgt_CHANNEL_INFO[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_TtlChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_TtlChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
             var controllersInfoList = info.Where(c => c.ControllerSN != 0).ToList();
             return (errCode, controllersInfoList);
+        }
+
+        /// <summary>
+        /// Retrieve information about each initialized valve channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
+        /// You can initialize instruments in specific order using <see cref="Fgt_initEx"/> function
+        /// </summary>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a list of <see cref="fgt_CHANNEL_INFO"/> <see cref="fgt_VALVE_TYPE"/> tuples</returns>
+        public static (fgt_ERROR_CODE errCode, List<(fgt_CHANNEL_INFO channelInfo, fgt_VALVE_TYPE sensorType)> info) Fgt_get_valveChannelsInfo()
+        {
+            var info = new fgt_CHANNEL_INFO[256];
+            var type = new int[256];
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_valveChannelsInfo(info, type), fgt_ERRCHECK_TYPE.Generic);
+            var tuplesList = new List<(fgt_CHANNEL_INFO, fgt_VALVE_TYPE)>();
+            for (var index = 0; index < info.Length; index++)
+            {
+                if (info[index].ControllerSN != 0)
+                {
+                    tuplesList.Add((info[index], (fgt_VALVE_TYPE)type[index]));
+                }
+            }
+
+            return (errCode, tuplesList);
         }
 
         #endregion
@@ -722,7 +542,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_pressure(uint pressureIndex, float pressure)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_pressure(pressureIndex, pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressure(pressureIndex, pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -734,7 +554,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, float pressure) Fgt_get_pressure(uint pressureIndex)
         {
             var pressure = 0.0f;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_pressure(pressureIndex, ref pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressure(pressureIndex, ref pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return (errCode, pressure);
         }
 
@@ -747,7 +567,7 @@ namespace fgt_sdk
         {
             var pressure = 0.0f;
             ushort timestamp = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_pressureEx(pressureIndex, ref pressure, ref timestamp), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureEx(pressureIndex, ref pressure, ref timestamp), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return (errCode, pressure, timestamp);
         }
 
@@ -761,7 +581,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorRegulation(uint sensorIndex, uint pressureIndex, float setpoint)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_sensorRegulation(sensorIndex, pressureIndex, setpoint), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorRegulation(sensorIndex, pressureIndex, setpoint), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -773,7 +593,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, float value) Fgt_get_sensorValue(uint sensorIndex)
         {
             var value = 0.0f;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_sensorValue(sensorIndex, ref value), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorValue(sensorIndex, ref value), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return (errCode, value);
         }
 
@@ -786,8 +606,47 @@ namespace fgt_sdk
         {
             var value = 0.0f;
             ushort timestamp = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_sensorValueEx(sensorIndex, ref value, ref timestamp), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorValueEx(sensorIndex, ref value, ref timestamp), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return (errCode, value, timestamp);
+        }
+
+        /// <summary>
+        /// Read the position of a specific valve channel.
+        /// </summary>
+        /// <param name="valveIndex">Index of valve channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and current position</returns>
+        public static (fgt_ERROR_CODE errCode, int position) Fgt_get_valvePosition(uint valveIndex)
+        {
+            int position = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_valvePosition(valveIndex, ref position), fgt_ERRCHECK_TYPE.Generic, valveIndex);
+            return (errCode, position);
+        }
+
+        /// <summary>
+        /// Set the position of a specific valve channel.
+        /// </summary>
+        /// <param name="valveIndex">Index of valve channel or unique ID</param>
+        /// <param name="position">position Desired valve position</param>
+        /// <param name="direction">Direction of the movement (applies only for M-Switch valve type)</param>
+        /// <param name="wait">Flag indicating if function should wait until the desired position is reached or not</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static fgt_ERROR_CODE Fgt_set_valvePosition(uint valveIndex, int position, fgt_SWITCH_DIRECTION direction = fgt_SWITCH_DIRECTION.Shortest, bool wait = true)
+        {
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_valvePosition(valveIndex, position, (int) direction, wait ? 1 : 0), fgt_ERRCHECK_TYPE.Generic, valveIndex);
+            return errCode;
+        }
+
+        /// <summary>
+        /// Set the position of all two positional valves connected to specified controller / module.
+        /// </summary>
+        /// <param name="controllerIndex">Index of sensor channel or unique ID</param>
+        /// <param name="moduleIndex">Index of the module (supported only by P-Switch)</param>
+        /// <param name="position">Desired position (0 or 1)</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static fgt_ERROR_CODE Fgt_set_allValves(uint controllerIndex, uint moduleIndex, int position)
+        {
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_allValves(controllerIndex, moduleIndex, position), fgt_ERRCHECK_TYPE.Generic, controllerIndex);
+            return errCode;
         }
 
         #endregion
@@ -815,7 +674,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_sessionPressureUnit(pressureUnit), fgt_ERRCHECK_TYPE.Pressure);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sessionPressureUnit(pressureUnit), fgt_ERRCHECK_TYPE.Pressure);
             return errCode;
         }
 
@@ -841,7 +700,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -854,7 +713,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, string unit) Fgt_get_pressureUnit(uint pressureIndex)
         {
             var pressureUnit = new char[140];
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
 
             var unitString = new string(pressureUnit.TakeWhile(c => c != '\0').ToArray());
             return (errCode, unitString);
@@ -882,7 +741,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -895,7 +754,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, string unit) Fgt_get_sensorUnit(uint sensorIndex)
         {
             var unit = new char[140];
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
 
             var unitString = new string(unit.TakeWhile(c => c != '\0').ToArray());
             return (errCode, unitString);
@@ -910,7 +769,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorCalibration(uint sensorIndex, fgt_SENSOR_CALIBRATION table)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_sensorCalibration(sensorIndex, (int) table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorCalibration(sensorIndex, (int) table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -922,7 +781,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, fgt_SENSOR_CALIBRATION table) Fgt_get_sensorCalibration(uint sensorIndex)
         {
             var table = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_sensorCalibration(sensorIndex, ref table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorCalibration(sensorIndex, ref table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
 
             return (errCode, (fgt_SENSOR_CALIBRATION) table);
         }
@@ -938,7 +797,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorCustomScale(uint sensorIndex, (float a, float b, float c) scale)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_sensorCustomScale(sensorIndex, scale.a, scale.b, scale.c), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorCustomScale(sensorIndex, scale.a, scale.b, scale.c), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -955,7 +814,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorCustomScaleEx(uint sensorIndex, (float a, float b, float c) scale, float sMax)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_sensorCustomScaleEx(sensorIndex, scale.a, scale.b, scale.c, sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorCustomScaleEx(sensorIndex, scale.a, scale.b, scale.c, sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -967,14 +826,14 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_calibratePressure(uint pressureIndex)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_calibratePressure(pressureIndex), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_calibratePressure(pressureIndex), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
         /// <summary>
         /// Start closed loop regulation between a sensor and a pressure controller. Pressure will be regulated in order to reach sensor setpoint.
         /// Custom sensors, outside Fluigent ones, can be used such as different flow-units, pressure, level ...
-        /// However we do not guarantee full compatibility with all sensors.Regulation quality is linked to sensor precision and your set-up.
+        /// However we do not guarantee full compatibility with all sensors. Regulation quality is linked to sensor precision and your set-up.
         /// In order to use this function, custom used sensor maximum range and measured values has to be updated at least once per second.
         /// Directly setting pressure on same pressureIndex will stop regulation. Not supported by IPS.
         /// This function must be called at 1Hz minimum or the regulation will stop.
@@ -986,7 +845,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_customSensorRegulation(float measure, float setpoint, float maxSensorRange, uint pressureIndex)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -998,7 +857,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, float pMin, float pMax) Fgt_get_pressureRange(uint pressureIndex)
         {
             float pMin = 0, pMax = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_pressureRange(pressureIndex, ref pMin, ref pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureRange(pressureIndex, ref pMin, ref pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return (errCode, pMin, pMax);
         }
 
@@ -1010,8 +869,20 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, (float sMin, float sMax) range) Fgt_get_sensorRange(uint sensorIndex)
         {
             float sMin = 0, sMax = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_get_sensorRange(sensorIndex, ref sMin, ref sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorRange(sensorIndex, ref sMin, ref sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return (errCode, (sMin, sMax));
+        }
+
+        /// <summary>
+        /// Get valve maximum position. Position indexing starts at 0.
+        /// </summary>
+        /// <param name="valveIndex">Index of valve channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and Maximum position of this valve</returns>
+        public static (fgt_ERROR_CODE errCode, int posMax) Fgt_get_valveRange(uint valveIndex)
+        {
+            int posMax = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_valveRange(valveIndex, ref posMax), fgt_ERRCHECK_TYPE.Sensor, valveIndex);
+            return (errCode, posMax);
         }
 
         /// <summary>
@@ -1022,7 +893,7 @@ namespace fgt_sdk
         /// <returns></returns>
         public static fgt_ERROR_CODE Fgt_set_pressureLimit(uint pressureIndex, (float pMin, float pMax) limits)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_pressureLimit(pressureIndex, limits.pMin, limits.pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressureLimit(pressureIndex, limits.pMin, limits.pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -1039,7 +910,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorRegulationResponse(uint sensorIndex, uint responseTime)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_sensorRegulationResponse(sensorIndex, responseTime), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorRegulationResponse(sensorIndex, responseTime), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -1053,7 +924,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_pressureResponse(uint pressureIndex, byte value)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_pressureResponse(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressureResponse(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -1074,7 +945,7 @@ namespace fgt_sdk
             byte infoCode = 0;
             var details = new char[140];
 
-            var errCode = _fgt_get_pressureStatus(pressureIndex, ref type, ref controllerSn, ref infoCode, details);
+            var errCode = fgt_get_pressureStatus(pressureIndex, ref type, ref controllerSn, ref infoCode, details);
 
             var detailsString = new string(details.TakeWhile(c => c != '\0').ToArray());
 
@@ -1094,7 +965,7 @@ namespace fgt_sdk
             byte infoCode = 0;
             var details = new char[140];
 
-            var errCode = _fgt_get_sensorStatus(sensorIndex, ref type, ref controllerSn, ref infoCode, details);
+            var errCode = fgt_get_sensorStatus(sensorIndex, ref type, ref controllerSn, ref infoCode, details);
 
             var detailsString = new string(details.TakeWhile(c => c != '\0').ToArray());
 
@@ -1110,7 +981,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_power(uint controllerIndex, fgt_POWER state)
         {
-            return (fgt_ERROR_CODE) _fgt_set_power(controllerIndex, (byte) state);
+            return (fgt_ERROR_CODE) fgt_set_power(controllerIndex, (byte) state);
         }
 
         /// <summary>
@@ -1122,7 +993,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, fgt_POWER state) Fgt_get_power(uint controllerIndex)
         {
             byte state = 0;
-            var errCode = _fgt_get_power(controllerIndex, ref state);
+            var errCode = fgt_get_power(controllerIndex, ref state);
             return ((fgt_ERROR_CODE) errCode, (fgt_POWER) state);
         }
 
@@ -1138,7 +1009,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_TtlMode(uint TtlIndex, fgt_TTL_MODE mode)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_TtlMode(TtlIndex, (int) mode), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_TtlMode(TtlIndex, (int) mode), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -1150,7 +1021,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, bool ttlEvent) Fgt_read_Ttl(uint ttlIndex)
         {
             uint state = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_read_Ttl(ttlIndex, ref state), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_read_Ttl(ttlIndex, ref state), fgt_ERRCHECK_TYPE.Generic);
             return ((fgt_ERROR_CODE) errCode, Convert.ToBoolean(state));
         }
 
@@ -1161,7 +1032,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a boolean indicating if an event (edge) has occured</returns>
         public static fgt_ERROR_CODE Fgt_trigger_Ttl(uint ttlIndex)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_trigger_Ttl(ttlIndex), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_trigger_Ttl(ttlIndex), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -1178,7 +1049,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_purge(uint controllerIndex, bool purge)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_purge(controllerIndex, (byte) (purge ? 1 : 0)), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_purge(controllerIndex, (byte) (purge ? 1 : 0)), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -1191,7 +1062,7 @@ namespace fgt_sdk
         /// <returns></returns>
         public static fgt_ERROR_CODE Fgt_set_manual(uint pressureIndex, float value)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) _fgt_set_manual(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_manual(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 

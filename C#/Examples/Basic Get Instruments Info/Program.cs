@@ -20,7 +20,7 @@ namespace fgt_sdk_example_basic_get_instruments_info
             Console.WriteLine($"Total number of controller(s): {controllersCount}");
 
             fgt_ERROR_CODE errCode;
-            int pressureChannelsCount, sensorChannelsCount, ttlChannelsCount;
+            int pressureChannelsCount, sensorChannelsCount, ttlChannelsCount, valveChannelsCount;
 
             if (controllersCount > 0)
             {
@@ -48,6 +48,10 @@ namespace fgt_sdk_example_basic_get_instruments_info
                 // Get total number of initialized TTL channel(s)
                 (errCode, ttlChannelsCount) = fgtSdk.Fgt_get_TtlChannelCount();
                 Console.WriteLine($"Total number of TTL channels: {ttlChannelsCount}{Environment.NewLine}");
+
+                // Get total number of initialized TTL channel(s)
+                (errCode, valveChannelsCount) = fgtSdk.Fgt_get_valveChannelCount();
+                Console.WriteLine($"Total number of valve channels: {valveChannelsCount}{Environment.NewLine}");
 
                 // Get detailed information about all controller(s)
                 List<fgt_CONTROLLER_INFO> controllerInfos;
@@ -106,6 +110,22 @@ namespace fgt_sdk_example_basic_get_instruments_info
                                       $"Index: {ttlChannelsInfo[index].Index}{Environment.NewLine}" +
                                       $"ID: {ttlChannelsInfo[index].IndexId}{Environment.NewLine}" +
                                       $"Type: {ttlChannelsInfo[index].InstrType}{Environment.NewLine}");
+                }
+
+                // Get detailed information about all valve channels
+                List<(fgt_CHANNEL_INFO channelInfo, fgt_VALVE_TYPE valveType)> valveChannelsInfo;
+                (errCode, valveChannelsInfo) = fgtSdk.Fgt_get_valveChannelsInfo();
+                for (var index = 0; index < valveChannelsCount; index++)
+                {
+                    Console.WriteLine($"Valve channel info at index: {index}{Environment.NewLine}" +
+                                      $"Controller SN: {valveChannelsInfo[index].channelInfo.ControllerSN}{Environment.NewLine}" +
+                                      $"Device SN: {valveChannelsInfo[index].channelInfo.DeviceSN}{Environment.NewLine}" +
+                                      $"Firmware: {valveChannelsInfo[index].channelInfo.Firmware}{Environment.NewLine}" +
+                                      $"Position: {valveChannelsInfo[index].channelInfo.Position}{Environment.NewLine}" +
+                                      $"Index: {valveChannelsInfo[index].channelInfo.Index}{Environment.NewLine}" +
+                                      $"ID: {valveChannelsInfo[index].channelInfo.IndexId}{Environment.NewLine}" +
+                                      $"Type: {valveChannelsInfo[index].channelInfo.InstrType}{Environment.NewLine}" +
+                                      $"Valve type: {valveChannelsInfo[index].valveType}{Environment.NewLine}");
                 }
             }
             else

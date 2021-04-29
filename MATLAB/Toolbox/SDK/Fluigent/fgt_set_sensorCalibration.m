@@ -1,4 +1,4 @@
-function [] = fgt_set_sensorCalibration( sensorIndex, calibration )
+function varargout = fgt_set_sensorCalibration( sensorIndex, calibration )
 %FGT_SET_SENSORCALIBRATION Set sensor calibration table or zero value. 
 % 
 % fgt_set_sensorCalibration(sensorIndex, calibration) sets the calibration
@@ -6,6 +6,9 @@ function [] = fgt_set_sensorCalibration( sensorIndex, calibration )
 % fgt_SENSOR_CALIBRATION enum, if the sensor is a Flow Unit.
 % Function is only available for specific sensors (dual type) such as
 % the Flow Unit M accepting H2O and IPA.
+%
+% error_code = fgt_set_sensorCalibration(sensorIndex, calibration) also
+% returns the error code returned by the library function.
 %
 % For IPS modules, calling this function sets the current pressure 
 % measurement as the sensor's zero value. The calibration argument is
@@ -20,7 +23,10 @@ function [] = fgt_set_sensorCalibration( sensorIndex, calibration )
 % fgt_set_sensorCalibration(2, fgt_SENSOR_CALIBRATION.None)
 
 calibration = uint8(calibration);
-LowLevel.fgt_set_sensorCalibration( sensorIndex, calibration );
+error_code = LowLevel.fgt_set_sensorCalibration( sensorIndex, calibration );
 manage_sensor_status('fgt_set_sensorCalibration', sensorIndex);
+if nargout > 0
+    varargout = {fgt_ERROR_CODE(error_code)};
+end
 end
 

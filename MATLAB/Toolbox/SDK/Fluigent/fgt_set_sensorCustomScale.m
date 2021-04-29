@@ -1,4 +1,4 @@
-function [ ] = fgt_set_sensorCustomScale(varargin)
+function varargout = fgt_set_sensorCustomScale(varargin)
 %FGT_SET_SENSORCUSTOMSCALE Apply a custom scale factor on sensor read value. 
 % 
 % fgt_set_sensorCustomScale(sensor_index, a) applies a linear scale factor
@@ -17,6 +17,9 @@ function [ ] = fgt_set_sensorCustomScale(varargin)
 % scale factor and clips the value at SMax, such that if the result of
 % applying the above formula is greater than SMax, the output will be SMax.
 %
+% error_code = fgt_set_sensorCustomScale(...) also returns the error code
+% returned by the library function.
+%
 % This function is useful in order to adapt read sensor value to 
 % physical measurement.
 % For example if a Flow Unit is used with a special oil and its 
@@ -30,12 +33,15 @@ if nargin > 5
 elseif nargin < 2
     error('Not enough input arguments.')
 elseif nargin == 5
-    LowLevel.fgt_set_sensorCustomScaleEx(varargin{:})
+    error_code = LowLevel.fgt_set_sensorCustomScaleEx(varargin{:});
 else
     varargin(nargin+1:4) = {0};
-    LowLevel.fgt_set_sensorCustomScale(varargin{:})
+    error_code = LowLevel.fgt_set_sensorCustomScale(varargin{:});
 end
 sensorIndex = varargin{1};
 manage_sensor_status('fgt_set_sensorCustomScale', sensorIndex);
+if nargout > 0
+    varargout = {fgt_ERROR_CODE(error_code)};
+end
 end
 

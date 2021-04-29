@@ -1,6 +1,5 @@
-function [ infoArray ] = fgt_get_pressureChannelsInfo( )
+function [ infoArray, error_code ] = fgt_get_pressureChannelsInfo( )
 %FGT_GET_PRESSURECHANNELSINFO Retrieve information about initialized pressure channels.
-% 
 % 
 % infoArray = fgt_get_pressureChannelsInfo() returns a structure array
 % containing the following fields for each pressure channel:
@@ -12,6 +11,9 @@ function [ infoArray ] = fgt_get_pressureChannelsInfo( )
 % index: global index of the channel across all instruments
 % indexID: instrument's unique identifier
 % InstrType: type of instrument
+%
+% [infoArray, error_code] = fgt_get_pressureChannelsInfo() also returns the
+% error code returned by the library function
 %
 % This function is useful in order to get channels order, controller, 
 % unique ID and instrument type.
@@ -27,4 +29,5 @@ for i=1:numel(infoArray)
     infoArray(i).InstrType = fgt_INSTRUMENT_TYPE(infoArray(i).InstrType);
 end
 manage_generic_status('fgt_get_pressureChannelsInfo', error_code);
+error_code = fgt_ERROR_CODE(error_code);
 end

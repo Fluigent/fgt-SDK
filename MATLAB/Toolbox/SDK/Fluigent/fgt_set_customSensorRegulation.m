@@ -1,9 +1,12 @@
-function [ ] = fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex)
+function varargout = fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex)
 %FGT_SET_CUSTOMSENSORREGULATION Start closed loop regulation with manual sensor update
 % 
 % fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex)
 % will update the algorithm with the current sensor measurement, desired
 % setpoint, range and the index of the pressure channel that can drive it.
+%
+% error_code = fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex)
+% also returns the error code returned by the library function.
 %
 % The measurement, setpoint and range must be in the same unit.
 % 
@@ -17,8 +20,11 @@ function [ ] = fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange,
 % Directly setting pressure on same pressure_index will stop regulation.
 % This function must be called at 1Hz minimum or the regulation will stop.
 
-LowLevel.fgt_set_customSensorRegulation(measure, setpoint, ...
+error_code = LowLevel.fgt_set_customSensorRegulation(measure, setpoint, ...
          maxSensorRange, pressureIndex);
 manage_pressure_status('fgt_set_customSensorRegulation', pressureIndex);
+if nargout > 0
+    varargout = {fgt_ERROR_CODE(error_code)};
+end
 end
 

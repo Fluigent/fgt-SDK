@@ -1,7 +1,7 @@
-function [infoArray, typeArray] = fgt_get_sensorChannelsInfo( )
+function [infoArray, typeArray, error_code] = fgt_get_sensorChannelsInfo( )
 %FGT_GET_SENSORCHANNELSINFO Retrieve information about initialized sensor channels. 
 % 
-% infoArray = fgt_get_pressureChannelsInfo returns a structure array
+% infoArray = fgt_get_sensorChannelsInfo returns a structure array
 % containing the following fields for each pressure channel:
 %
 % ControllerSN: serial number of the controller
@@ -14,6 +14,9 @@ function [infoArray, typeArray] = fgt_get_sensorChannelsInfo( )
 %
 % [infoArray, typeArray] = fgt_get_sensorChannelsInfo also returns the
 % type of each sensor in the list, in the same order as infoArray
+%
+% [infoArray, typeArray, error_code] = fgt_get_sensorChannelsInfo() also 
+% returns the error code returned by the library function.
 %
 % This function is useful in order to get channels order, controller, 
 % unique ID and instrument type.
@@ -29,5 +32,6 @@ for i=1:numel(infoArray)
     typeArray(i) = fgt_SENSOR_TYPE(typeArray(i));
 end
 manage_generic_status('fgt_get_sensorChannelsInfo', error_code);
+error_code = fgt_ERROR_CODE(error_code);
 end
 

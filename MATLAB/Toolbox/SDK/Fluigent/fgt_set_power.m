@@ -1,9 +1,12 @@
-function [] = fgt_set_power(controllerIndex, powerState)
+function varargout = fgt_set_power(controllerIndex, powerState)
 %FGT_SET_POWER Set power ON or OFF on a controller.
 % 
 % fgt_set_power(controllerIndex, powerState) will set the powered state of
 % the selected controller to the specified value from the fgt_POWER
 % enumeration.
+%
+% error_code = fgt_set_power(controllerIndex, powerState) also returns the
+% error code returned by the library function.
 %
 % Not all controllers support this functionality.
 %
@@ -15,5 +18,8 @@ function [] = fgt_set_power(controllerIndex, powerState)
 powerState = uint8(powerState);
 [error_code] = LowLevel.fgt_set_power(controllerIndex, powerState);
 manage_generic_status('fgt_set_power', error_code);
+if nargout > 0
+    varargout = {fgt_ERROR_CODE(error_code)};
+end
 end
 

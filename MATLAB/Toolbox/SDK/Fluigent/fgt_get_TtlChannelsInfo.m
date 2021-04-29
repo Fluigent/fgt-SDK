@@ -1,4 +1,4 @@
-function [ infoArray ] = fgt_get_TtlChannelsInfo( )
+function [ infoArray, error_code ] = fgt_get_TtlChannelsInfo( )
 %FGT_GET_TTLCHANNELSINFO Retrieve information about each initialized TTL channel. 
 %
 % infoArray = fgt_get_TtlChannelsInfo() returns a structure array
@@ -12,6 +12,9 @@ function [ infoArray ] = fgt_get_TtlChannelsInfo( )
 % indexID: instrument's unique identifier
 % InstrType: type of instrument
 %
+% [infoArray, error_code] = fgt_get_TtlChannelsInfo() also returns the
+% error code returned by the library function
+%
 % This function is useful in order to get channels order, controller,
 % unique ID and instrument type.
 % TTL channels are only available for LineUP Series, 2 ports for each
@@ -23,5 +26,6 @@ for i=1:numel(infoArray)
     infoArray(i).InstrType = fgt_INSTRUMENT_TYPE(infoArray(i).InstrType);
 end
 manage_generic_status('fgt_get_TtlChannelsInfo', error_code);
+error_code = fgt_ERROR_CODE(error_code);
 end
 

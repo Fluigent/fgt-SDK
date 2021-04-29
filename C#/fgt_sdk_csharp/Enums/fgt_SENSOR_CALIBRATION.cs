@@ -5,6 +5,7 @@
     /// </summary>
     public enum fgt_SENSOR_CALIBRATION
     {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         None,
         H2O,
         IPA,
