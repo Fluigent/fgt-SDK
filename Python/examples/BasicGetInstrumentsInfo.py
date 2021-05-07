@@ -18,6 +18,7 @@ from Fluigent.SDK import fgt_get_controllersInfo
 from Fluigent.SDK import fgt_get_pressureChannelCount, fgt_get_pressureChannelsInfo
 from Fluigent.SDK import fgt_get_sensorChannelCount, fgt_get_sensorChannelsInfo
 from Fluigent.SDK import fgt_get_TtlChannelCount, fgt_get_TtlChannelsInfo
+from Fluigent.SDK import fgt_get_valveChannelCount, fgt_get_valveChannelsInfo
 
 # Detect all controllers
 SNs, types = fgt_detect()
@@ -45,6 +46,9 @@ print('Total number of sensor channels: {}'.format(fgt_get_sensorChannelCount())
 
 # Get total number of initialized TTL channels
 print('Total number of TTL channels: {}'.format(fgt_get_TtlChannelCount()))
+
+# Get total number of initialized valve channels
+print('Total number of valve channels: {}'.format(fgt_get_valveChannelCount()))
     
 ## Get detailed information about all controllers
 
@@ -74,6 +78,12 @@ ttlInfoArray = fgt_get_TtlChannelsInfo()
 for i, ttlInfo in enumerate(ttlInfoArray):
     print('TTL channel info at index: {}'.format(i))
     print(ttlInfo)
+    
+valveInfoArray, valveTypeArray = fgt_get_valveChannelsInfo()
+for i, valveInfo in enumerate(valveInfoArray):
+    print('Valve channel info at index: {}'.format(i))
+    print(valveInfo)
+    print("Valve type: {}".format(valveTypeArray[i]))
 
 ## Close the session
 fgt_close()

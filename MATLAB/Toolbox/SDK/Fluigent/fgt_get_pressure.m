@@ -6,9 +6,13 @@ function varargout = fgt_get_pressure( pressureIndex )
 %
 % [pressure, timestamp] = fgt_get_pressure( pressureIndex ) returns the
 % instrument's internal timestamp in addition to the pressure.
+%
+% [pressure, timestamp, error_code] = fgt_get_pressure( pressureIndex )
+% also returns the error code returned by the library function
 
-[~, pressure, timestamp] = LowLevel.fgt_get_pressureEx(pressureIndex);
+[error_code, pressure, timestamp] = LowLevel.fgt_get_pressureEx(pressureIndex);
 manage_pressure_status('fgt_get_pressure', pressureIndex);
-varargout = {pressure, timestamp};
+error_code = fgt_ERROR_CODE(error_code);
+varargout = {pressure, timestamp, error_code};
 end
 

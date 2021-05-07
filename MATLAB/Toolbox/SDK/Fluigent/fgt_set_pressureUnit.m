@@ -1,8 +1,11 @@
-function [] = fgt_set_pressureUnit( pressureIndex, unit )
+function varargout = fgt_set_pressureUnit( pressureIndex, unit )
 %FGT_SET_PRESSUREUNIT Set pressure unit on selected pressure device.
 % 
 % fgt_set_pressureUnit(pressureIndex, unit) sets the unit to be used on the
 % selected pressure channel, which should be passed as a string.
+%
+% error_code = fgt_set_pressureUnit(pressureIndex, unit) also returns the
+% error code returned by the library function.
 % 
 % Default value is 'mbar'. 
 %
@@ -15,7 +18,10 @@ function [] = fgt_set_pressureUnit( pressureIndex, unit )
 % See also:
 %     fgt_set_sensorUnit
 
-LowLevel.fgt_set_pressureUnit( pressureIndex, unit );
+error_code = LowLevel.fgt_set_pressureUnit( pressureIndex, unit );
 manage_pressure_status('fgt_set_pressureUnit', pressureIndex);
+if nargout > 0
+    varargout = {fgt_ERROR_CODE(error_code)};
+end
 end
 

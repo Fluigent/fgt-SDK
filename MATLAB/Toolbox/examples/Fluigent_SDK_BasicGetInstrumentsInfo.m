@@ -35,12 +35,15 @@ fprintf('Total number of sensor channels: %d\n', fgt_get_sensorChannelCount);
 
 % Get total number of initialized TTL channels
 fprintf('Total number of TTL channels: %d\n', fgt_get_TtlChannelCount);
+
+% Get total number of initialized valve channels
+fprintf('Total number of valve channels: %d\n', fgt_get_valveChannelCount);
     
 %% Get detailed information about all controllers
 
 controllerInfoArray = fgt_get_controllersInfo;
 for i=1:numel(controllerInfoArray)
-    fprintf('Controller info at index: %d\n', i-1);
+    fprintf('Controller at index %d:\n', i-1);
     disp(controllerInfoArray(i));
 end
 
@@ -48,15 +51,15 @@ end
 
 pressureInfoArray = fgt_get_pressureChannelsInfo;
 for i=1:numel(pressureInfoArray)
-    fprintf('Pressure channel info at index: %d\n', i-1);
+    fprintf('Pressure channel at index %d:\n', i-1);
     disp(pressureInfoArray(i));
 end
 
 %% Get detailed information about all sensor channels
 
-sensorInfoArray = fgt_get_sensorChannelsInfo;
+[sensorInfoArray, sensorTypeArray] = fgt_get_sensorChannelsInfo;
 for i=1:numel(sensorInfoArray)
-    fprintf('Sensor channel info at index: %d\n', i-1);
+    fprintf('Sensor channel at index %d (%s):\n', i-1, char(fgt_SENSOR_TYPE(sensorTypeArray(i))));
     disp(sensorInfoArray(i));
 end
 
@@ -64,8 +67,16 @@ end
 
 ttlInfoArray = fgt_get_TtlChannelsInfo;
 for i=1:numel(ttlInfoArray)
-    fprintf('TTL channel info at index: %d\n', i-1);
+    fprintf('TTL channel at index: %d:\n', i-1);
     disp(ttlInfoArray(i));
+end
+
+%% Get detailed information about all sensor channels
+
+[valveInfoArray, valveTypeArray] = fgt_get_valveChannelsInfo;
+for i=1:numel(valveInfoArray)
+    fprintf('Valve channel info at index %d (%s):\n', i-1, char(fgt_VALVE_TYPE(valveTypeArray(i))));
+    disp(valveInfoArray(i));
 end
 
 %% Close the session

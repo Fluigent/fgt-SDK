@@ -20,7 +20,7 @@ namespace UnitTests
         {
             var (count, instruments) = fgtSdk.Fgt_detect();
             Assert.Equal(0, count);
-            Assert.Equal(0, instruments.Count);
+            Assert.Empty(instruments);
         }
 
         [Fact]

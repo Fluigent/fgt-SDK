@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Basic Get Instruments Info</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-07-23"><meta name="DC.source" content="Fluigent_SDK_BasicGetInstrumentsInfo.m"><style type="text/css">
+      --><title>Basic Get Instruments Info</title><meta name="generator" content="MATLAB 9.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-26"><meta name="DC.source" content="Fluigent_SDK_BasicGetInstrumentsInfo.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Basic Get Instruments Info</h1><!--introduction--><p>This example shows how to retrieve information about Fluigent instruments: type, controller, serial number, unique ID...</p><p>Requires at least one Fluigent pressure or sensor module</p><p><a href="matlab:edit('Fluigent_SDK_BasicGetInstrumentsInfo')">Open this M File</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Get serial numbers and types of detected Fluigent controllers</a></li><li><a href="#2">Initialize specific instruments</a></li><li><a href="#3">Get the number of channels of each type</a></li><li><a href="#4">Get detailed information about all controllers</a></li><li><a href="#5">Get detailed information about all pressure channels</a></li><li><a href="#6">Get detailed information about all sensor channels</a></li><li><a href="#7">Get detailed information about all TTL channels</a></li><li><a href="#8">Close the session</a></li></ul></div><h2>Get serial numbers and types of detected Fluigent controllers<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Detect all controllers</span>
+  </style></head><body><div class="content"><h1>Basic Get Instruments Info</h1><!--introduction--><p>This example shows how to retrieve information about Fluigent instruments: type, controller, serial number, unique ID...</p><p>Requires at least one Fluigent pressure or sensor module</p><p><a href="matlab:edit('Fluigent_SDK_BasicGetInstrumentsInfo')">Open this M File</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Get serial numbers and types of detected Fluigent controllers</a></li><li><a href="#2">Initialize specific instruments</a></li><li><a href="#3">Get the number of channels of each type</a></li><li><a href="#4">Get detailed information about all controllers</a></li><li><a href="#5">Get detailed information about all pressure channels</a></li><li><a href="#6">Get detailed information about all sensor channels</a></li><li><a href="#7">Get detailed information about all TTL channels</a></li><li><a href="#8">Get detailed information about all sensor channels</a></li><li><a href="#9">Close the session</a></li></ul></div><h2>Get serial numbers and types of detected Fluigent controllers<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Detect all controllers</span>
 [SNs, types] = fgt_detect;
 controllerCount = numel(SNs);
 fprintf(<span class="string">'Number of controllers detected: %d\n'</span>, controllerCount);
@@ -87,27 +87,35 @@ fprintf(<span class="string">'Total number of sensor channels: %d\n'</span>, fgt
 
 <span class="comment">% Get total number of initialized TTL channels</span>
 fprintf(<span class="string">'Total number of TTL channels: %d\n'</span>, fgt_get_TtlChannelCount);
+
+<span class="comment">% Get total number of initialized valve channels</span>
+fprintf(<span class="string">'Total number of valve channels: %d\n'</span>, fgt_get_valveChannelCount);
 </pre><h2>Get detailed information about all controllers<a name="4"></a></h2><pre class="codeinput">controllerInfoArray = fgt_get_controllersInfo;
 <span class="keyword">for</span> i=1:numel(controllerInfoArray)
-    fprintf(<span class="string">'Controller info at index: %d\n'</span>, i-1);
+    fprintf(<span class="string">'Controller at index %d:\n'</span>, i-1);
     disp(controllerInfoArray(i));
 <span class="keyword">end</span>
 </pre><h2>Get detailed information about all pressure channels<a name="5"></a></h2><pre class="codeinput">pressureInfoArray = fgt_get_pressureChannelsInfo;
 <span class="keyword">for</span> i=1:numel(pressureInfoArray)
-    fprintf(<span class="string">'Pressure channel info at index: %d\n'</span>, i-1);
+    fprintf(<span class="string">'Pressure channel at index %d:\n'</span>, i-1);
     disp(pressureInfoArray(i));
 <span class="keyword">end</span>
-</pre><h2>Get detailed information about all sensor channels<a name="6"></a></h2><pre class="codeinput">sensorInfoArray = fgt_get_sensorChannelsInfo;
+</pre><h2>Get detailed information about all sensor channels<a name="6"></a></h2><pre class="codeinput">[sensorInfoArray, sensorTypeArray] = fgt_get_sensorChannelsInfo;
 <span class="keyword">for</span> i=1:numel(sensorInfoArray)
-    fprintf(<span class="string">'Sensor channel info at index: %d\n'</span>, i-1);
+    fprintf(<span class="string">'Sensor channel at index %d (%s):\n'</span>, i-1, char(fgt_SENSOR_TYPE(sensorTypeArray(i))));
     disp(sensorInfoArray(i));
 <span class="keyword">end</span>
 </pre><h2>Get detailed information about all TTL channels<a name="7"></a></h2><pre class="codeinput">ttlInfoArray = fgt_get_TtlChannelsInfo;
 <span class="keyword">for</span> i=1:numel(ttlInfoArray)
-    fprintf(<span class="string">'TTL channel info at index: %d\n'</span>, i-1);
+    fprintf(<span class="string">'TTL channel at index: %d:\n'</span>, i-1);
     disp(ttlInfoArray(i));
 <span class="keyword">end</span>
-</pre><h2>Close the session<a name="8"></a></h2><pre class="codeinput">fgt_close
+</pre><h2>Get detailed information about all sensor channels<a name="8"></a></h2><pre class="codeinput">[valveInfoArray, valveTypeArray] = fgt_get_valveChannelsInfo;
+<span class="keyword">for</span> i=1:numel(valveInfoArray)
+    fprintf(<span class="string">'Valve channel info at index %d (%s):\n'</span>, i-1, char(fgt_VALVE_TYPE(valveTypeArray(i))));
+    disp(valveInfoArray(i));
+<span class="keyword">end</span>
+</pre><h2>Close the session<a name="9"></a></h2><pre class="codeinput">fgt_close
 </pre><p>Copyright (c) Fluigent 2019.  All Rights Reserved.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Basic Get Instruments Info
@@ -147,12 +155,15 @@ fprintf('Total number of sensor channels: %d\n', fgt_get_sensorChannelCount);
 
 % Get total number of initialized TTL channels
 fprintf('Total number of TTL channels: %d\n', fgt_get_TtlChannelCount);
+
+% Get total number of initialized valve channels
+fprintf('Total number of valve channels: %d\n', fgt_get_valveChannelCount);
     
 %% Get detailed information about all controllers
 
 controllerInfoArray = fgt_get_controllersInfo;
 for i=1:numel(controllerInfoArray)
-    fprintf('Controller info at index: %d\n', i-1);
+    fprintf('Controller at index %d:\n', i-1);
     disp(controllerInfoArray(i));
 end
 
@@ -160,15 +171,15 @@ end
 
 pressureInfoArray = fgt_get_pressureChannelsInfo;
 for i=1:numel(pressureInfoArray)
-    fprintf('Pressure channel info at index: %d\n', i-1);
+    fprintf('Pressure channel at index %d:\n', i-1);
     disp(pressureInfoArray(i));
 end
 
 %% Get detailed information about all sensor channels
 
-sensorInfoArray = fgt_get_sensorChannelsInfo;
+[sensorInfoArray, sensorTypeArray] = fgt_get_sensorChannelsInfo;
 for i=1:numel(sensorInfoArray)
-    fprintf('Sensor channel info at index: %d\n', i-1);
+    fprintf('Sensor channel at index %d (%s):\n', i-1, char(fgt_SENSOR_TYPE(sensorTypeArray(i))));
     disp(sensorInfoArray(i));
 end
 
@@ -176,8 +187,16 @@ end
 
 ttlInfoArray = fgt_get_TtlChannelsInfo;
 for i=1:numel(ttlInfoArray)
-    fprintf('TTL channel info at index: %d\n', i-1);
+    fprintf('TTL channel at index: %d:\n', i-1);
     disp(ttlInfoArray(i));
+end
+
+%% Get detailed information about all sensor channels
+
+[valveInfoArray, valveTypeArray] = fgt_get_valveChannelsInfo;
+for i=1:numel(valveInfoArray)
+    fprintf('Valve channel info at index %d (%s):\n', i-1, char(fgt_VALVE_TYPE(valveTypeArray(i))));
+    disp(valveInfoArray(i));
 end
 
 %% Close the session

@@ -1,0 +1,8 @@
+set(program_name "AdvancedParallelPressureControl")
+add_executable(${program_name} "Advanced Parallel Pressure Control.cpp")
+if(UNIX)
+   target_link_libraries(${program_name} PRIVATE fgt_SDK_cpp pthread)
+else()
+   target_link_libraries(${program_name} PRIVATE fgt_SDK_cpp)
+endif()
+COPY_SDK_LIB(${program_name})
