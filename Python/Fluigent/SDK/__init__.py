@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "21.0.0"
+__version__ = "21.1.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
