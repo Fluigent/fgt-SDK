@@ -1,4 +1,4 @@
-# Fluigent Software Developement Kit - version 21.0.0
+# Fluigent Software Developement Kit - version 21.1.0
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application;
