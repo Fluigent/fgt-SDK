@@ -30,6 +30,8 @@ for i, sn in enumerate(SNs):
     print('Detected instrument at index: {}, ControllerSN: {}, type: {}'\
           .format(i, sn, str(types[i])))
 
+print('')
+
 ## Initialize specific instruments
 # Initialize only specific instrument controllers here If you do not want
 # a controller in the list or if you want a specific order (e.g. LineUP
@@ -49,6 +51,8 @@ print('Total number of TTL channels: {}'.format(fgt_get_TtlChannelCount()))
 
 # Get total number of initialized valve channels
 print('Total number of valve channels: {}'.format(fgt_get_valveChannelCount()))
+
+print('')
     
 ## Get detailed information about all controllers
 
@@ -56,6 +60,7 @@ controllerInfoArray = fgt_get_controllersInfo()
 for i, controllerInfo in enumerate(controllerInfoArray):
     print('Controller info at index: {}'.format(i))
     print(controllerInfo)
+    print('')
 
 ## Get detailed information about all pressure channels
 
@@ -63,6 +68,7 @@ pressureInfoArray = fgt_get_pressureChannelsInfo()
 for i, pressureInfo in enumerate(pressureInfoArray):
     print('Pressure channel info at index: {}'.format(i))
     print(pressureInfo)
+    print('')
 
 ## Get detailed information about all sensor channels
 
@@ -71,6 +77,7 @@ for i, sensorInfo in enumerate(sensorInfoArray):
     print('Sensor channel info at index: {}'.format(i))
     print(sensorInfo)
     print("Sensor type: {}".format(sensorTypeArray[i]))
+    print('')
 
 ## Get detailed information about all TTL channels
 
@@ -78,12 +85,14 @@ ttlInfoArray = fgt_get_TtlChannelsInfo()
 for i, ttlInfo in enumerate(ttlInfoArray):
     print('TTL channel info at index: {}'.format(i))
     print(ttlInfo)
+    print('')
     
 valveInfoArray, valveTypeArray = fgt_get_valveChannelsInfo()
 for i, valveInfo in enumerate(valveInfoArray):
     print('Valve channel info at index: {}'.format(i))
     print(valveInfo)
     print("Valve type: {}".format(valveTypeArray[i]))
+    print('')
 
 ## Close the session
 fgt_close()

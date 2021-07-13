@@ -1,4 +1,5 @@
 ﻿using fgt_sdk.Enums;
+using System;
 using System.Runtime.InteropServices;
 
 namespace fgt_sdk.Structs
@@ -17,5 +18,18 @@ namespace fgt_sdk.Structs
         public uint Id;
         /** Instrument type */
         public fgt_INSTRUMENT_TYPE InstrType;
+        /// <summary>
+        /// Prints the struct fields
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Join(Environment.NewLine, new string[] {
+                $"Controller SN: {SN}",
+                $"Firmware: {(Firmware >> 8) & 0xFF:x}.{Firmware & 0xFF:x2}",
+                $"ID: {Id}",
+                $"Type: {InstrType}",
+            });
+        }
     }
 }

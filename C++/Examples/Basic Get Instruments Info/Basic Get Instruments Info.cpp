@@ -65,7 +65,7 @@ int main()
 
 	// Get total number of initialized TTL channel(s)
 	Fgt_get_TtlChannelCount(&ttl_number);
-	std::cout << "Total number of TTL channels: " << int(ttl_number) << std::endl << std::endl;
+	std::cout << "Total number of TTL channels: " << int(ttl_number) << std::endl;
 
 	// Get total number of initialized valve channel(s)
 	Fgt_get_valveChannelCount(&valve_number);
@@ -75,49 +75,42 @@ int main()
 	Fgt_get_controllersInfo(controller_info);
 	for (unsigned char loop = 0; loop < controller_number; loop++)
 	{
-		std::cout << "Controller info at index: " << int(loop) << " SN: " << controller_info[loop].SN
-			<< " Firmware: " << controller_info[loop].Firmware << " ID: " << controller_info[loop].id
-			<< " type: " << controller_info[loop].InstrType << std::endl;
+		std::cout << "Controller info at index: " << int(loop) << "\n"
+			<< controller_info[loop] << "\n\n";
 	}
 
 	// Get detailed information about all pressure channels
 	Fgt_get_pressureChannelsInfo(pressure_info);
 	for (unsigned char loop = 0; loop < pressure_number; loop++)
 	{
-		std::cout << "Pressure channel info at index: " << int(loop) << " ,Controller SN: " << pressure_info[loop].ControllerSN
-			<< " DeviceSN: " << pressure_info[loop].DeviceSN << " firmware: " << pressure_info[loop].firmware
-			<< " position: " << pressure_info[loop].position << " index: " << pressure_info[loop].index
-			<< " ID: " << pressure_info[loop].indexID << " InstrType: " << pressure_info[loop].InstrType << std::endl;
+		std::cout << "Pressure channel info at index: " << int(loop) << "\n" 
+			<< pressure_info[loop] << "\n\n";
 	}
 
 	// Get detailed information about all sensor channels
 	Fgt_get_sensorChannelsInfo(sensor_info, sensor_type);
 	for (unsigned char loop = 0; loop < sensor_number; loop++)
 	{
-		std::cout << "Sensor channel info at index: " << int(loop) << " ,ControllerSN: " << sensor_info[loop].ControllerSN
-			<< " DeviceSN: " << sensor_info[loop].DeviceSN << " firmware: " << sensor_info[loop].firmware
-			<< " position: " << sensor_info[loop].position << " index: " << sensor_info[loop].index
-			<< " ID: " << sensor_info[loop].indexID << " InstrType: " << sensor_info[loop].InstrType << " sensor SensorType: " << sensor_type[loop] << std::endl;
+		std::cout << "Sensor channel info at index: " << int(loop) << "\n"
+			<< sensor_info[loop] << "\n"
+			<< "Sensor type: " << sensor_type[loop] << "\n\n";
 	}
 
 	// Get detailed information about all TTL channels
 	Fgt_get_TtlChannelsInfo(Ttl_info);
 	for (unsigned char loop = 0; loop < ttl_number; loop++)
 	{
-		std::cout << "TTL channel info at index: " << int(loop) << " ControllerSN: " << Ttl_info[loop].ControllerSN
-			<< " DeviceSN: " << Ttl_info[loop].DeviceSN << " firmware: " << Ttl_info[loop].firmware
-			<< " position: " << Ttl_info[loop].position << " index: " << Ttl_info[loop].index
-			<< " ID: " << Ttl_info[loop].indexID << " InstrType: " << Ttl_info[loop].InstrType << std::endl;
+		std::cout << "TTL channel info at index: " << int(loop) << "\n"
+			<< Ttl_info[loop] << "\n\n";
 	}
 
 	// Get detailed information about all valve channels
 	Fgt_get_valveChannelsInfo(valve_info, valve_type);
 	for (unsigned char loop = 0; loop < valve_number; loop++)
 	{
-		std::cout << "Valve channel info at index: " << int(loop) << " ,ControllerSN: " << valve_info[loop].ControllerSN
-			<< " DeviceSN: " << valve_info[loop].DeviceSN << " firmware: " << valve_info[loop].firmware
-			<< " position: " << valve_info[loop].position << " index: " << valve_info[loop].index
-			<< " ID: " << valve_info[loop].indexID << " InstrType: " << valve_info[loop].InstrType << " valve ValveType: " << valve_type[loop] << std::endl;
+		std::cout << "Valve channel info at index: " << int(loop) << "\n"
+			<< valve_info[loop] << "\n"
+			<< "Valve type: " << valve_type[loop] << "\n\n";
 	}
 
 	// Close session

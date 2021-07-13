@@ -51,6 +51,12 @@ std::ostream& operator<<(std::ostream& str, fgt_VALVE_TYPE valveType);
 /** fgt_SWITCH_DIRECTION: switch direction for rotating switches */
 std::ostream& operator<<(std::ostream& str, fgt_SWITCH_DIRECTION direction);
 
+/** fgt_CONTROLLER_INFO: displays data on controller instruments */
+std::ostream& operator<<(std::ostream& str, const fgt_CONTROLLER_INFO& info);
+
+/** fgt_CHANNEL_INFO: displays data instrument channels */
+std::ostream& operator<<(std::ostream& str, const fgt_CHANNEL_INFO& info);
+
 /** Manage pressure error and status, display details
  *  Change this function for custom error management, returned fgt_ERROR_CODE can directly be used in main application
  *  This functions calls Fgt_get_pressureStatus and displays error details */

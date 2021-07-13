@@ -27,9 +27,9 @@ namespace fgt_sdk_example_basic_get_instruments_info
                 // List all found controllers serial number and type
                 for (var index = 0; index < controllersCount; index++)
                 {
-                    Console.WriteLine($"Detected instrument at index: {index}{Environment.NewLine}" +
-                                      $"Controller SN: {instruments[index].serialNumber}{Environment.NewLine}" +
-                                      $"Type: {instruments[index].type}{Environment.NewLine}");
+                    Console.WriteLine($"Detected instrument at index: {index}");
+                    Console.WriteLine($"Controller SN: {instruments[index].serialNumber}");
+                    Console.WriteLine($"Type: {instruments[index].type}{Environment.NewLine}");
                 }
 
                 // Initialize only specific instrument controllers here
@@ -47,11 +47,13 @@ namespace fgt_sdk_example_basic_get_instruments_info
 
                 // Get total number of initialized TTL channel(s)
                 (errCode, ttlChannelsCount) = fgtSdk.Fgt_get_TtlChannelCount();
-                Console.WriteLine($"Total number of TTL channels: {ttlChannelsCount}{Environment.NewLine}");
+                Console.WriteLine($"Total number of TTL channels: {ttlChannelsCount}");
 
                 // Get total number of initialized TTL channel(s)
                 (errCode, valveChannelsCount) = fgtSdk.Fgt_get_valveChannelCount();
-                Console.WriteLine($"Total number of valve channels: {valveChannelsCount}{Environment.NewLine}");
+                Console.WriteLine($"Total number of valve channels: {valveChannelsCount}");
+
+                Console.WriteLine("");
 
                 // Get detailed information about all controller(s)
                 List<fgt_CONTROLLER_INFO> controllerInfos;
@@ -59,11 +61,9 @@ namespace fgt_sdk_example_basic_get_instruments_info
 
                 for (var index = 0; index < controllersCount; index++)
                 {
-                    Console.WriteLine($"Controller info at index: {index}{Environment.NewLine}" +
-                                      $"SN: {controllerInfos[index].SN}{Environment.NewLine}" +
-                                      $"Firmware: {controllerInfos[index].Firmware}{Environment.NewLine}" +
-                                      $"ID: {controllerInfos[index].Id}{Environment.NewLine}" +
-                                      $"Type: {controllerInfos[index].InstrType}{Environment.NewLine}");
+                    Console.WriteLine($"Controller info at index: {index}");
+                    Console.WriteLine(controllerInfos[index]);
+                    Console.WriteLine("");
                 }
 
                 // Get detailed information about all pressure channels
@@ -71,14 +71,9 @@ namespace fgt_sdk_example_basic_get_instruments_info
                 (errCode, pressureChannelInfo) = fgtSdk.Fgt_get_pressureChannelsInfo();
                 for (var index = 0; index < pressureChannelsCount; index++)
                 {
-                    Console.WriteLine($"Pressure channel info at index: {index}{Environment.NewLine}" +
-                                      $"Controller SN: {pressureChannelInfo[index].ControllerSN}{Environment.NewLine}" +
-                                      $"Device SN: {pressureChannelInfo[index].DeviceSN}{Environment.NewLine}" +
-                                      $"Firmware: {pressureChannelInfo[index].Firmware}{Environment.NewLine}" +
-                                      $"Position: {pressureChannelInfo[index].Position}{Environment.NewLine}" +
-                                      $"Index: {pressureChannelInfo[index].Index}{Environment.NewLine}" +
-                                      $"ID: {pressureChannelInfo[index].IndexId}{Environment.NewLine}" +
-                                      $"Type: {pressureChannelInfo[index].InstrType}{Environment.NewLine}");
+                    Console.WriteLine($"Pressure channel info at index: {index}");
+                    Console.WriteLine(pressureChannelInfo[index]);
+                    Console.WriteLine("");
                 }
 
                 // Get detailed information about all sensor channels
@@ -86,15 +81,9 @@ namespace fgt_sdk_example_basic_get_instruments_info
                 (errCode, sensorChannelsInfo) = fgtSdk.Fgt_get_sensorChannelsInfo();
                 for (var index = 0; index < sensorChannelsCount; index++)
                 {
-                    Console.WriteLine($"Sensor channel info at index: {index}{Environment.NewLine}" +
-                                      $"Controller SN: {sensorChannelsInfo[index].channelInfo.ControllerSN}{Environment.NewLine}" +
-                                      $"Device SN: {sensorChannelsInfo[index].channelInfo.DeviceSN}{Environment.NewLine}" +
-                                      $"Firmware: {sensorChannelsInfo[index].channelInfo.Firmware}{Environment.NewLine}" +
-                                      $"Position: {sensorChannelsInfo[index].channelInfo.Position}{Environment.NewLine}" +
-                                      $"Index: {sensorChannelsInfo[index].channelInfo.Index}{Environment.NewLine}" +
-                                      $"ID: {sensorChannelsInfo[index].channelInfo.IndexId}{Environment.NewLine}" +
-                                      $"Type: {sensorChannelsInfo[index].channelInfo.InstrType}{Environment.NewLine}" +
-                                      $"Sensor type: {sensorChannelsInfo[index].sensorType}{Environment.NewLine}");
+                    Console.WriteLine($"Sensor channel info at index: {index}");
+                    Console.WriteLine(sensorChannelsInfo[index].channelInfo);
+                    Console.WriteLine($"Sensor type: {sensorChannelsInfo[index].sensorType}{Environment.NewLine}");
                 }
 
                 // Get detailed information about all ttl channels
@@ -102,14 +91,9 @@ namespace fgt_sdk_example_basic_get_instruments_info
                 (errCode, ttlChannelsInfo) = fgtSdk.Fgt_get_TtlChannelsInfo();
                 for (var index = 0; index < ttlChannelsCount; index++)
                 {
-                    Console.WriteLine($"TTL channel info at index: {index}{Environment.NewLine}" +
-                                      $"Controller SN: {ttlChannelsInfo[index].ControllerSN}{Environment.NewLine}" +
-                                      $"Device SN: {ttlChannelsInfo[index].DeviceSN}{Environment.NewLine}" +
-                                      $"Firmware: {ttlChannelsInfo[index].Firmware}{Environment.NewLine}" +
-                                      $"Position: {ttlChannelsInfo[index].Position}{Environment.NewLine}" +
-                                      $"Index: {ttlChannelsInfo[index].Index}{Environment.NewLine}" +
-                                      $"ID: {ttlChannelsInfo[index].IndexId}{Environment.NewLine}" +
-                                      $"Type: {ttlChannelsInfo[index].InstrType}{Environment.NewLine}");
+                    Console.WriteLine($"TTL channel info at index: {index}");
+                    Console.WriteLine(ttlChannelsInfo[index]);
+                    Console.WriteLine("");
                 }
 
                 // Get detailed information about all valve channels
@@ -117,15 +101,9 @@ namespace fgt_sdk_example_basic_get_instruments_info
                 (errCode, valveChannelsInfo) = fgtSdk.Fgt_get_valveChannelsInfo();
                 for (var index = 0; index < valveChannelsCount; index++)
                 {
-                    Console.WriteLine($"Valve channel info at index: {index}{Environment.NewLine}" +
-                                      $"Controller SN: {valveChannelsInfo[index].channelInfo.ControllerSN}{Environment.NewLine}" +
-                                      $"Device SN: {valveChannelsInfo[index].channelInfo.DeviceSN}{Environment.NewLine}" +
-                                      $"Firmware: {valveChannelsInfo[index].channelInfo.Firmware}{Environment.NewLine}" +
-                                      $"Position: {valveChannelsInfo[index].channelInfo.Position}{Environment.NewLine}" +
-                                      $"Index: {valveChannelsInfo[index].channelInfo.Index}{Environment.NewLine}" +
-                                      $"ID: {valveChannelsInfo[index].channelInfo.IndexId}{Environment.NewLine}" +
-                                      $"Type: {valveChannelsInfo[index].channelInfo.InstrType}{Environment.NewLine}" +
-                                      $"Valve type: {valveChannelsInfo[index].valveType}{Environment.NewLine}");
+                    Console.WriteLine($"Valve channel info at index: {index}");
+                    Console.WriteLine(valveChannelsInfo[index].channelInfo);
+                    Console.WriteLine($"Valve type: {valveChannelsInfo[index].valveType}{Environment.NewLine}");
                 }
             }
             else

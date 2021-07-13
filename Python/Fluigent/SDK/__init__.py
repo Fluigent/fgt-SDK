@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "21.1.0"
+__version__ = "21.2.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -46,6 +46,9 @@ def replace_enums():
     
 replace_enums()
 del replace_enums
+
+def format_firmware_version(bcd_version):
+    return "{:x}.{:02x}".format(bcd_version >> 8, bcd_version & 0xFF)
 
 # Instrument information structures
 class fgt_CHANNEL_INFO(object):
@@ -95,12 +98,17 @@ class fgt_CHANNEL_INFO(object):
         """Type of the instrument"""
         return self.__instr_type
     
+    def formatattr(self, attr):
+        if attr.lower() == "firmware":
+            return "{}: {}".format(attr, format_firmware_version(getattr(self, attr)))
+        else:
+            return "{}: {}".format(attr, getattr(self, attr))
+    
     def __repr__(self):
         fields = ["ControllerSN", "firmware", "DeviceSN", "position",
                   "index", "indexID", "InstrType"]
-        return os.linesep.join([str(self.__class__)] 
-                       + ["{}: {}".format(attr, getattr(self, attr))
-                       for attr in fields])
+        return os.linesep.join([str(self.__class__)]
+                       + [self.formatattr(attr) for attr in fields])
     
     def __int__(self):
         return self.__index_id
@@ -134,11 +142,16 @@ class fgt_CONTROLLER_INFO(object):
         """Type of the instrument"""
         return self.__instr_type
     
+    def formatattr(self, attr):
+        if attr.lower() == "firmware":
+            return "{}: {}".format(attr, format_firmware_version(getattr(self, attr)))
+        else:
+            return "{}: {}".format(attr, getattr(self, attr))
+    
     def __repr__(self):
         fields = ["SN", "Firmware", "index", "InstrType"]
-        return os.linesep.join([str(self.__class__)] 
-                       + ["{}: {}".format(attr, getattr(self, attr))
-                       for attr in fields])
+        return os.linesep.join([str(self.__class__)]
+                       + [self.formatattr(attr) for attr in fields])
             
     def __int__(self):
         return self.__id
