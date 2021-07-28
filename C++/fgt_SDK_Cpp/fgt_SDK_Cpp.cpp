@@ -12,6 +12,7 @@
 *============================================================================*/
 
 #include <iostream>
+#include <cstdio>
 #include "fgt_SDK_Cpp.h"
 
 /*============================================================================*/
@@ -154,6 +155,33 @@ std::ostream& operator<<(std::ostream& str, fgt_SWITCH_DIRECTION direction)
 	case fgt_SWITCH_DIRECTION::Clockwise: str << "Clockwise"; break;
 	default: str << "Unknown switch direction (" << int(direction) << ")";
 	}
+	return str;
+}
+
+std::string format_firmware_version(unsigned short bcd_version)
+{
+	char buf[10]{};
+	std::snprintf(buf, 10, "%x.%02x", bcd_version >> 8, bcd_version & 0xff);
+	return std::string(buf);
+}
+
+std::ostream& operator<<(std::ostream& str, const fgt_CONTROLLER_INFO& info)
+{
+	str << "SN: " << info.SN << "\n"
+		<< "Firmware: " << format_firmware_version(info.Firmware) << "\n"
+		<< "Unique ID: " << info.id << "\n"
+		<< "Type: " << info.InstrType;
+	return str;
+}
+
+std::ostream& operator<<(std::ostream& str, const fgt_CHANNEL_INFO& info)
+{
+	str << "Controller SN: " << info.ControllerSN << "\n"
+		<< "Device SN: " << info.DeviceSN << "\n"
+		<< "Firmware: " << format_firmware_version(info.firmware) << "\n"
+		<< "Position: " << info.position << "\n"
+		<< "Unique ID: " << info.indexID << "\n"
+		<< "Type: " << info.InstrType;
 	return str;
 }
 

@@ -6,8 +6,8 @@
 *                                                                            
 * Title:   fgt_SDK.h                                                         
 * Purpose: Functions API for Fluigent instruments                            
-* Version: 21.1.0.0
-* Date:	05/2021
+* Version: 21.2.0.0
+* Date:	07/2021
 *============================================================================*/
 
 #ifndef _FGT_SDK_H
@@ -116,7 +116,7 @@ typedef struct
 {
 	/** Serial number of this channel's controller */
 	unsigned short ControllerSN; 
-	/** Firmware version of this channel (0 if not applicable) */
+	/** Firmware version of this channel in BCD (0 if not applicable) */
 	unsigned short firmware;
 	/** Serial number of this channel (0 if not applicable) */
 	unsigned short DeviceSN;
@@ -135,7 +135,7 @@ typedef struct
 {
 	/** Serial number */
 	unsigned short SN;
-	/** Firmware version */
+	/** Firmware version in BCD */
 	unsigned short Firmware;
 	/** Index */
 	unsigned int id;
