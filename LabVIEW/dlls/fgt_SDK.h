@@ -6,8 +6,8 @@
 *                                                                            
 * Title:   fgt_SDK.h                                                         
 * Purpose: Functions API for Fluigent instruments                            
-* Version: 21.2.0.0
-* Date:	07/2021
+* Version: 21.3.0.0
+* Date:	11/2021
 *============================================================================*/
 
 #ifndef _FGT_SDK_H
@@ -150,7 +150,7 @@ typedef struct
 	/**
 	 * @Description Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP, IPS, ESS) are initialized.
 	 * This function is optional, directly calling a function will automatically creates the instance.
-	 * Only one instance can be opened at once. If called again, session is reinitialized.
+	 * Only one instance can be opened at a time. If called again, any new instruments are added to the same instance.
 	 * @param void
 	 * @return fgt_ERROR_CODE
 	 * @see fgt_close

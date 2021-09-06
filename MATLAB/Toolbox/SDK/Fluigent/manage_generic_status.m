@@ -12,6 +12,11 @@ function [] = manage_generic_status( function_name, error_code )
 % generate errors (which will stop execution of the program if not
 % handled).
 
+global fgt_error_report_mode;
+if strcmpi(fgt_error_report_mode, 'none')
+    return;
+end
+
 error_messages = {'No error',...       
 'USB communication error',...      
 'Wrong command was sent',...      

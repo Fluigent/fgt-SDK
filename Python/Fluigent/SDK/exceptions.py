@@ -6,6 +6,8 @@ import logging
 
 from . import low_level
 
+error_report_mode = "print"
+
 class FGT_ERROR(Exception):
     """Error in the Fluigent SDK"""
     
@@ -13,7 +15,8 @@ class FGT_WARNING(UserWarning):
     """Warning in the Fluigent SDK"""
 
 def warn(e):
-    logging.warning(e)
+    if error_report_mode.lower() == "print":
+        logging.warning(e)
     
 def get_enum_name(EnumClass, key):
     return str(EnumClass(key))

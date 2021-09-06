@@ -15,8 +15,10 @@ function varargout = fgt_init(varargin)
 %
 % This function is optional, directly calling a function will automatically
 % create the instance. In this case, all instruments are initialized.
-% Only one instance can be opened at once. If called again, the session is 
-% reinitialized.
+% Only one instance can be opened at a time. If called again, any new
+% instruments are added to the same instance if no serial numbers are
+% specified, otherwise, the session is reinitialized with only the requested
+% serial numbers.
 
 if nargin == 0
     [error_code]= LowLevel.fgt_init();

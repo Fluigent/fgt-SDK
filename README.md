@@ -1,4 +1,4 @@
-# Fluigent Software Developement Kit - version 21.2.0
+﻿# Fluigent Software Developement Kit - version 21.3.0
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application;
@@ -25,13 +25,18 @@ Then, follow the instructions from the manual to install each package.
 If you want to compile from source, you can clone or download this repository and follow the instructions, when provided, 
 in the language sub-folder you are interested in.
 
-# Supported OS
+# Supported operating systems and architectures
 
-| Operating system | 32 bits | 64 bits |
-| ---------------- | ------- | ------- |
-| Windows 7/8/10   | X       | X       |
-| Linux            |         | X       |
-| macOS            |         | X       |
+| Operating system | x86 (32 bits) | x64 (64 bits) | ARM (32 bits) | ARM64 (64 bits) |
+| ---------------- | ------------- | ------------- | ------------- | --------------- |
+| Windows 7/8/10   | X             | X             |               |                 |
+| Linux<sup>1</sup>|               | X<sup>2</sup> | X<sup>3</sup> | X<sup>4</sup>   |
+| macOS            |               | X             |               |                 |
+
+1. Requires kernel version 2.6.39 or newer
+2. Requires GLIBC ≥ 2.14, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11
+3. Requires GLIBC ≥ 2.7, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11, CXXABI\_ARM ≥ 1.3.3
+4. Requires GLIBC ≥ 2.17, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11
 
 # Supported hardware
 By using Fluigent SDK, you have direct access to following Fluigent devices:
@@ -46,16 +51,19 @@ Switch EZ and compatible switches, and P-Switch
 
 ## Native libraries
 
-The Fluigent SDK, is based on a set of native shared libraries for each supported platform.
+The Fluigent SDK is based on a set of native shared libraries for each supported platform.
 The libraries are sorted into folders by the operating system and processor architecture they target:
 
 - windows/x86/fgt_SDK.dll
 - windows/x64/fgt_SDK.dll
 - linux/x64/libfgt_SDK.so
+- linux/arm/libfgt_SDK.so
+- linux/arm64/libfgt_SDK.so
 - mac/x64/libfgt_SDK.dylib
 - fgt_SDK.h
 
-Legacy files fgt_SDK_32.dll and fgt_SDK_64.dll are also included for convenience, in case.
+Legacy files fgt_SDK_32.dll and fgt_SDK_64.dll are also included for convenience,
+to match naming conventions used by environments such as LabVIEW.
 They correspond to the Windows x86 and Windows x64 libraries, respectively.
 
 ## Middleware
@@ -95,7 +103,7 @@ Refer to the user manual **Fluigent SDK.pdf** for detailed documentation.
 
 The public API of the native libraries is documented in the header file **fgt_SDK.h**.
 
-Wrappers and examples are also documented, depending on the environement.
+Wrappers and examples are also documented, depending on the environment.
 
 # Support
 You can use this GitHub repository to find the source code, report issues, and contribute.
