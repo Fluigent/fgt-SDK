@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "21.2.0"
+__version__ = "21.3.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -165,8 +165,8 @@ def fgt_init(instruments = None):
     initialized.
     This function is optional, directly calling a function will automatically
     create the instance.
-    Only one instance can be opened at once. If called again, session is 
-    reinitialized.
+    Only one instance can be opened at a time. If called again, any new
+    instruments are added to the same instance.
     
     If a list of serial numbers is passed to this function, only the 
     instruments whose serial numbers are in the list will be initialized.
@@ -972,4 +972,14 @@ def fgt_detect():
     low_level_function = low_level.fgt_detect
     n_instruments, serial_numbers, instr_types = low_level_function()
     return serial_numbers, [fgt_INSTRUMENT_TYPE(i) for i in instr_types]
-        
+
+def fgt_set_errorReportMode(mode):
+    """Sets a flag that defines how SDK errors should be reported.
+    
+    "None": Only return the error code enum.
+    "Print": Output the error message to the console.
+    """
+    options = ["none", "print"]
+    if type(mode) is not str or mode.lower() not in options:
+        raise Exception("Invalid argument. Options are {}".format(options))
+    exceptions.error_report_mode = mode

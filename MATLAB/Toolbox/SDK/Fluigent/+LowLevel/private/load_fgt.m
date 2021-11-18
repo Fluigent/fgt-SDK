@@ -1,6 +1,8 @@
 function load_fgt()
 %LOAD_FGT Load the Fluigent SDK shared library
 
+global fgt_error_report_mode;
+
 if not(libisloaded('fgt_sdk'))
     
     function_fullname = mfilename('fullpath');
@@ -16,6 +18,8 @@ if not(libisloaded('fgt_sdk'))
         lib_path = fullfile( function_directory, 'fgt_SDK_32.dll');
         loadlibrary(lib_path,@fgt_SDK_32_prototype, 'alias', 'fgt_sdk');
     end
+    
+    fgt_error_report_mode = 'print';
 end
 
 end

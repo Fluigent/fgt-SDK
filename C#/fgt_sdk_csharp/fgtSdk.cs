@@ -18,31 +18,45 @@ namespace fgt_sdk
         private const string FGT_SDK = "FGT_SDK";
         private static IntPtr ArchResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
         {
-            var pDll = IntPtr.Zero;
-
             if (libraryName != FGT_SDK)
-                return pDll;
+            {
+                throw new NotSupportedException($"{libraryName} not supported");
+            }
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             var basePath = Path.Combine(assemblyPath, "fgt_sdk_dlls");
+            string osFolder;
+            string libFile;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (Environment.Is64BitProcess)
-                    pDll = NativeLibrary.Load(Path.Combine(basePath, "windows", "x64", "fgt_SDK.dll"));
-                else
-                    pDll = NativeLibrary.Load(Path.Combine(basePath, "windows", "x86", "fgt_SDK.dll"));
+                osFolder = "windows";
+                libFile = "fgt_SDK.dll";
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                pDll = NativeLibrary.Load(Path.Combine(basePath, "linux", "x64", "libfgt_SDK.so"));
+            {
+                osFolder = "linux";
+                libFile = "libfgt_SDK.so";
+            }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                pDll = NativeLibrary.Load(Path.Combine(basePath, "mac", "x64", "libfgt_SDK.dylib"));
+            {
+                osFolder = "mac";
+                libFile = "libfgt_SDK.dylib";
+            }
             else
-                throw new Exception("Operational system not supported!");
+                throw new NotSupportedException("Operating system not supported");
 
-            if(pDll == null)
-                throw new Exception("Error when loading library!");
+            var archFolder = RuntimeInformation.ProcessArchitecture switch
+            {
 
-            return pDll;
+                Architecture.X86 => "x86",
+                Architecture.X64 => "x64",
+                Architecture.Arm => "arm",
+                Architecture.Arm64 => "arm64",
+                Architecture arch => throw new NotSupportedException($"Architecture {arch} not supported"),
+            };
+
+            var libPath = Path.Combine(basePath, osFolder, archFolder, libFile);
+            return NativeLibrary.Load(libPath);
         }
 
         #region Imported functions
@@ -272,9 +286,11 @@ namespace fgt_sdk
 
         #endregion
 
+        private static fgt_ERROR_REPORT_MODE _errorReportMode;
         static fgtSdk()
         {
             NativeLibrary.SetDllImportResolver(typeof(fgtSdk).Assembly, ArchResolver);
+            _errorReportMode = fgt_ERROR_REPORT_MODE.Print;
         }
 
         #region Private methods
@@ -289,7 +305,10 @@ namespace fgt_sdk
         /// <returns>The error code <see cref="fgt_ERROR_CODE"/> that was returned by the low level function</returns>
         private static fgt_ERROR_CODE ErrCheck(fgt_ERROR_CODE errorCode, fgt_ERRCHECK_TYPE type, uint index = 0, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "")
         {
-            if (errorCode == fgt_ERROR_CODE.OK) return errorCode;
+            if (_errorReportMode == fgt_ERROR_REPORT_MODE.None || errorCode == fgt_ERROR_CODE.OK)
+            {
+                return errorCode;
+            }
 
             fgt_ERROR_CODE localErrorCode;
             fgt_INSTRUMENT_TYPE instrumentType;
@@ -327,7 +346,7 @@ namespace fgt_sdk
         /// <summary>
         /// Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments (MFCS, MFCS-EZ, FRP, LineUP, IPS) are initialized.
         /// This function is optional, directly calling a function will automatically creates the instance.
-        /// Only one instance can be opened at once.If called again, session is reinitialized.
+        /// Only one instance can be opened at a time. If called again, any new instruments are added to the same instance.
         /// </summary>
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_init()
@@ -1067,6 +1086,21 @@ namespace fgt_sdk
         }
 
         #endregion
+
+        /// <summary>
+        /// Sets a flag that defines how SDK errors should be reported.
+        /// </summary>
+        /// <remarks>
+        /// None: Only return the error code enum.
+        /// Print: Output the error message to the console.
+        /// </remarks>
+        /// <param name="mode">Report mode</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static fgt_ERROR_CODE Fgt_set_errorReportMode(fgt_ERROR_REPORT_MODE mode)
+        {
+            _errorReportMode = mode;
+            return fgt_ERROR_CODE.OK;
+        }
 
         #endregion
 

@@ -7,8 +7,8 @@
 * Title:    fgt_SDK_Cpp.cpp                                                  
 * Purpose:  Wrapper to fgt_SDK library			                          
 *			Contains an interface to each dll function and type conversions	  
-* Version:  21.0.0.0                                                         
-* Date:	    04/2021															 
+* Version:  21.3.0.0                                                         
+* Date:	    09/2021															 
 *============================================================================*/
 
 #include <iostream>
@@ -185,12 +185,14 @@ std::ostream& operator<<(std::ostream& str, const fgt_CHANNEL_INFO& info)
 	return str;
 }
 
+fgt_ERROR_REPORT_MODE error_report_mode = fgt_ERROR_REPORT_MODE::Print;
 
 /** Manage pressure error and status, display details 
  *  Change this function for custom error management, returned fgt_ERROR_CODE can directly be used in main application
  *  This functions calls Fgt_get_pressureStatus and displays error details */
 void Fgt_Manage_Pressure_Status(unsigned int pressureIndex, std::string calledFunctionName)
 {
+	if (error_report_mode == fgt_ERROR_REPORT_MODE::None) return;
 	fgt_INSTRUMENT_TYPE type;
 	unsigned short controllerSN;
 	unsigned char information;
@@ -214,6 +216,7 @@ void Fgt_Manage_Pressure_Status(unsigned int pressureIndex, std::string calledFu
  *  This functions calls Fgt_get_sensorStatus and displays error details */
 void Fgt_Manage_Sensor_Status(unsigned int sensorIndex, std::string calledFunctionName)
 {
+	if (error_report_mode == fgt_ERROR_REPORT_MODE::None) return;
 	fgt_INSTRUMENT_TYPE type;
 	unsigned short controllerSN;
 	unsigned char information;
@@ -233,6 +236,7 @@ void Fgt_Manage_Sensor_Status(unsigned int sensorIndex, std::string calledFuncti
  *  Change this function for custom error management, returned fgt_ERROR_CODE can directly be used in main application */
 void Fgt_Manage_Generic_Status(fgt_ERROR_CODE error, std::string calledFunctionName)
 {
+	if (error_report_mode == fgt_ERROR_REPORT_MODE::None) return;
 	// If error display it
 	if (error != fgt_ERROR_CODE::OK) std::cout << calledFunctionName << " error " << int(error) << " - " << error << std::endl;
 }
@@ -249,7 +253,7 @@ void Fgt_Manage_Generic_Status(fgt_ERROR_CODE error, std::string calledFunctionN
 /**
  * @Description Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments are initialized.
  * This function is optional, directly calling a function will automatically creates the instance.
- * Only one instance can be opened at once. If called again, session is reinitialized.
+ * Only one instance can be opened at a time. If called again, any new instruments are added to the same instance.
  * @param void
  * @return fgt_ERROR_CODE
  * @see fgt_close
@@ -1070,5 +1074,11 @@ fgt_ERROR_CODE Fgt_set_manual(unsigned int pressureIndex, float value)
 	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_manual(pressureIndex, value));
 	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_manual");											// Manage error if occured
 	return returnCode;
+}
+
+fgt_ERROR_CODE Fgt_set_errorReportMode(fgt_ERROR_REPORT_MODE mode)
+{
+	error_report_mode = mode;
+	return fgt_ERROR_CODE::OK;
 }
 

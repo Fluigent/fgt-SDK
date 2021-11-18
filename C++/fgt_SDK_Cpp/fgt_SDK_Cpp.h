@@ -7,8 +7,8 @@
 * Title:    fgt_SDK_Cpp.h                                                     
 * Purpose:  Wrapper to fgt_SDK library
 *			Contains an interface to each dll function and type conversions
-* Version:  21.0.0.0
-* Date:	    04/2021
+* Version:  21.3.0.0
+* Date:	    09/2021
 *============================================================================*/
 
 #ifndef _FGT_SDK_CPP_H
@@ -25,6 +25,13 @@
 /*============================================================================*/
 /*-------------  Custom definitions and functions section  -------------------*/
 /*============================================================================*/
+
+// Defines how errors should be reported to the user
+enum class fgt_ERROR_REPORT_MODE
+{
+	None,
+	Print,
+};
 
 /** Overload << operator for more intuitive enum display */
 /** fgt_ERROR_CODE: enumerator of all returned codes */
@@ -83,7 +90,7 @@ void Fgt_Manage_Generic_Status(fgt_ERROR_CODE error, std::string calledFunctionN
 /**
  * @Description Initialize or reinitialize (if already opened) Fluigent SDK instance. All detected Fluigent instruments are initialized.
  * This function is optional, directly calling a function will automatically creates the instance.
- * Only one instance can be opened at once. If called again, session is reinitialized.
+ * Only one instance can be opened at a time. If called again, any new instruments are added to the same instance.
  * @param void
  * @return fgt_ERROR_CODE
  * @see fgt_close
@@ -572,5 +579,13 @@ fgt_ERROR_CODE Fgt_set_purge(unsigned int controllerIndex, unsigned char purge);
  */
 fgt_ERROR_CODE Fgt_set_manual(unsigned int pressureIndex, float value);
 
+/**
+ * @Description Sets a flag that defines how SDK errors should be reported.
+ * @param mode The report mode to use.
+ * None: Only return the error code enum.
+ * Print: Output the error message to the console.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_errorReportMode(fgt_ERROR_REPORT_MODE mode);
 
 #endif
