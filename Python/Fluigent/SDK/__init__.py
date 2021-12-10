@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "21.3.0"
+__version__ = "21.4.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -196,6 +196,22 @@ def fgt_close():
      """
     low_level_function = low_level.fgt_close
     c_error, = low_level_function()
+    exceptions.manage_generic_status(low_level_function.__name__, c_error)
+    return fgt_ERROR(c_error)
+
+def fgt_create_simulated_instr(instr_type, serial, version, config):
+    """Creates a simulated instrument.
+     """
+    low_level_function = low_level.fgt_create_simulated_instr
+    c_error, = low_level_function(instr_type, serial, version, config)
+    exceptions.manage_generic_status(low_level_function.__name__, c_error)
+    return fgt_ERROR(c_error)
+
+def fgt_remove_simulated_instr(instr_type, serial):
+    """Removes a simulated instrument.
+     """
+    low_level_function = low_level.fgt_remove_simulated_instr
+    c_error, = low_level_function(instr_type, serial)
     exceptions.manage_generic_status(low_level_function.__name__, c_error)
     return fgt_ERROR(c_error)
     
