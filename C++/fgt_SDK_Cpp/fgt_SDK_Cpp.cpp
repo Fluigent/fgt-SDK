@@ -312,6 +312,20 @@ fgt_ERROR_CODE Fgt_initEx(unsigned short SN[256])
 	return returnCode;
 }
 
+fgt_ERROR_CODE Fgt_create_simulated_instr(fgt_instrument_t type, unsigned short serial, unsigned short version, int* config, int length)
+{
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_create_simulated_instr(type, serial, version, config, length));
+	Fgt_Manage_Generic_Status(returnCode, __func__);
+	return returnCode;
+}
+
+fgt_ERROR_CODE Fgt_remove_simulated_instr(fgt_instrument_t type, unsigned short serial)
+{
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_remove_simulated_instr(type, serial));
+	Fgt_Manage_Generic_Status(returnCode, __func__);
+	return returnCode;
+}
+
 /*============================================================================*/
 /*------------------------------  Channels info  -----------------------------*/
 /*============================================================================*/

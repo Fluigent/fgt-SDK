@@ -190,6 +190,8 @@ lib.restype = c_ubyte
 lib.fgt_init.argtypes = []
 lib.fgt_initEx.argtypes = [POINTER(c_ushort)]
 lib.fgt_close.argtypes = []
+lib.fgt_create_simulated_instr.argtypes = [c_int, c_ushort, c_ushort, POINTER(c_int), c_int]
+lib.fgt_remove_simulated_instr.argtypes = [c_int, c_ushort]
 lib.fgt_get_controllersInfo.argtypes = [POINTER(fgt_CONTROLLER_INFO)] 
 lib.fgt_get_pressureChannelCount.argtypes = [POINTER(c_ushort)]
 lib.fgt_get_sensorChannelCount.argtypes = [POINTER(c_ushort)]
@@ -252,6 +254,19 @@ def fgt_initEx(instruments):
 def fgt_close():
     """Stops the engine and closes the connection with all instruments"""
     c_error = c_ubyte(lib.fgt_close())
+    return c_error.value,
+
+def fgt_create_simulated_instr(instr_type, serial, version, config):
+    """Creates a simulated instrument"""
+    config_pointer = (c_int*len(config))(*[int(x) for x in config])
+    config_length = c_int(len(config))
+    c_error = c_ubyte(lib.fgt_create_simulated_instr(c_int(int(instr_type)),
+                   c_ushort(serial), c_ushort(version), config_pointer, config_length))
+    return c_error.value,
+
+def fgt_remove_simulated_instr(instr_type, serial):
+    """Removes a simulated instrument"""
+    c_error = c_ubyte(lib.fgt_remove_simulated_instr(c_int(int(instr_type)), c_ushort(serial)))
     return c_error.value,
 
 def fgt_get_controllersInfo():

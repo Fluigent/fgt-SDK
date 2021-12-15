@@ -77,6 +77,11 @@ namespace fgt_sdk
         [DllImport(FGT_SDK)]
         private static extern byte fgt_initEx(ushort[] serialNumbers);
 
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_create_simulated_instr(fgt_INSTRUMENT_TYPE type, ushort serial, ushort version, int[] config, int length);
+
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_remove_simulated_instr(fgt_INSTRUMENT_TYPE type, ushort serial);
 
         #endregion
 
@@ -413,6 +418,33 @@ namespace fgt_sdk
             }
 
             return ErrCheck((fgt_ERROR_CODE) fgt_initEx(sns), fgt_ERRCHECK_TYPE.Generic);
+        }
+
+        /// <summary>
+        /// Creates a simulated Fluigent instrument, which can be detected and initialized like a real one,
+        /// for the purposes of testing and demonstrations.
+        /// </summary>
+        /// <param name="type">Type of instrument to simulate</param>
+        /// <param name="serial">Serial number for the simulated instrument</param>
+        /// <param name="version">Firmware version for the simulated instrument. Set to 0 to use the default version</param>
+        /// <param name="config">Array describing the instrument's configuration</param>
+        /// <returns></returns>
+        public static fgt_ERROR_CODE Fgt_create_simulated_instr(fgt_INSTRUMENT_TYPE type, ushort serial, ushort version, int[] config)
+        {
+            return ErrCheck((fgt_ERROR_CODE)fgt_create_simulated_instr(type, serial, version, config, config.Length), fgt_ERRCHECK_TYPE.Generic);
+        }
+
+        /// <summary>
+        /// Removes a simulated instrument that had been previously created. If it had already been initialized
+        /// by the SDK, the controller and channels will remain in the respective lists, but they will act as if
+        /// the instrument is missing. This is equivalent to physically disconnecting a real instrument.
+        /// </summary>
+        /// <param name="type">Type of instrument to remove</param>
+        /// <param name="serial">Serial number of the simulated instrument</param>
+        /// <returns></returns>
+        public static fgt_ERROR_CODE Fgt_remove_simulated_instr(fgt_INSTRUMENT_TYPE type, ushort serial)
+        {
+            return ErrCheck((fgt_ERROR_CODE)fgt_remove_simulated_instr(type, serial), fgt_ERRCHECK_TYPE.Generic);
         }
 
         #endregion

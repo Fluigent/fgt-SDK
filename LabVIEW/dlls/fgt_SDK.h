@@ -6,8 +6,8 @@
 *                                                                            
 * Title:   fgt_SDK.h                                                         
 * Purpose: Functions API for Fluigent instruments                            
-* Version: 21.3.0.0
-* Date:	11/2021
+* Version: 21.4.0.0
+* Date:	12/2021
 *============================================================================*/
 
 #ifndef _FGT_SDK_H
@@ -182,6 +182,27 @@ typedef struct
 	 */
 	unsigned char FGT_API fgt_initEx(unsigned short SN[256]);
 
+	/**
+	 * @Description Creates a simulated Fluigent instrument, which can be detected and initialized like a real one, for the purposes
+	 * of testing and demonstrations.
+	 * @param [type] Type of instrument to simulate
+	 * @param [serial] Serial number for the simulated instrument
+	 * @param [version] Firmware version for the simulated instrument. Set to 0 to use the default version
+	 * @param [config] Array describing the instrument's configuration
+	 * @param [length] Length of the config array
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_create_simulated_instr(fgt_instrument_t type, unsigned short serial, unsigned short version, int* config, int length);
+
+	/**
+	 * @Description Removes a simulated instrument that had been previously created. If it had already been initialized by the SDK,
+	 * the controller and channels will remain in the respective lists, but they will act as if the instrument is missing. This is
+	   equivalent to physically disconnecting a real instrument.
+	 * @param [type] Type of instrument to remove
+	 * @param [serial] Serial number of the simulated instrument
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_remove_simulated_instr(fgt_instrument_t type, unsigned short serial);
 
 	/*============================================================================*/
 	/*-----------------------------  Channels info  ------------------------------*/
