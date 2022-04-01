@@ -13,5 +13,6 @@
         LineUP,
         IPS,
         ESS,
+        F_OEM,
     }
 }

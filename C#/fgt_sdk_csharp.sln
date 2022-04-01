@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "fgt_sdk", "fgt_sdk_csharp\fgt_sdk.csproj", "{33B38AD3-45AB-47A7-A60A-FEF1F5F2C680}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{CCFEDF28-2E32-4486-A939-B8D48C3E2169}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{CCFEDF28-2E32-4486-A939-B8D48C3E2169}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{D0B23A9F-ECEC-45DB-998C-FD00A8C96626}"
 EndProject
@@ -25,7 +25,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basic Sensor Regulation", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basic Set Pressure", "Examples\Basic Set Pressure\Basic Set Pressure.csproj", "{BC5CFC73-73E5-4589-99E9-D2FA6ED0D1C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic Set Valve Position", "Examples\Basic Set Valve Position\Basic Set Valve Position.csproj", "{3BAF2C97-A143-4F04-9D17-8BF28380BF13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basic Set Valve Position", "Examples\Basic Set Valve Position\Basic Set Valve Position.csproj", "{3BAF2C97-A143-4F04-9D17-8BF28380BF13}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD111F64-AE9B-41B6-98E5-6BF1A8BF86A2}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

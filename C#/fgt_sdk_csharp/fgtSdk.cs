@@ -1,12 +1,12 @@
-﻿using fgt_sdk.Structs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using fgt_sdk.Enums;
-using System.Reflection;
+using fgt_sdk.Structs;
 
 namespace fgt_sdk
 {
@@ -43,7 +43,9 @@ namespace fgt_sdk
                 libFile = "libfgt_SDK.dylib";
             }
             else
+            {
                 throw new NotSupportedException("Operating system not supported");
+            }
 
             var archFolder = RuntimeInformation.ProcessArchitecture switch
             {
@@ -287,6 +289,18 @@ namespace fgt_sdk
         [DllImport(FGT_SDK)]
         private static extern byte fgt_set_manual(uint pressureIndex, float value);
 
+        // unsigned char __stdcall fgt_set_digitalOutput(unsigned int controllerIndex, unsigned char state);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_digitalOutput(uint controllerIndex, byte port, byte state);
+
+        // unsigned char __stdcall fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned char* detected);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorAirBubbleFlag(uint pressureIndex, ref byte detected);
+
+        // unsigned char __stdcall fgt_get_inletPressure(unsigned int pressureIndex, float* pressure);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_inletPressure(uint pressureIndex, ref float pressure);
+
         #endregion
 
         #endregion
@@ -356,7 +370,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_init()
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_init(), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_init(), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -368,7 +382,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_close()
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_close(), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_close(), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -388,7 +402,7 @@ namespace fgt_sdk
             {
                 if (serialNumbers[i] != 0)
                 {
-                    tuplesList.Add((serialNumbers[i], (fgt_INSTRUMENT_TYPE) types[i]));
+                    tuplesList.Add((serialNumbers[i], (fgt_INSTRUMENT_TYPE)types[i]));
                 }
             }
             return (count, tuplesList);
@@ -417,7 +431,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            return ErrCheck((fgt_ERROR_CODE) fgt_initEx(sns), fgt_ERRCHECK_TYPE.Generic);
+            return ErrCheck((fgt_ERROR_CODE)fgt_initEx(sns), fgt_ERRCHECK_TYPE.Generic);
         }
 
         /// <summary>
@@ -458,7 +472,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, List<fgt_CONTROLLER_INFO> info) Fgt_get_controllersInfo()
         {
             var controllersInfo = new fgt_CONTROLLER_INFO[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_controllersInfo(controllersInfo), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_controllersInfo(controllersInfo), fgt_ERRCHECK_TYPE.Generic);
             var controllersInfoList = controllersInfo.Where(c => c.SN != 0).ToList();
             return (errCode, controllersInfoList);
         }
@@ -481,8 +495,8 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, int count) Fgt_get_sensorChannelCount()
         {
             byte count = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
-            return (errCode, (int) count);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
+            return (errCode, count);
         }
 
         /// <summary>
@@ -492,8 +506,8 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, int count) Fgt_get_TtlChannelCount()
         {
             byte count = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_TtlChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
-            return (errCode, (int) count);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_TtlChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
+            return (errCode, count);
         }
 
         /// <summary>
@@ -506,7 +520,7 @@ namespace fgt_sdk
         {
             byte count = 0;
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_valveChannelCount(ref count), fgt_ERRCHECK_TYPE.Generic);
-            return (errCode, (int)count);
+            return (errCode, count);
         }
 
         /// <summary>
@@ -518,7 +532,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, List<fgt_CHANNEL_INFO> info) Fgt_get_pressureChannelsInfo()
         {
             var info = new fgt_CHANNEL_INFO[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_pressureChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
             var controllersInfoList = info.Where(c => c.ControllerSN != 0).ToList();
             return (errCode, controllersInfoList);
         }
@@ -533,13 +547,13 @@ namespace fgt_sdk
         {
             var info = new fgt_CHANNEL_INFO[256];
             var type = new int[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorChannelsInfo(info, type), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorChannelsInfo(info, type), fgt_ERRCHECK_TYPE.Generic);
             var tuplesList = new List<(fgt_CHANNEL_INFO, fgt_SENSOR_TYPE)>();
             for (var index = 0; index < info.Length; index++)
             {
                 if (info[index].ControllerSN != 0)
                 {
-                    tuplesList.Add((info[index], (fgt_SENSOR_TYPE) type[index]));
+                    tuplesList.Add((info[index], (fgt_SENSOR_TYPE)type[index]));
                 }
             }
 
@@ -554,7 +568,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, List<fgt_CHANNEL_INFO> info) Fgt_get_TtlChannelsInfo()
         {
             var info = new fgt_CHANNEL_INFO[256];
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_TtlChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_TtlChannelsInfo(info), fgt_ERRCHECK_TYPE.Generic);
             var controllersInfoList = info.Where(c => c.ControllerSN != 0).ToList();
             return (errCode, controllersInfoList);
         }
@@ -593,7 +607,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_pressure(uint pressureIndex, float pressure)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressure(pressureIndex, pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_pressure(pressureIndex, pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -605,7 +619,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, float pressure) Fgt_get_pressure(uint pressureIndex)
         {
             var pressure = 0.0f;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressure(pressureIndex, ref pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_pressure(pressureIndex, ref pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return (errCode, pressure);
         }
 
@@ -618,7 +632,7 @@ namespace fgt_sdk
         {
             var pressure = 0.0f;
             ushort timestamp = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureEx(pressureIndex, ref pressure, ref timestamp), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_pressureEx(pressureIndex, ref pressure, ref timestamp), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return (errCode, pressure, timestamp);
         }
 
@@ -632,7 +646,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorRegulation(uint sensorIndex, uint pressureIndex, float setpoint)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorRegulation(sensorIndex, pressureIndex, setpoint), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorRegulation(sensorIndex, pressureIndex, setpoint), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -644,7 +658,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, float value) Fgt_get_sensorValue(uint sensorIndex)
         {
             var value = 0.0f;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorValue(sensorIndex, ref value), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorValue(sensorIndex, ref value), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return (errCode, value);
         }
 
@@ -657,7 +671,7 @@ namespace fgt_sdk
         {
             var value = 0.0f;
             ushort timestamp = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorValueEx(sensorIndex, ref value, ref timestamp), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorValueEx(sensorIndex, ref value, ref timestamp), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return (errCode, value, timestamp);
         }
 
@@ -668,7 +682,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and current position</returns>
         public static (fgt_ERROR_CODE errCode, int position) Fgt_get_valvePosition(uint valveIndex)
         {
-            int position = 0;
+            var position = 0;
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_valvePosition(valveIndex, ref position), fgt_ERRCHECK_TYPE.Generic, valveIndex);
             return (errCode, position);
         }
@@ -683,7 +697,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_valvePosition(uint valveIndex, int position, fgt_SWITCH_DIRECTION direction = fgt_SWITCH_DIRECTION.Shortest, bool wait = true)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_valvePosition(valveIndex, position, (int) direction, wait ? 1 : 0), fgt_ERRCHECK_TYPE.Generic, valveIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_valvePosition(valveIndex, position, (int)direction, wait ? 1 : 0), fgt_ERRCHECK_TYPE.Generic, valveIndex);
             return errCode;
         }
 
@@ -725,7 +739,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sessionPressureUnit(pressureUnit), fgt_ERRCHECK_TYPE.Pressure);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sessionPressureUnit(pressureUnit), fgt_ERRCHECK_TYPE.Pressure);
             return errCode;
         }
 
@@ -751,7 +765,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -764,7 +778,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, string unit) Fgt_get_pressureUnit(uint pressureIndex)
         {
             var pressureUnit = new char[140];
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
 
             var unitString = new string(pressureUnit.TakeWhile(c => c != '\0').ToArray());
             return (errCode, unitString);
@@ -792,7 +806,7 @@ namespace fgt_sdk
                 throw;
             }
 
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -805,7 +819,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, string unit) Fgt_get_sensorUnit(uint sensorIndex)
         {
             var unit = new char[140];
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
 
             var unitString = new string(unit.TakeWhile(c => c != '\0').ToArray());
             return (errCode, unitString);
@@ -820,7 +834,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorCalibration(uint sensorIndex, fgt_SENSOR_CALIBRATION table)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorCalibration(sensorIndex, (int) table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorCalibration(sensorIndex, (int)table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -832,9 +846,9 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, fgt_SENSOR_CALIBRATION table) Fgt_get_sensorCalibration(uint sensorIndex)
         {
             var table = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorCalibration(sensorIndex, ref table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorCalibration(sensorIndex, ref table), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
 
-            return (errCode, (fgt_SENSOR_CALIBRATION) table);
+            return (errCode, (fgt_SENSOR_CALIBRATION)table);
         }
 
         /// <summary>
@@ -848,7 +862,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorCustomScale(uint sensorIndex, (float a, float b, float c) scale)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorCustomScale(sensorIndex, scale.a, scale.b, scale.c), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorCustomScale(sensorIndex, scale.a, scale.b, scale.c), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -865,7 +879,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorCustomScaleEx(uint sensorIndex, (float a, float b, float c) scale, float sMax)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorCustomScaleEx(sensorIndex, scale.a, scale.b, scale.c, sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorCustomScaleEx(sensorIndex, scale.a, scale.b, scale.c, sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -877,7 +891,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_calibratePressure(uint pressureIndex)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_calibratePressure(pressureIndex), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_calibratePressure(pressureIndex), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -896,7 +910,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_customSensorRegulation(float measure, float setpoint, float maxSensorRange, uint pressureIndex)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -908,7 +922,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, float pMin, float pMax) Fgt_get_pressureRange(uint pressureIndex)
         {
             float pMin = 0, pMax = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_pressureRange(pressureIndex, ref pMin, ref pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_pressureRange(pressureIndex, ref pMin, ref pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return (errCode, pMin, pMax);
         }
 
@@ -920,7 +934,7 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, (float sMin, float sMax) range) Fgt_get_sensorRange(uint sensorIndex)
         {
             float sMin = 0, sMax = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_get_sensorRange(sensorIndex, ref sMin, ref sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorRange(sensorIndex, ref sMin, ref sMax), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return (errCode, (sMin, sMax));
         }
 
@@ -931,7 +945,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and Maximum position of this valve</returns>
         public static (fgt_ERROR_CODE errCode, int posMax) Fgt_get_valveRange(uint valveIndex)
         {
-            int posMax = 0;
+            var posMax = 0;
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_valveRange(valveIndex, ref posMax), fgt_ERRCHECK_TYPE.Sensor, valveIndex);
             return (errCode, posMax);
         }
@@ -944,7 +958,7 @@ namespace fgt_sdk
         /// <returns></returns>
         public static fgt_ERROR_CODE Fgt_set_pressureLimit(uint pressureIndex, (float pMin, float pMax) limits)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressureLimit(pressureIndex, limits.pMin, limits.pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_pressureLimit(pressureIndex, limits.pMin, limits.pMax), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -961,7 +975,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorRegulationResponse(uint sensorIndex, uint responseTime)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_sensorRegulationResponse(sensorIndex, responseTime), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorRegulationResponse(sensorIndex, responseTime), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
         }
 
@@ -975,7 +989,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_pressureResponse(uint pressureIndex, byte value)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_pressureResponse(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_pressureResponse(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
         }
 
@@ -1000,7 +1014,7 @@ namespace fgt_sdk
 
             var detailsString = new string(details.TakeWhile(c => c != '\0').ToArray());
 
-            return ((fgt_ERROR_CODE) errCode, (fgt_INSTRUMENT_TYPE) type, controllerSN: controllerSn, infoCode == 1, detailsString);
+            return ((fgt_ERROR_CODE)errCode, (fgt_INSTRUMENT_TYPE)type, controllerSN: controllerSn, infoCode == 1, detailsString);
         }
 
         /// <summary>
@@ -1020,7 +1034,7 @@ namespace fgt_sdk
 
             var detailsString = new string(details.TakeWhile(c => c != '\0').ToArray());
 
-            return ((fgt_ERROR_CODE) errCode, (fgt_INSTRUMENT_TYPE) type, controllerSN: controllerSn, infoCode == 1, detailsString);
+            return ((fgt_ERROR_CODE)errCode, (fgt_INSTRUMENT_TYPE)type, controllerSN: controllerSn, infoCode == 1, detailsString);
         }
 
         /// <summary>
@@ -1032,7 +1046,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_power(uint controllerIndex, fgt_POWER state)
         {
-            return (fgt_ERROR_CODE) fgt_set_power(controllerIndex, (byte) state);
+            return (fgt_ERROR_CODE)fgt_set_power(controllerIndex, (byte)state);
         }
 
         /// <summary>
@@ -1045,7 +1059,7 @@ namespace fgt_sdk
         {
             byte state = 0;
             var errCode = fgt_get_power(controllerIndex, ref state);
-            return ((fgt_ERROR_CODE) errCode, (fgt_POWER) state);
+            return ((fgt_ERROR_CODE)errCode, (fgt_POWER)state);
         }
 
         #endregion
@@ -1060,7 +1074,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_TtlMode(uint TtlIndex, fgt_TTL_MODE mode)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_TtlMode(TtlIndex, (int) mode), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_TtlMode(TtlIndex, (int)mode), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -1072,8 +1086,8 @@ namespace fgt_sdk
         public static (fgt_ERROR_CODE errCode, bool ttlEvent) Fgt_read_Ttl(uint ttlIndex)
         {
             uint state = 0;
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_read_Ttl(ttlIndex, ref state), fgt_ERRCHECK_TYPE.Generic);
-            return ((fgt_ERROR_CODE) errCode, Convert.ToBoolean(state));
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_read_Ttl(ttlIndex, ref state), fgt_ERRCHECK_TYPE.Generic);
+            return (errCode, Convert.ToBoolean(state));
         }
 
         /// <summary>
@@ -1083,7 +1097,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a boolean indicating if an event (edge) has occured</returns>
         public static fgt_ERROR_CODE Fgt_trigger_Ttl(uint ttlIndex)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_trigger_Ttl(ttlIndex), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_trigger_Ttl(ttlIndex), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -1100,7 +1114,7 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_purge(uint controllerIndex, bool purge)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_purge(controllerIndex, (byte) (purge ? 1 : 0)), fgt_ERRCHECK_TYPE.Generic);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_purge(controllerIndex, (byte)(purge ? 1 : 0)), fgt_ERRCHECK_TYPE.Generic);
             return errCode;
         }
 
@@ -1113,8 +1127,48 @@ namespace fgt_sdk
         /// <returns></returns>
         public static fgt_ERROR_CODE Fgt_set_manual(uint pressureIndex, float value)
         {
-            var errCode = ErrCheck((fgt_ERROR_CODE) fgt_set_manual(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_manual(pressureIndex, value), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
+        }
+
+        /// <summary>
+        /// Set the digital output ON or OFF on a controller
+        /// This feature is only available on the F-OEM device.
+        /// </summary>
+        /// <param name="controllerIndex">Index of controller or unique ID</param>
+        /// <param name="port">Address of the digital output to toggle. For F-OEM: 0: Pump, 1: LED</param>
+        /// <param name="state">True to turn on the output, false to turn off</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static fgt_ERROR_CODE Fgt_set_digitalOutput(uint controllerIndex, byte port, bool state)
+        {
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_digitalOutput(controllerIndex, port, (byte)(state ? 1 : 0)), fgt_ERRCHECK_TYPE.Generic);
+            return errCode;
+        }
+
+        /// <summary>
+        /// Read the flag indicating whether the flow rate sensor detects an air bubble. Only 
+        /// available on Flow Unit sensor ranges M+ and L+.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a boolean which is true if the sensor detects an air bubble</returns>
+        public static (fgt_ERROR_CODE errCode, bool detected) Fgt_get_sensorAirBubbleFlag(uint sensorIndex)
+        {
+            byte detected = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorAirBubbleFlag(sensorIndex, ref detected), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            return (errCode, detected != 0);
+        }
+
+        /// <summary>
+        /// Returns the pressure measured at the device's inlet. 
+        /// This feature is only available on LineUP Flow EZ and FOEM Pressure Module instruments.
+        /// </summary>
+        /// <param name="pressureIndex">Index of pressure channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and current inlet pressure</returns>
+        public static (fgt_ERROR_CODE errCode, float pressure) Fgt_get_inletPressure(uint pressureIndex)
+        {
+            var pressure = 0.0f;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_inletPressure(pressureIndex, ref pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
+            return (errCode, pressure);
         }
 
         #endregion

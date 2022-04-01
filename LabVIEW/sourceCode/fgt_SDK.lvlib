@@ -17,6 +17,7 @@
 			<Item Name="fgt get pressure Range.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt get pressure Range.vi"/>
 			<Item Name="fgt get pressure Unit.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt get pressure Unit.vi"/>
 			<Item Name="fgt get pressure.vi" Type="VI" URL="../VIs/Basic functions/fgt get pressure.vi"/>
+			<Item Name="fgt get inlet Pressure.vi" Type="VI" URL="../VIs/Specific functions/fgt get inlet Pressure.vi"/>
 			<Item Name="fgt set manual.vi" Type="VI" URL="../VIs/Specific functions/fgt set manual.vi"/>
 			<Item Name="fgt set pressure Limit.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set pressure Limit.vi"/>
 			<Item Name="fgt set pressure Response.vi" Type="VI" URL="../VIs/Regulation settings/fgt set pressure Response.vi"/>
@@ -26,6 +27,7 @@
 			<Item Name="fgt set session Pressure Unit.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set session Pressure Unit.vi"/>
 		</Item>
 		<Item Name="Sensor" Type="Folder">
+			<Item Name="fgt get sensor Air Bubble Flag.vi" Type="VI" URL="../VIs/Specific functions/fgt get sensor Air Bubble Flag.vi"/>
 			<Item Name="fgt get sensor Calibration.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt get sensor Calibration.vi"/>
 			<Item Name="fgt get sensor Channel Count.vi" Type="VI" URL="../VIs/Channels information/fgt get sensor Channel Count.vi"/>
 			<Item Name="fgt get sensor Channels Info.vi" Type="VI" URL="../VIs/Channels information/fgt get sensor Channels Info.vi"/>
@@ -60,6 +62,7 @@
 		<Item Name="fgt get controllers info.vi" Type="VI" URL="../VIs/Channels information/fgt get controllers info.vi"/>
 		<Item Name="fgt get power.vi" Type="VI" URL="../VIs/Status information/fgt get power.vi"/>
 		<Item Name="fgt set all Valves.vi" Type="VI" URL="../VIs/Specific functions/fgt set all Valves.vi"/>
+		<Item Name="fgt set digital Output.vi" Type="VI" URL="../VIs/Specific functions/fgt set digital Output.vi"/>
 		<Item Name="fgt set power.vi" Type="VI" URL="../VIs/Status information/fgt set power.vi"/>
 	</Item>
 	<Item Name="Engine" Type="Folder">

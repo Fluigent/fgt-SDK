@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "21.4.0"
+__version__ = "22.0.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -974,7 +974,23 @@ def fgt_set_manual(pressure_index, voltage):
     c_error, = low_level_function(pressure_index, voltage)
     exceptions.manage_pressure_status(low_level_function.__name__, pressure_index)
     return fgt_ERROR(c_error)
+
+def fgt_set_digitalOutput(controller_index, port, state):
+    """Activate/deactivate purge function.
     
+    This feature is only available on F-OEM devices.
+    
+    Args:
+        controller_index: Index of controller or unique ID
+        port: Address of the digital output to toggle. For F-OEM: 0: Pump, 1: LED
+        state 0: OFF, 1:ON
+    """
+    controller_index = int(controller_index)
+    low_level_function = low_level.fgt_set_digitalOutput
+    c_error, = low_level_function(controller_index, port, state)
+    exceptions.manage_generic_status(low_level_function.__name__, c_error)
+    return fgt_ERROR(c_error)
+
 def fgt_detect():
     """Detect all connected Fluigent instruments.
     
@@ -988,6 +1004,44 @@ def fgt_detect():
     low_level_function = low_level.fgt_detect
     n_instruments, serial_numbers, instr_types = low_level_function()
     return serial_numbers, [fgt_INSTRUMENT_TYPE(i) for i in instr_types]
+
+def fgt_get_inletPressure(pressure_index, get_error = _get_error):
+    """Returns the pressure measured at the device's inlet.
+    This feature is only available on LineUP Flow EZ and FOEM Pressure Module
+    instruments.
+    
+    Args:
+        pressure_index: Index of pressure channel or unique ID
+
+    Returns:
+        pressure Inlet pressure value in selected unit, default is "mbar"
+        
+    See also:
+        fgt_get_pressureStatus
+    """
+    pressure_index = int(pressure_index)
+    c_error, pressure = low_level.fgt_get_inletPressure(pressure_index)
+    exceptions.manage_pressure_status("fgt_get_inletPressure", pressure_index)
+    c_error = fgt_ERROR(c_error)
+    return (c_error, pressure) if get_error else pressure
+
+def fgt_get_sensorAirBubbleFlag(sensor_index, get_error = _get_error):
+    """Read the flag indicating whether the flow rate sensor detects an air bubble. Only 
+    available on Flow Unit sensor ranges M+ and L+.
+    
+    Args:
+        sensor_index Index of sensor channel or unique ID
+    
+    Returns 
+        0: no air bubble is detected 
+        1: an air bubble is detected
+    """
+    sensor_index = int(sensor_index)
+    low_level_function = low_level.fgt_get_sensorAirBubbleFlag
+    c_error, bubble_detected = low_level_function(sensor_index)
+    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
+    c_error = fgt_ERROR(c_error)
+    return (c_error, bubble_detected) if get_error else bubble_detected
 
 def fgt_set_errorReportMode(mode):
     """Sets a flag that defines how SDK errors should be reported.

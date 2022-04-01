@@ -130,16 +130,17 @@ fgt_SENSOR_TYPE = make_enum("fgt_SENSOR_TYPE",
                        "NONE", "Flow_XS_single", "Flow_S_single", 
                        "Flow_S_dual", "Flow_M_single", "Flow_M_dual", 
                        "Flow_L_single", "Flow_L_dual", "Flow_XL_single",
-                       "Pressure_S", "Pressure_M", "Pressure_XL")
+                       "Pressure_S", "Pressure_M", "Pressure_XL",
+                       "Flow_M_plus_dual", "Flow_L_plus_dual")
  
 fgt_INSTRUMENT_TYPE = make_enum("fgt_INSTRUMENT_TYPE",
-                           "NONE","MFCS","MFCS_EZ","FRP","LineUP", "IPS", "ESS")
+                           "NONE","MFCS","MFCS_EZ","FRP","LineUP", "IPS", "ESS", "F_OEM")
 
 fgt_SENSOR_CALIBRATION = make_enum("fgt_SENSOR_CALIBRATION",
                                       "NONE", "H2O", "IPA", "HFE", "FC40", 
                                       "OIL")
                                       
-fgt_VALVE_TYPE = make_enum("fgt_VALVE_TYPE", "NONE", "MSwitch", "TwoSwitch", "LSwitch", "PSwitch")
+fgt_VALVE_TYPE = make_enum("fgt_VALVE_TYPE", "NONE", "MSwitch", "TwoSwitch", "LSwitch", "PSwitch", "M_X", "Two_X", "L_X")
 
 fgt_SWITCH_DIRECTION = make_enum("fgt_SWITCH_DIRECTION", "Shortest", "Anticlockwise", "Clockwise")
     
@@ -233,10 +234,13 @@ lib.fgt_read_Ttl.argtypes = [c_uint, POINTER(c_ubyte)]
 lib.fgt_trigger_Ttl.argtypes = [c_uint]
 lib.fgt_set_purge.argtypes = [c_uint, c_ubyte]
 lib.fgt_set_manual.argtypes = [c_uint, c_float]
+lib.fgt_set_digitalOutput.argtypes = [c_uint, c_ubyte, c_ubyte]
 lib.fgt_detect.argtypes = [POINTER(c_ushort), POINTER(c_int)]
 lib.fgt_get_valvePosition.argtypes = [c_uint, POINTER(c_int)]
 lib.fgt_set_valvePosition.argtypes = [c_uint, c_int, c_int, c_int]
 lib.fgt_set_allValves.argtypes = [c_uint, c_uint, c_int]
+lib.fgt_get_inletPressure.argtypes = [c_uint, POINTER(c_float)]
+lib.fgt_get_sensorAirBubbleFlag.argtypes = [c_uint, POINTER(c_ubyte)]
 
 
 # Wrappers
@@ -565,6 +569,12 @@ def fgt_set_manual(pressure_index, voltage):
     c_error = c_ubyte(lib.fgt_set_manual(c_uint(pressure_index), c_float(voltage)))
     return c_error.value,
     
+def fgt_set_digitalOutput(controller_index, port, state):
+    """Sets the digital output on or off on the specified controller.
+    Only available on F-OEM"""
+    c_error = c_ubyte(lib.fgt_set_digitalOutput(c_uint(controller_index), c_ubyte(port), c_ubyte(state)))
+    return c_error.value,
+    
 def fgt_detect():
     """Returns a list containing the serial numbers of all detected 
     instruments and another list containing their types"""
@@ -586,3 +596,15 @@ def fgt_set_valvePosition(valve_index, position, direction, wait):
 def fgt_set_allValves(controller_index, module_index, position):
     c_error = c_ubyte(lib.fgt_set_allValves(c_uint(controller_index),c_uint(module_index), c_int(position)))
     return c_error.value,
+
+def fgt_get_inletPressure(pressure_index):
+    """Returns the supply pressure on the specified channel, if available"""
+    pressure = c_float(0)
+    c_error = c_ubyte(lib.fgt_get_inletPressure(c_uint(pressure_index), byref(pressure)))
+    return c_error.value, pressure.value
+
+def fgt_get_sensorAirBubbleFlag(sensor_index):
+    """RRead the flag indicating whether the flow rate sensor detects an air bubble."""
+    bubble_detected = c_ubyte(0)
+    c_error = c_ubyte(lib.fgt_get_sensorAirBubbleFlag(c_uint(sensor_index), byref(bubble_detected)))
+    return c_error.value, bubble_detected.value

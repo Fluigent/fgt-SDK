@@ -6,6 +6,7 @@
 %   fgt_SENSOR_CALIBRATION - Calibration table to be used by the sensor
 %   fgt_SENSOR_TYPE        - Fluigent sensor available types and ranges
 %   fgt_TTL_MODE           - TTL port direction and pulse type
+%   fgt_VALVE_TYPE         - Fluigent valve types
 % 
 % Functions
 %   fgt_calibratePressure            - Calibrate internal pressure sensor.

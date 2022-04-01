@@ -1,14 +1,14 @@
 /*============================================================================
 *               Fluigent Software Developement Kit for C++                   
 *----------------------------------------------------------------------------
-*         Copyright (c) Fluigent 2021.  All Rights Reserved.                 
+*         Copyright (c) Fluigent 2022.  All Rights Reserved.                 
 *----------------------------------------------------------------------------
 *                                                                            
 * Title:    fgt_SDK_Cpp.h                                                     
 * Purpose:  Wrapper to fgt_SDK library
 *			Contains an interface to each dll function and type conversions
-* Version:  21.4.0.0
-* Date:	    12/2021
+* Version:  22.0.0.0
+* Date:	    04/2022
 *============================================================================*/
 
 #ifndef _FGT_SDK_CPP_H
@@ -600,6 +600,36 @@ fgt_ERROR_CODE Fgt_set_purge(unsigned int controllerIndex, unsigned char purge);
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_set_manual(unsigned int pressureIndex, float value);
+
+/**
+ * @Description Set the digital output ON or OFF on a controller
+ * This feature is only available on the F-OEM device.
+ * @param controllerIndex Index of controller or unique ID
+ * @param port Address of the digital output to toggle. For F-OEM: 0: Pump, 1: LED
+ * @param state 0: OFF, 1:ON
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_digitalOutput(unsigned int controllerIndex, unsigned char port, unsigned char state);
+
+/**
+ * @Description Read the flag indicating whether the flow rate sensor detects an air bubble. Only 
+    available on Flow Unit sensor ranges M+ and L+.
+ * @param sensorIndex Index of sensor channel or unique ID
+ * @out detected 1 if an air bubble was detected, 0 otherwise.
+ * @return fgt_ERROR_CODE
+ * @see fgt_get_sensorStatus
+ */
+fgt_ERROR_CODE FGT_API Fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned char* detected);
+
+/**
+ * @Description Returns the pressure measured at the device's inlet.
+ * This feature is only available on LineUP Flow EZ and FOEM Pressure Module instruments.
+ * @param pressureIndex Index of pressure channel or unique ID
+ * @param *pressure Inlet pressure value in selected unit, default is "mbar"
+ * @return errorCode
+ * @see fgt_get_pressureStatus
+ */
+fgt_ERROR_CODE Fgt_get_inletPressure(unsigned int pressureIndex, float* pressure);
 
 /**
  * @Description Sets a flag that defines how SDK errors should be reported.
