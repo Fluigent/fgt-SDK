@@ -11,5 +11,8 @@
         TwoSwitch,
         LSwitch,
         PSwitch,
+        M_X,
+        Two_X,
+        L_X,
     }
 }

@@ -14,6 +14,8 @@ classdef fgt_SENSOR_TYPE < uint8
         Pressure_S (9),
         Pressure_M (10),
         Pressure_XL (11),
+        Flow_M_plus_dual (12),
+        Flow_L_plus_dual (13),
     end
     
     properties

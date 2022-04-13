@@ -7,6 +7,9 @@ classdef fgt_VALVE_TYPE < int32
         TwoSwitch (2),
         LSwitch (3),
         PSwitch (4),
+        M_X (5),
+        Two_X (6),
+        L_X(7),
     end
     
     properties

@@ -60,6 +60,7 @@ std::ostream& operator<<(std::ostream& str, fgt_INSTRUMENT_TYPE instrType)
 	case fgt_INSTRUMENT_TYPE::LineUP: str << "LineUP"; break;
 	case fgt_INSTRUMENT_TYPE::IPS: str << "IPS"; break;
 	case fgt_INSTRUMENT_TYPE::ESS: str << "ESS"; break;
+    case fgt_INSTRUMENT_TYPE::F_OEM: str << "F_OEM"; break;
 	default: str << "Unknown instrument type (" << int(instrType) << ")";
 	}
 	return str;
@@ -82,6 +83,8 @@ std::ostream& operator<<(std::ostream& str, fgt_SENSOR_TYPE sensorType)
 	case fgt_SENSOR_TYPE::Pressure_S: str << "Pressure_S"; break;
 	case fgt_SENSOR_TYPE::Pressure_M: str << "Pressure_M"; break;
 	case fgt_SENSOR_TYPE::Pressure_XL: str << "Pressure_XL"; break;
+	case fgt_SENSOR_TYPE::Flow_M_plus_dual: str << "Flow_M_plus_dual"; break;
+	case fgt_SENSOR_TYPE::Flow_L_plus_dual: str << "Flow_L_plus_dual"; break;
 	default: str << "Unknown sensor type (" << int(sensorType) << ")";
 	}
 	return str;
@@ -140,6 +143,9 @@ std::ostream& operator<<(std::ostream& str, fgt_VALVE_TYPE valveType)
 	case fgt_VALVE_TYPE::TwoSwitch: str << "TwoSwitch"; break;
 	case fgt_VALVE_TYPE::LSwitch: str << "LSwitch"; break;
 	case fgt_VALVE_TYPE::PSwitch: str << "PSwitch"; break;
+	case fgt_VALVE_TYPE::M_X: str << "M_X"; break;
+	case fgt_VALVE_TYPE::Two_X: str << "Two_X"; break;
+	case fgt_VALVE_TYPE::L_X: str << "L_X"; break;
 	default: str << "Unknown valve type (" << int(valveType) << ")";
 	}
 	return str;
@@ -1087,6 +1093,51 @@ fgt_ERROR_CODE Fgt_set_manual(unsigned int pressureIndex, float value)
 {
 	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_manual(pressureIndex, value));
 	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_manual");											// Manage error if occured
+	return returnCode;
+}
+
+/**
+ * @Description Set the digital output ON or OFF on a controller
+ * This feature is only available on the F-OEM device.
+ * @param controllerIndex Index of controller or unique ID
+ * @param port Address of the digital output to toggle. For F-OEM: 0: Pump, 1: LED
+ * @param state 0: OFF, 1:ON
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_digitalOutput(unsigned int controllerIndex, unsigned char port, unsigned char state)
+{
+    fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_digitalOutput(controllerIndex, port, state));
+	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_digitalOutput");
+	return returnCode;
+}
+
+/**
+ * @Description Read the flag indicating whether the flow rate sensor detects an air bubble. Only 
+    available on Flow Unit sensor ranges M+ and L+.
+ * @param sensorIndex Index of sensor channel or unique ID
+ * @out detected 1 if an air bubble was detected, 0 otherwise.
+ * @return fgt_ERROR_CODE
+ * @see fgt_get_sensorStatus
+ */
+fgt_ERROR_CODE Fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned char* detected)
+{
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorAirBubbleFlag(sensorIndex, detected));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorAirBubbleFlag");
+	return returnCode;
+}
+
+/**
+ * @Description Returns the pressure measured at the device's inlet.
+ * This feature is only available on LineUP Flow EZ and FOEM Pressure Module instruments.
+ * @param pressureIndex Index of pressure channel or unique ID
+ * @param *pressure Inlet pressure value in selected unit, default is "mbar"
+ * @return errorCode
+ * @see fgt_get_pressureStatus
+ */
+fgt_ERROR_CODE Fgt_get_inletPressure(unsigned int pressureIndex, float* pressure)
+{
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_inletPressure(pressureIndex, pressure));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_inletPressure");
 	return returnCode;
 }
 
