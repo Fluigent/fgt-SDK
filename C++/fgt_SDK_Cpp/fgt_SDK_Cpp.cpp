@@ -1,14 +1,14 @@
 /*============================================================================
 *               Fluigent Software Developement Kit for C++                  
 *----------------------------------------------------------------------------
-*         Copyright (c) Fluigent 2021.  All Rights Reserved.                 
+*         Copyright (c) Fluigent 2022.  All Rights Reserved.                 
 *----------------------------------------------------------------------------
 *                                                                            
 * Title:    fgt_SDK_Cpp.cpp                                                  
 * Purpose:  Wrapper to fgt_SDK library			                          
 *			Contains an interface to each dll function and type conversions	  
-* Version:  21.3.0.0                                                         
-* Date:	    09/2021															 
+* Version:  22.1.0.0                                                         
+* Date:	    07/2022															 
 *============================================================================*/
 
 #include <iostream>

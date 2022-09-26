@@ -7,8 +7,8 @@
 * Title:    fgt_SDK_Cpp.h                                                     
 * Purpose:  Wrapper to fgt_SDK library
 *			Contains an interface to each dll function and type conversions
-* Version:  22.0.0.0
-* Date:	    04/2022
+* Version:  22.1.0.0
+* Date:	    07/2022
 *============================================================================*/
 
 #ifndef _FGT_SDK_CPP_H
@@ -619,7 +619,7 @@ fgt_ERROR_CODE Fgt_set_digitalOutput(unsigned int controllerIndex, unsigned char
  * @return fgt_ERROR_CODE
  * @see fgt_get_sensorStatus
  */
-fgt_ERROR_CODE FGT_API Fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned char* detected);
+fgt_ERROR_CODE Fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned char* detected);
 
 /**
  * @Description Returns the pressure measured at the device's inlet.

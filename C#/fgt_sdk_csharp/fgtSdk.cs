@@ -16,11 +16,16 @@ namespace fgt_sdk
     public static class fgtSdk
     {
         private const string FGT_SDK = "FGT_SDK";
+        private static IntPtr _nativeLibPointer = IntPtr.Zero;
         private static IntPtr ArchResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
         {
             if (libraryName != FGT_SDK)
             {
-                throw new NotSupportedException($"{libraryName} not supported");
+                return IntPtr.Zero;
+            }
+            if (_nativeLibPointer != IntPtr.Zero)
+            {
+                return _nativeLibPointer;
             }
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
@@ -58,7 +63,15 @@ namespace fgt_sdk
             };
 
             var libPath = Path.Combine(basePath, osFolder, archFolder, libFile);
-            return NativeLibrary.Load(libPath);
+            if (!File.Exists(libPath))
+            {
+                // Native library can be placed in the root folder containing the executable that uses it
+                // When doing so, prepend "lib" on Windows to avoid a name collision with the assembly DLL
+                libPath = Path.Combine(assemblyPath, libFile.StartsWith("lib") ? libFile : "lib" + libFile);
+            }
+
+            _nativeLibPointer = NativeLibrary.Load(libPath);
+            return _nativeLibPointer;
         }
 
         #region Imported functions

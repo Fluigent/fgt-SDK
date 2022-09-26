@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "22.0.0"
+__version__ = "22.1.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -718,6 +718,7 @@ def fgt_set_valvePosition(valve_index, position, direction = fgt_SWITCH_DIRECTIO
     low_level_function = low_level.fgt_set_valvePosition
     c_error, = low_level_function(valve_index, position, direction, wait)
     exceptions.manage_generic_status(low_level_function.__name__, c_error)
+    return fgt_ERROR(c_error)
     
 def fgt_get_valvePosition(valve_index, get_error = _get_error):
     """Read the position of a specific valve channel.
