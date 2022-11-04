@@ -27,7 +27,12 @@
 			<Item Name="fgt set session Pressure Unit.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set session Pressure Unit.vi"/>
 		</Item>
 		<Item Name="Sensor" Type="Folder">
+			<Item Name="fgt get absolute Pressure Range.vi" Type="VI" URL="../VIs/Specific functions/fgt get absolute Pressure Range.vi"/>
+			<Item Name="fgt get absolute Pressure.vi" Type="VI" URL="../VIs/Specific functions/fgt get absolute Pressure.vi"/>
+			<Item Name="fgt get differential Pressure Range.vi" Type="VI" URL="../VIs/Specific functions/fgt get differential Pressure Range.vi"/>
+			<Item Name="fgt get differential Pressure.vi" Type="VI" URL="../VIs/Specific functions/fgt get differential Pressure.vi"/>
 			<Item Name="fgt get sensor Air Bubble Flag.vi" Type="VI" URL="../VIs/Specific functions/fgt get sensor Air Bubble Flag.vi"/>
+			<Item Name="fgt get sensor Bypass Valve.vi" Type="VI" URL="../VIs/Specific functions/fgt get sensor Bypass Valve.vi"/>
 			<Item Name="fgt get sensor Calibration.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt get sensor Calibration.vi"/>
 			<Item Name="fgt get sensor Channel Count.vi" Type="VI" URL="../VIs/Channels information/fgt get sensor Channel Count.vi"/>
 			<Item Name="fgt get sensor Channels Info.vi" Type="VI" URL="../VIs/Channels information/fgt get sensor Channels Info.vi"/>
@@ -36,6 +41,7 @@
 			<Item Name="fgt get sensor Value Ex.vi" Type="VI" URL="../VIs/Basic functions/fgt get sensor Value Ex.vi"/>
 			<Item Name="fgt get sensor Value.vi" Type="VI" URL="../VIs/Basic functions/fgt get sensor Value.vi"/>
 			<Item Name="fgt set custom Sensor Regulation.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set custom Sensor Regulation.vi"/>
+			<Item Name="fgt set sensor Bypass Valve.vi" Type="VI" URL="../VIs/Specific functions/fgt set sensor Bypass Valve.vi"/>
 			<Item Name="fgt set sensor Calibration.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set sensor Calibration.vi"/>
 			<Item Name="fgt set sensor Custom Scale Ex.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set sensor Custom Scale Ex.vi"/>
 			<Item Name="fgt set sensor Custom Scale.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set sensor Custom Scale.vi"/>

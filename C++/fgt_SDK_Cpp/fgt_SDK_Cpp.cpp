@@ -7,8 +7,8 @@
 * Title:    fgt_SDK_Cpp.cpp                                                  
 * Purpose:  Wrapper to fgt_SDK library			                          
 *			Contains an interface to each dll function and type conversions	  
-* Version:  22.1.0.0                                                         
-* Date:	    07/2022															 
+* Version:  22.2.0.0                                                         
+* Date:	    11/2022															 
 *============================================================================*/
 
 #include <iostream>
@@ -61,6 +61,8 @@ std::ostream& operator<<(std::ostream& str, fgt_INSTRUMENT_TYPE instrType)
 	case fgt_INSTRUMENT_TYPE::IPS: str << "IPS"; break;
 	case fgt_INSTRUMENT_TYPE::ESS: str << "ESS"; break;
     case fgt_INSTRUMENT_TYPE::F_OEM: str << "F_OEM"; break;
+    case fgt_INSTRUMENT_TYPE::CFU: str << "CFU"; break;
+	case fgt_INSTRUMENT_TYPE::NIFS: str << "NIFS"; break;
 	default: str << "Unknown instrument type (" << int(instrType) << ")";
 	}
 	return str;
@@ -85,6 +87,8 @@ std::ostream& operator<<(std::ostream& str, fgt_SENSOR_TYPE sensorType)
 	case fgt_SENSOR_TYPE::Pressure_XL: str << "Pressure_XL"; break;
 	case fgt_SENSOR_TYPE::Flow_M_plus_dual: str << "Flow_M_plus_dual"; break;
 	case fgt_SENSOR_TYPE::Flow_L_plus_dual: str << "Flow_L_plus_dual"; break;
+	case fgt_SENSOR_TYPE::Flow_L_CFU: str << "Flow_L_CFU"; break;
+	case fgt_SENSOR_TYPE::Flow_L_NIFS: str << "Flow_L_NIFS"; break;
 	default: str << "Unknown sensor type (" << int(sensorType) << ")";
 	}
 	return str;
@@ -146,6 +150,7 @@ std::ostream& operator<<(std::ostream& str, fgt_VALVE_TYPE valveType)
 	case fgt_VALVE_TYPE::M_X: str << "M_X"; break;
 	case fgt_VALVE_TYPE::Two_X: str << "Two_X"; break;
 	case fgt_VALVE_TYPE::L_X: str << "L_X"; break;
+    case fgt_VALVE_TYPE::Bypass: str << "Bypass"; break;
 	default: str << "Unknown valve type (" << int(valveType) << ")";
 	}
 	return str;
@@ -1083,8 +1088,9 @@ fgt_ERROR_CODE Fgt_set_purge(unsigned int controllerIndex, unsigned char purge)
 }
 
 /**
- * @Description Manually activate internal electrovalve. This stops pressure regulation.
- * This feature is only available on MFCS and MFCS-EZ devices.
+ * @Description Manually set internal solenoid valve voltage. 
+ *  This stops pressure regulation on the channel until a new pressure or
+ *  flow rate command is set.
  * @param pressureIndex Index of pressure channel or unique ID
  * @param value applied valve voltage from 0 to 100(%)
  * @return fgt_ERROR_CODE
@@ -1140,6 +1146,91 @@ fgt_ERROR_CODE Fgt_get_inletPressure(unsigned int pressureIndex, float* pressure
 	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_inletPressure");
 	return returnCode;
 }
+
+/**
+ * @Description Returns the range of the differential pressure sensor in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pmin minimum differential pressure in mbar
+ * @out Pmax maximum differential pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_differentialPressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax)
+{
+    fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_differentialPressureRange(sensorIndex, Pmin, Pmax));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_differentialPressureRange");
+	return returnCode;
+}
+
+/**
+ * @Description Returns the current differential pressure measurement in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pdiff differential pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_differentialPressure(unsigned int sensorIndex, float* Pdiff)
+{
+    fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_differentialPressure(sensorIndex, Pdiff));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_differentialPressure");
+	return returnCode;
+}
+
+/**
+ * @Description Returns the range of the absolute pressure sensor in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pmin minimum absolute pressure in mbar
+ * @out Pmax maximum absolute pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_absolutePressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax)
+{
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_absolutePressureRange(sensorIndex, Pmin, Pmax));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_absolutePressureRange");
+	return returnCode;
+}
+
+/**
+ * @Description Returns the current absolute pressure measurement in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pdiff absolute pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_absolutePressure(unsigned int sensorIndex, float* Pabs)
+{
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_absolutePressure(sensorIndex, Pabs));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_absolutePressure");
+	return returnCode;
+}
+
+/**
+ * @Description Returns the current state of the bypass valve.
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out state 1 if the valve is open, 0 if it is closed.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_sensorBypassValve(unsigned int sensorIndex, unsigned char* state) {
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorBypassValve(sensorIndex, state));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorBypassValve");
+	return returnCode;
+}
+
+/**
+ * @Description Sets the state of the sensor's bypass valve.
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @param state 1 to open, 0 to close.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char state) {
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorBypassValve(sensorIndex, state));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorBypassValve");
+	return returnCode;
+}
+
 
 fgt_ERROR_CODE Fgt_set_errorReportMode(fgt_ERROR_REPORT_MODE mode)
 {

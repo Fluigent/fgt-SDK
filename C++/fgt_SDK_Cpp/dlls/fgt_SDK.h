@@ -1,13 +1,13 @@
 /*============================================================================
 *                   Fluigent Software Developement Kit                       
 *----------------------------------------------------------------------------
-*         Copyright (c) Fluigent 2022.  All Rights Reserved.                 
+*         Copyright (c) Fluigent 2023.  All Rights Reserved.                 
 *----------------------------------------------------------------------------
 *                                                                            
 * Title:   fgt_SDK.h                                                         
 * Purpose: Functions API for Fluigent instruments                            
-* Version: 22.1.0.0
-* Date:	07/2022
+* Version: 22.2.0.0
+* Date:	01/2023
 *============================================================================*/
 
 #ifndef _FGT_SDK_H
@@ -71,7 +71,7 @@ extern "C"
 	};
 
 	/** @Description Instrument controller type */
-	enum class fgt_INSTRUMENT_TYPE { None, MFCS, MFCS_EZ, FRP, LineUP, IPS, ESS, F_OEM };
+	enum class fgt_INSTRUMENT_TYPE { None, MFCS, MFCS_EZ, FRP, LineUP, IPS, ESS, F_OEM, CFU, NIFS };
 
 	/** @Description Sensor type */
 	enum class fgt_SENSOR_TYPE { 
@@ -79,6 +79,7 @@ extern "C"
 		Flow_XS_single, Flow_S_single, Flow_S_dual, Flow_M_single, Flow_M_dual, Flow_L_single, Flow_L_dual, Flow_XL_single, 
 		Pressure_S, Pressure_M, Pressure_XL,
 		Flow_M_plus_dual, Flow_L_plus_dual,
+		Flow_L_CFU, Flow_L_NIFS,
 	};
 
 	/** @Description Sensor calibration table */
@@ -94,7 +95,7 @@ extern "C"
 	enum class fgt_LINK_MODULE { None, FlowEZ, PSwitch = 3, SwitchEZ = 4 };
 
 	/** @Description Valve type */
-	enum class fgt_VALVE_TYPE { None, MSwitch, TwoSwitch, LSwitch, PSwitch, M_X, Two_X, L_X };
+	enum class fgt_VALVE_TYPE { None, MSwitch, TwoSwitch, LSwitch, PSwitch, M_X, Two_X, L_X, Bypass };
 
 	/** @Description Switch direction type */
 	enum class fgt_SWITCH_DIRECTION { Shortest, Anticlockwise, Clockwise };
@@ -664,8 +665,8 @@ typedef struct
 	unsigned char FGT_API fgt_set_purge(unsigned int controllerIndex, unsigned char purge);
 
 	/**
-	 * @Description Manually activate internal electrovalve. This stops pressure regulation.
-	 * This feature is only available on MFCS and MFCS-EZ devices.
+	 * @Description Manually set the voltage of the pressure channel's input solenoid valve.
+	 * This stops pressure regulation.
 	 * @param pressureIndex Index of pressure channel or unique ID
 	 * @param value applied valve voltage from 0 to 100(%)
 	 * @return fgt_ERROR_CODE
@@ -690,6 +691,62 @@ typedef struct
 	 * @return fgt_ERROR_CODE
 	 */
 	unsigned char FGT_API fgt_get_inletPressure(unsigned int pressureIndex, float* pressure);
+	/**
+	 * @Description Returns the range of the differential pressure sensor in mbar
+	 * This feature is only available on NIFS devices.
+	 * @param sensorIndex Index of sensor or unique ID
+	 * @out Pmin minimum differential pressure in mbar
+	 * @out Pmax maximum differential pressure in mbar
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_get_differentialPressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax);
+
+	/**
+	 * @Description Returns the current differential pressure measurement in mbar
+	 * This feature is only available on NIFS devices.
+	 * @param sensorIndex Index of sensor or unique ID
+	 * @out Pdiff differential pressure in mbar
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_get_differentialPressure(unsigned int sensorIndex, float* Pdiff);
+
+	/**
+	 * @Description Returns the range of the absolute pressure sensor in mbar
+	 * This feature is only available on NIFS devices.
+	 * @param sensorIndex Index of sensor or unique ID
+	 * @out Pmin minimum absolute pressure in mbar
+	 * @out Pmax maximum absolute pressure in mbar
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_get_absolutePressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax);
+
+	/**
+	 * @Description Returns the current absolute pressure measurement in mbar
+	 * This feature is only available on NIFS devices.
+	 * @param sensorIndex Index of sensor or unique ID
+	 * @out Pabs absolute pressure in mbar
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_get_absolutePressure(unsigned int sensorIndex, float* Pabs);
+
+	/**
+	 * @Description Returns the current state of the bypass valve.
+	 * This feature is only available on NIFS devices.
+	 * @param sensorIndex Index of sensor or unique ID
+	 * @out state 1 if the valve is open, 0 if it is closed.
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_get_sensorBypassValve(unsigned int sensorIndex, unsigned char* state);
+
+	/**
+	 * @Description Sets the state of the sensor's bypass valve.
+	 * This feature is only available on NIFS devices.
+	 * @param sensorIndex Index of sensor or unique ID
+	 * @param state 1 to open, 0 to close.
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char state);
+
 
 #ifdef __cplusplus
 }

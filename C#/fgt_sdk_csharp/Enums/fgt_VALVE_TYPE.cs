@@ -14,5 +14,6 @@
         M_X,
         Two_X,
         L_X,
+        Bypass,
     }
 }

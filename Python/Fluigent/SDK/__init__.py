@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "22.1.0"
+__version__ = "22.2.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -962,9 +962,8 @@ def fgt_set_purge(controller_index, purge_state):
 def fgt_set_manual(pressure_index, voltage):
     """Manually set internal solenoid valve voltage. 
     
-    This stops pressure regulation on the channel.
-    
-    This feature is only available on MFCS and MFCS-EZ devices.
+    This stops pressure regulation on the channel until a new pressure or
+    flow rate command is set.
     
     Args:
         pressure_index: Index of pressure channel or unique ID
@@ -991,7 +990,7 @@ def fgt_set_digitalOutput(controller_index, port, state):
     c_error, = low_level_function(controller_index, port, state)
     exceptions.manage_generic_status(low_level_function.__name__, c_error)
     return fgt_ERROR(c_error)
-
+    
 def fgt_detect():
     """Detect all connected Fluigent instruments.
     
@@ -1043,6 +1042,108 @@ def fgt_get_sensorAirBubbleFlag(sensor_index, get_error = _get_error):
     exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
     c_error = fgt_ERROR(c_error)
     return (c_error, bubble_detected) if get_error else bubble_detected
+
+def fgt_get_differentialPressureRange(sensor_index, get_error = _get_error):
+    """Returns the range of the differential pressure sensor in mbar
+    This feature is only available on NIFS devices.
+    
+    Args:
+        sensor_index: Index of sensor channel or unique ID
+    Returns:
+        (pmin, pmax):
+            minimum differential pressure in mbar
+            maximum differential pressure in mbar
+    """
+    sensor_index = int(sensor_index)
+    low_level_function = low_level.fgt_get_differentialPressureRange
+    c_error, pressure_min, pressure_max = low_level_function(sensor_index)
+    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
+    c_error = fgt_ERROR(c_error)
+    return (c_error, pressure_min, pressure_max) if get_error else (pressure_min, pressure_max)
+
+def fgt_get_differentialPressure(sensor_index, get_error = _get_error):
+    """Returns the current differential pressure measurement in mbar
+    
+    This feature is only available on NIFS devices.
+    
+    Args:
+        sensor_index: Index of sensor channel or unique ID
+    Returns:
+        Differential pressure measurement in mbar
+    """
+    sensor_index = int(sensor_index)
+    low_level_function = low_level.fgt_get_differentialPressure
+    c_error, pressure_diff = low_level_function(sensor_index)
+    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
+    c_error = fgt_ERROR(c_error)
+    return (c_error, pressure_diff) if get_error else pressure_diff
+
+def fgt_get_absolutePressureRange(sensor_index, get_error = _get_error):
+    """Returns the range of the absolute pressure sensor in mbar
+    This feature is only available on NIFS devices.
+    
+    Args:
+        sensor_index: Index of sensor channel or unique ID
+    Returns:
+        (pmin, pmax):
+            minimum absolute pressure in mbar
+            maximum absolute pressure in mbar
+    """
+    sensor_index = int(sensor_index)
+    low_level_function = low_level.fgt_get_absolutePressureRange
+    c_error, pressure_min, pressure_max = low_level_function(sensor_index)
+    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
+    c_error = fgt_ERROR(c_error)
+    return (c_error, pressure_min, pressure_max) if get_error else (pressure_min, pressure_max)
+
+def fgt_get_absolutePressure(sensor_index, get_error = _get_error):
+    """Returns the current absolute pressure measurement in mbar
+    
+    This feature is only available on NIFS devices.
+    
+    Args:
+        sensor_index: Index of sensor channel or unique ID
+    Returns:
+        Absolute pressure measurement in mbar
+    """
+    sensor_index = int(sensor_index)
+    low_level_function = low_level.fgt_get_absolutePressure
+    c_error, pressure_abs = low_level_function(sensor_index)
+    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
+    c_error = fgt_ERROR(c_error)
+    return (c_error, pressure_abs) if get_error else pressure_abs
+
+def fgt_get_sensorBypassValve(sensor_index, get_error = _get_error):
+    """Returns the current state of the bypass valve.
+       This feature is only available on NIFS devices.
+    
+    Args:
+        sensor_index Index of sensor channel or unique ID
+    
+    Returns 
+        0: the valve is closed
+        1: the valve is open
+    """
+    sensor_index = int(sensor_index)
+    low_level_function = low_level.fgt_get_sensorBypassValve
+    c_error, state = low_level_function(sensor_index)
+    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
+    c_error = fgt_ERROR(c_error)
+    return (c_error, state) if get_error else state
+
+def fgt_set_sensorBypassValve(sensor_index, state):
+    """Sets the state of the sensor's bypass valve.
+       This feature is only available on NIFS devices.
+    
+    Args:
+        sensor_index Index of sensor channel or unique ID
+        state 0: OFF, 1:ON
+    """
+    sensor_index = int(sensor_index)
+    low_level_function = low_level.fgt_set_sensorBypassValve
+    c_error, = low_level_function(sensor_index, state)
+    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
+    return fgt_ERROR(c_error)
 
 def fgt_set_errorReportMode(mode):
     """Sets a flag that defines how SDK errors should be reported.

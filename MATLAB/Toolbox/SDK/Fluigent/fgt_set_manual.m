@@ -8,8 +8,6 @@ function varargout = fgt_set_manual( pressureIndex, value )
 %
 % error_code = fgt_set_manual( pressureIndex, value ) also returns the
 % error code returned by the library function.
-% 
-% This feature is only available on MFCS and MFCS-EZ devices.
 
 error_code = LowLevel.fgt_set_manual(pressureIndex, value);
 manage_pressure_status('fgt_set_manual', pressureIndex);
