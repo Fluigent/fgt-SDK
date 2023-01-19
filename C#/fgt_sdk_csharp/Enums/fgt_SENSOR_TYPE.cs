@@ -20,5 +20,7 @@
         Pressure_XL,
         Flow_M_plus_dual,
         Flow_L_plus_dual,
+        Flow_L_CFU,
+        Flow_L_NIFS,
     }
 }

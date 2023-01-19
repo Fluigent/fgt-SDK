@@ -7,8 +7,8 @@
 * Title:    fgt_SDK_Cpp.h                                                     
 * Purpose:  Wrapper to fgt_SDK library
 *			Contains an interface to each dll function and type conversions
-* Version:  22.1.0.0
-* Date:	    07/2022
+* Version:  22.2.0.0
+* Date:	    11/2022
 *============================================================================*/
 
 #ifndef _FGT_SDK_CPP_H
@@ -630,6 +630,62 @@ fgt_ERROR_CODE Fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned ch
  * @see fgt_get_pressureStatus
  */
 fgt_ERROR_CODE Fgt_get_inletPressure(unsigned int pressureIndex, float* pressure);
+
+/**
+ * @Description Returns the range of the differential pressure sensor in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pmin minimum differential pressure in mbar
+ * @out Pmax maximum differential pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_differentialPressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax);
+
+/**
+ * @Description Returns the current differential pressure measurement in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pdiff differential pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_differentialPressure(unsigned int sensorIndex, float* Pdiff);
+
+/**
+ * @Description Returns the range of the absolute pressure sensor in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pmin minimum absolute pressure in mbar
+ * @out Pmax maximum absolute pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_absolutePressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax);
+
+/**
+ * @Description Returns the current absolute pressure measurement in mbar
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out Pabs absolute pressure in mbar
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_absolutePressure(unsigned int sensorIndex, float* Pabs);
+
+/**
+ * @Description Returns the current state of the bypass valve.
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @out state 1 if the valve is open, 0 if it is closed.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_sensorBypassValve(unsigned int sensorIndex, unsigned char* state);
+
+/**
+ * @Description Sets the state of the sensor's bypass valve.
+ * This feature is only available on NIFS devices.
+ * @param sensorIndex Index of sensor or unique ID
+ * @param state 1 to open, 0 to close.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char state);
 
 /**
  * @Description Sets a flag that defines how SDK errors should be reported.

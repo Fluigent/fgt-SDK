@@ -131,16 +131,17 @@ fgt_SENSOR_TYPE = make_enum("fgt_SENSOR_TYPE",
                        "Flow_S_dual", "Flow_M_single", "Flow_M_dual", 
                        "Flow_L_single", "Flow_L_dual", "Flow_XL_single",
                        "Pressure_S", "Pressure_M", "Pressure_XL",
-                       "Flow_M_plus_dual", "Flow_L_plus_dual")
+                       "Flow_M_plus_dual", "Flow_L_plus_dual",
+                       "Flow_L_CFU", "Flow_L_NIFS")
  
 fgt_INSTRUMENT_TYPE = make_enum("fgt_INSTRUMENT_TYPE",
-                           "NONE","MFCS","MFCS_EZ","FRP","LineUP", "IPS", "ESS", "F_OEM")
+                           "NONE","MFCS","MFCS_EZ","FRP","LineUP", "IPS", "ESS", "F_OEM", "CFU", "NIFS")
 
 fgt_SENSOR_CALIBRATION = make_enum("fgt_SENSOR_CALIBRATION",
                                       "NONE", "H2O", "IPA", "HFE", "FC40", 
                                       "OIL")
                                       
-fgt_VALVE_TYPE = make_enum("fgt_VALVE_TYPE", "NONE", "MSwitch", "TwoSwitch", "LSwitch", "PSwitch", "M_X", "Two_X", "L_X")
+fgt_VALVE_TYPE = make_enum("fgt_VALVE_TYPE", "NONE", "MSwitch", "TwoSwitch", "LSwitch", "PSwitch", "M_X", "Two_X", "L_X", "Bypass")
 
 fgt_SWITCH_DIRECTION = make_enum("fgt_SWITCH_DIRECTION", "Shortest", "Anticlockwise", "Clockwise")
     
@@ -241,6 +242,12 @@ lib.fgt_set_valvePosition.argtypes = [c_uint, c_int, c_int, c_int]
 lib.fgt_set_allValves.argtypes = [c_uint, c_uint, c_int]
 lib.fgt_get_inletPressure.argtypes = [c_uint, POINTER(c_float)]
 lib.fgt_get_sensorAirBubbleFlag.argtypes = [c_uint, POINTER(c_ubyte)]
+lib.fgt_get_differentialPressureRange.argtypes = [c_uint, POINTER(c_float), POINTER(c_float)]
+lib.fgt_get_differentialPressure.argtypes = [c_uint, POINTER(c_float)]
+lib.fgt_get_absolutePressureRange.argtypes = [c_uint, POINTER(c_float), POINTER(c_float)]
+lib.fgt_get_absolutePressure.argtypes = [c_uint, POINTER(c_float)]
+lib.fgt_get_sensorBypassValve.argtypes = [c_uint, POINTER(c_ubyte)]
+lib.fgt_set_sensorBypassValve.argtypes = [c_uint, c_ubyte]
 
 
 # Wrappers
@@ -608,3 +615,40 @@ def fgt_get_sensorAirBubbleFlag(sensor_index):
     bubble_detected = c_ubyte(0)
     c_error = c_ubyte(lib.fgt_get_sensorAirBubbleFlag(c_uint(sensor_index), byref(bubble_detected)))
     return c_error.value, bubble_detected.value
+
+def fgt_get_differentialPressureRange(sensor_index):
+    pressure_min = c_float(0)
+    pressure_max = c_float(0)
+    c_error = c_ubyte(lib.fgt_get_differentialPressureRange(c_uint(sensor_index), 
+                                    byref(pressure_min), byref(pressure_max)))
+    return c_error.value, pressure_min.value, pressure_max.value
+
+def fgt_get_differentialPressure(sensor_index):
+    pressure_diff = c_float(0)
+    c_error = c_ubyte(lib.fgt_get_differentialPressure(c_uint(sensor_index), 
+                                    byref(pressure_diff)))
+    return c_error.value, pressure_diff.value
+
+def fgt_get_absolutePressureRange(sensor_index):
+    pressure_min = c_float(0)
+    pressure_max = c_float(0)
+    c_error = c_ubyte(lib.fgt_get_absolutePressureRange(c_uint(sensor_index), 
+                                    byref(pressure_min), byref(pressure_max)))
+    return c_error.value, pressure_min.value, pressure_max.value
+
+def fgt_get_absolutePressure(sensor_index):
+    pressure_diff = c_float(0)
+    c_error = c_ubyte(lib.fgt_get_absolutePressure(c_uint(sensor_index), 
+                                    byref(pressure_diff)))
+    return c_error.value, pressure_diff.value
+
+def fgt_get_sensorBypassValve(sensor_index):
+    state = c_ubyte(0)
+    c_error = c_ubyte(lib.fgt_get_sensorBypassValve(c_uint(sensor_index), 
+                                    byref(state)))
+    return c_error.value, state.value
+
+def fgt_set_sensorBypassValve(sensor_index, state):
+    c_error = c_ubyte(lib.fgt_set_sensorBypassValve(c_uint(sensor_index), 
+                                    c_ubyte(state)))
+    return c_error.value,

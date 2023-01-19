@@ -314,6 +314,30 @@ namespace fgt_sdk
         [DllImport(FGT_SDK)]
         private static extern byte fgt_get_inletPressure(uint pressureIndex, ref float pressure);
 
+        // unsigned char __stdcall fgt_get_differentialPressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_differentialPressureRange(uint sensorIndex, ref float pMin, ref float pMax);
+
+        // unsigned char __stdcall fgt_get_differentialPressure(unsigned int sensorIndex, float* Pdiff);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_differentialPressure(uint sensorIndex, ref float pDiff);
+
+        // unsigned char __stdcall fgt_get_absolutePressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_absolutePressureRange(uint sensorIndex, ref float pMin, ref float pMax);
+
+        // unsigned char __stdcall fgt_get_absolutePressure(unsigned int sensorIndex, float* Pabs);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_absolutePressure(uint sensorIndex, ref float pAbs);
+
+        // unsigned char __stdcall fgt_get_sensorBypassValve(unsigned int sensorIndex, unsigned char* state)
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_sensorBypassValve(uint sensorIndex, ref byte state);
+
+        // unsigned char __stdcall fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char state)
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorBypassValve(uint sensorIndex, byte state);
+
         #endregion
 
         #endregion
@@ -1132,8 +1156,9 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Manually activate internal electrovalve. This stops pressure regulation.
-        /// This feature is only available on MFCS and MFCS-EZ devices.
+        /// Manually set internal solenoid valve voltage.
+        /// This stops pressure regulation on the channel until a new pressure or 
+        /// flow rate command is set.
         /// </summary>
         /// <param name="pressureIndex">Index of pressure channel or unique ID</param>
         /// <param name="value">Applied valve voltage from 0 to 100(%)</param>
@@ -1182,6 +1207,84 @@ namespace fgt_sdk
             var pressure = 0.0f;
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_inletPressure(pressureIndex, ref pressure), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return (errCode, pressure);
+        }
+
+        /// <summary>
+        /// Returns the range of the differential pressure sensor.
+        /// This feature is only available on NIFS devices.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static (fgt_ERROR_CODE errCode, float pMin, float pMax) Fgt_get_differentialPressureRange(uint sensorIndex)
+        {
+            float pMin = 0, pMax = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_differentialPressureRange(sensorIndex, ref pMin, ref pMax), fgt_ERRCHECK_TYPE.Sensor);
+            return (errCode, pMin, pMax);
+        }
+
+        /// <summary>
+        /// Returns the current differential pressure measurement
+        /// This feature is only available on NIFS devices.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and differential pressure</returns>
+        public static (fgt_ERROR_CODE errCode, float pDiff) Fgt_get_differentialPressure(uint sensorIndex)
+        {
+            float pDiff = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_differentialPressure(sensorIndex, ref pDiff), fgt_ERRCHECK_TYPE.Sensor);
+            return (errCode, pDiff);
+        }
+
+        /// <summary>
+        /// Returns the range of the absolute pressure sensor.
+        /// This feature is only available on NIFS devices.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static (fgt_ERROR_CODE errCode, float pMin, float pMax) Fgt_get_absolutePressureRange(uint sensorIndex)
+        {
+            float pMin = 0, pMax = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_absolutePressureRange(sensorIndex, ref pMin, ref pMax), fgt_ERRCHECK_TYPE.Sensor);
+            return (errCode, pMin, pMax);
+        }
+
+        /// <summary>
+        /// Returns the current absolute pressure measurement
+        /// This feature is only available on NIFS devices.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and absolute pressure</returns>
+        public static (fgt_ERROR_CODE errCode, float pAbs) Fgt_get_absolutePressure(uint sensorIndex)
+        {
+            float pAbs = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_absolutePressure(sensorIndex, ref pAbs), fgt_ERRCHECK_TYPE.Sensor);
+            return (errCode, pAbs);
+        }
+
+        /// <summary>
+        /// Returns the current state of the bypass valve.
+        /// This feature is only available on NIFS devices.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and boolean value which is true if the valve is open and false otherwise</returns>
+        public static (fgt_ERROR_CODE errCode, bool state) Fgt_get_sensorBypassValve(uint sensorIndex)
+        {
+            byte state = 0;
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorBypassValve(sensorIndex, ref state), fgt_ERRCHECK_TYPE.Sensor);
+            return (errCode, state != 0);
+        }
+
+        /// <summary>
+        /// Sets the state of the sensor's bypass valve.
+        /// This feature is only available on NIFS devices.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <param name="state">True to open the valve, false to close</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and boolean value which is true if the valve is open and false otherwise</returns>
+        public static fgt_ERROR_CODE Fgt_set_sensorBypassValve(uint sensorIndex, bool state)
+        {
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorBypassValve(sensorIndex, (byte)(state ? 1 : 0)), fgt_ERRCHECK_TYPE.Sensor);
+            return errCode;
         }
 
         #endregion

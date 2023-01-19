@@ -1,4 +1,4 @@
-﻿# Fluigent Software Developement Kit - version 22.1.0
+﻿# Fluigent Software Developement Kit - version 22.2.0
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application;
@@ -46,6 +46,7 @@ Switch EZ and compatible switches, and P-Switch
 * Flowboard and compatible Flow Units
 * Inline Pressure Sensor (IPS)
 * ESS Series Switchboard and compatible switches
+* NIFS (Non-Invasive Flow sensor)
 
 # Software layers
 

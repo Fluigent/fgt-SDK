@@ -14,5 +14,7 @@
         IPS,
         ESS,
         F_OEM,
+        CFU,
+        NIFS,
     }
 }
