@@ -1231,6 +1231,43 @@ fgt_ERROR_CODE Fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char
 	return returnCode;
 }
 
+/**
+ * @Description Sets the verbosity of the logging feature, i.e., how much data is logged.
+ * @param verbosity The amount of data to log. Set to 0 to disable logging (default).
+ * Set to 5 to log the maximum amount of data.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_log_verbosity(unsigned int verbosity){
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_log_verbosity(verbosity));
+	return returnCode;
+}
+
+/**
+ * @Description Sets how the SDK outputs the log entries.
+ * @param output_to_file Output log entries to a file in the current directory. 1 to enable, 0 to disable. Default: enabled.
+ * @param output_to_stderr Output log entries to the stderr pipe (console). 1 to enable, 0 to disable. Default: disabled.
+ * @param output_to_queue Store log entries in memory. They can be retrieved via the fgt_get_next_log function. 1 to enable, 0 to disable. Default: disabled.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_log_output_mode(unsigned char output_to_file, unsigned char output_to_stderr, unsigned char output_to_queue){
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_log_output_mode(output_to_file, output_to_stderr, output_to_queue));
+	return returnCode;
+}
+
+/**
+ * @Description Returns the next log entry stored in memory, if any, and removes it from the queue.
+ * Will return an error if the queue is empty. Logs are only stored in memory if the corresponding option is set with the
+ * fgt_set_log_output_mode function. Call this function repeatedly until an error is returned to retrieve all log entries.
+ * @param log char array provided by the user, on which the log string will be copied.
+ *  Must have at least 2000 bytes of available space.
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_get_next_log(std::string* log_entry){
+	char buffer[2000] = { 0 };
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_next_log(buffer));
+	*log_entry = buffer;
+	return returnCode;
+}
 
 fgt_ERROR_CODE Fgt_set_errorReportMode(fgt_ERROR_REPORT_MODE mode)
 {

@@ -79,6 +79,9 @@
 		<Item Name="fgt init.vi" Type="VI" URL="../VIs/Engine/fgt init.vi"/>
 		<Item Name="fgt create simulated instr.vi" Type="VI" URL="../VIs/Engine/fgt create simulated instr.vi"/>
 		<Item Name="fgt remove simulated instr.vi" Type="VI" URL="../VIs/Engine/fgt remove simulated instr.vi"/>
+		<Item Name="fgt set log verbosity.vi" Type="VI" URL="../VIs/Engine/fgt set log verbosity.vi"/>
+		<Item Name="fgt set log output mode.vi" Type="VI" URL="../VIs/Engine/fgt set log output mode.vi"/>
+		<Item Name="fgt get next log.vi" Type="VI" URL="../VIs/Engine/fgt get next log.vi"/>
 	</Item>
 	<Item Name="subvi" Type="Folder">
 		<Item Name="Error Converter (ErrCode or Status).vi" Type="VI" URL="../subvi/Error Converter (ErrCode or Status).vi"/>
