@@ -78,6 +78,9 @@ class fgt_ENUM(object):
         
     def __int__(self):
         return self.__value
+        
+    def __index__(self):
+        return self.__value
     
     def __str__(self):
         return self.reverse_mapping[self.__value]
@@ -248,6 +251,9 @@ lib.fgt_get_absolutePressureRange.argtypes = [c_uint, POINTER(c_float), POINTER(
 lib.fgt_get_absolutePressure.argtypes = [c_uint, POINTER(c_float)]
 lib.fgt_get_sensorBypassValve.argtypes = [c_uint, POINTER(c_ubyte)]
 lib.fgt_set_sensorBypassValve.argtypes = [c_uint, c_ubyte]
+lib.fgt_set_log_verbosity.argtypes = [c_uint]
+lib.fgt_set_log_output_mode.argtypes = [c_ubyte, c_ubyte, c_ubyte]
+lib.fgt_get_next_log.argtypes = [POINTER(c_char)]
 
 
 # Wrappers
@@ -652,3 +658,21 @@ def fgt_set_sensorBypassValve(sensor_index, state):
     c_error = c_ubyte(lib.fgt_set_sensorBypassValve(c_uint(sensor_index), 
                                     c_ubyte(state)))
     return c_error.value,
+
+def fgt_set_log_verbosity(verbosity):
+    c_error = c_ubyte(lib.fgt_set_log_verbosity(c_uint(verbosity)))
+    return c_error.value,
+
+def fgt_set_log_output_mode(output_to_file, output_to_stderr, output_to_queue):
+    output_to_file = 1 if output_to_file else 0
+    output_to_stderr = 1 if output_to_stderr else 0
+    output_to_queue = 1 if output_to_queue else 0
+    c_error = c_ubyte(lib.fgt_set_log_output_mode(c_ubyte(output_to_file),
+                                                  c_ubyte(output_to_stderr),
+                                                  c_ubyte(output_to_queue)))
+    return c_error.value,
+
+def fgt_get_next_log():
+    log_entry = (c_char * 2000)()
+    c_error = c_ubyte(lib.fgt_get_next_log(log_entry))
+    return c_error.value, log_entry.value.decode()

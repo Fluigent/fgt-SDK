@@ -1,4 +1,4 @@
-﻿# Fluigent Software Developement Kit - version 22.2.0
+﻿# Fluigent Software Developement Kit - version 23.0.0
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application;
@@ -34,7 +34,7 @@ in the language sub-folder you are interested in.
 | macOS            |               | X             |               |                 |
 
 1. Requires kernel version 2.6.39 or newer
-2. Requires GLIBC ≥ 2.14, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11
+2. Requires GLIBC ≥ 2.14, GLIBCXX ≥ 3.4.26, CXXABI ≥ 1.3.11
 3. Requires GLIBC ≥ 2.7, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11, CXXABI\_ARM ≥ 1.3.3
 4. Requires GLIBC ≥ 2.17, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11
 

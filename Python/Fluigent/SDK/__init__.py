@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "22.2.0"
+__version__ = "23.0.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -976,7 +976,7 @@ def fgt_set_manual(pressure_index, voltage):
     return fgt_ERROR(c_error)
 
 def fgt_set_digitalOutput(controller_index, port, state):
-    """Activate/deactivate purge function.
+    """Set the state of an ON/OFF output port.
     
     This feature is only available on F-OEM devices.
     
@@ -1144,6 +1144,40 @@ def fgt_set_sensorBypassValve(sensor_index, state):
     c_error, = low_level_function(sensor_index, state)
     exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
     return fgt_ERROR(c_error)
+
+def fgt_set_log_verbosity(verbosity):
+    """Sets the verbosity of the logging feature, i.e., how much data is logged.
+    
+    Args:
+       verbosity The amount of data to log. Set to 0 to disable logging (default).
+	             Set to 5 to log the maximum amount of data.
+    """
+    low_level_function = low_level.fgt_set_log_verbosity
+    c_error, = low_level_function(verbosity)
+    return fgt_ERROR(c_error)
+
+def fgt_set_log_output_mode(output_to_file, output_to_stderr, output_to_queue):
+    """Sets how the SDK outputs the log entries.
+    
+    Args:
+        output_to_file Output log entries to a file in the current directory. 1 to enable, 0 to disable. Default: enabled.
+        output_to_stderr Output log entries to the stderr pipe (console). 1 to enable, 0 to disable. Default: disabled.
+        output_to_queue Store log entries in memory. They can be retrieved via the fgt_get_next_log function. 1 to enable, 0 to disable. Default: disabled.
+    """
+    low_level_function = low_level.fgt_set_log_output_mode
+    c_error, = low_level_function(output_to_file, output_to_stderr, output_to_queue)
+    return fgt_ERROR(c_error)
+
+def fgt_get_next_log(get_error = _get_error):
+    """Returns the next log entry stored in memory, if any, and removes it from the queue.
+       Will return an error if the queue is empty. Logs are only stored in memory if the corresponding option is set with the
+       fgt_set_log_output_mode function. Call this function repeatedly until an error is returned to retrieve all log entries.
+    """
+    low_level_function = low_level.fgt_get_next_log
+    c_error, log_entry = low_level_function()
+    c_error = fgt_ERROR(c_error)
+    log_entry = log_entry if int(c_error) == 0 else None
+    return (c_error, log_entry) if get_error else log_entry
 
 def fgt_set_errorReportMode(mode):
     """Sets a flag that defines how SDK errors should be reported.

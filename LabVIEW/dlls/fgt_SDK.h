@@ -6,8 +6,8 @@
 *                                                                            
 * Title:   fgt_SDK.h                                                         
 * Purpose: Functions API for Fluigent instruments                            
-* Version: 22.2.0.0
-* Date:	01/2023
+* Version: 23.0.0.0
+* Date:	05/2023
 *============================================================================*/
 
 #ifndef _FGT_SDK_H
@@ -114,6 +114,7 @@ extern "C"
 	typedef int fgt_calibration_t;
 	typedef int fgt_switch_direction_t;
 #endif
+
 	/** @Description Structure containing pressure or sensor identification and details */
 typedef struct
 {
@@ -454,7 +455,7 @@ typedef struct
 	unsigned char FGT_API fgt_set_sensorCalibration(unsigned int sensorIndex, fgt_calibration_t calibration);
 
 	/**
-	 * @Description Get sensor's current calibration table. Not supported by IPS.
+	 * @Description Get sensor's current calibration table. Only applicable to Flow Unit sensors.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @out *calibration fgt_SENSOR_CALIBRATION
 	 * @return fgt_ERROR_CODE
@@ -465,7 +466,7 @@ typedef struct
 	 * @Description Apply a custom scale factor on sensor read value. This function is useful in order to adapt read sensor value to physical measurement.
 	 * For example if a flow-unit is used with a special oil and it's calibration table is set to H2O, read flowrate is not correct.
 	 * Scale factor is applied using following formula: scaled_value = a*sensor_value + b*sensor_value^2 + c*sensor_value^3
-	 * Note that this scale is also used for the regulation. Not supported by IPS.
+	 * Note that this scale is also used for the regulation. Only applicable to Flow Unit sensors.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param float a proportional multiplier value
 	 * @param float b square multiplier value
@@ -480,7 +481,7 @@ typedef struct
 	 * For example if a flow-unit is used with a special oil and it's calibration table is set to H2O, read flowrate is not correct.
 	 * Scale factor is applied using following formula: scaled_value = a*sensor_value + b*sensor_value^2 + c*sensor_value^3
 	 * When applying a custom scale factor, sensor range may increase very rapidly, SMax parameter is meant to limit this maximal value.
-	 * This function purpose is to be used with the regulation in order to avoid too high maximum range on the sensor. Not supported by IPS.
+	 * This function purpose is to be used with the regulation in order to avoid too high maximum range on the sensor. Only applicable to Flow Unit sensors.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param float a proportional multiplier value
 	 * @param float b square multiplier value
@@ -505,8 +506,9 @@ typedef struct
 	 * Custom sensors, outside Fluigent ones, can be used such as different flow-units, pressure, level ... 
 	 * However we do not guarantee full compatibility with all sensors. Regulation quality is linked to sensor precision and your set-up.
 	 * In order to use this function, custom used sensor maximum range and measured values has to be updated at least once per second.
-	 * Directly setting pressure on same pressureIndex will stop regulation. Not supported by IPS. 
-	 * This function must be called at 1Hz minimum or the regulation will stop. 
+	 * Directly setting pressure on same pressureIndex will stop regulation.
+	 * This function must be called at least once per second to update the sensor measurement,
+	 * or the regulation will stop.
 	 * @param measure custom sensor measured value, no unit is required
 	 * @param setpoint custom sensor regulation goal value, no unit is required
 	 * @param pressureIndex Index of pressure channel or unique ID
@@ -525,7 +527,7 @@ typedef struct
 	unsigned char FGT_API fgt_get_pressureRange(unsigned int pressureIndex, float* Pmin, float* Pmax);
 
 	/**
-	 * @Description Get sensor minimum and maximum range. Returned values takes into account set unit, default value is 'µl/min' in case of flow-units and 'mbar' for pressure sensors.
+	 * @Description Get sensor minimum and maximum range. Returned values takes into account set unit, default value is 'µl/min' in case of Flow Units and 'mbar' for pressure sensors.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @out Smin minimum measured sensor value
 	 * @out Smax maximum measured sensor value
@@ -557,7 +559,7 @@ typedef struct
 
 	/**
 	 * @Description Set on a running regulation pressure response time. Minimal value is 2 for FlowEZ, 6 for MFCS controllers.
-	 * This function is useful if a more smooth response is wanted. Not supported by IPS.
+	 * This function is useful if a more smooth response is wanted.
 	 * @param sensorIndex Index of sensor channel or unique ID
 	 * @param responseTime pressure response time in seconds
 	 * @return fgt_ERROR_CODE
@@ -746,6 +748,37 @@ typedef struct
 	 * @return fgt_ERROR_CODE
 	 */
 	unsigned char FGT_API fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char state);
+
+	/*============================================================================*/
+	/*--------------------------------  Logging  ---------------------------------*/
+	/*============================================================================*/
+
+	/**
+	 * @Description Sets the verbosity of the logging feature, i.e., how much data is logged.
+	 * @param verbosity The amount of data to log. Set to 0 to disable logging (default).
+	 * Set to 5 to log the maximum amount of data.
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_set_log_verbosity(unsigned int verbosity);
+
+	/**
+	 * @Description Sets how the SDK outputs the log entries.
+	 * @param output_to_file Output log entries to a file in the current directory. 1 to enable, 0 to disable. Default: enabled.
+	 * @param output_to_stderr Output log entries to the stderr pipe (console). 1 to enable, 0 to disable. Default: disabled.
+	 * @param output_to_queue Store log entries in memory. They can be retrieved via the fgt_get_next_log function. 1 to enable, 0 to disable. Default: disabled.
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_set_log_output_mode(unsigned char output_to_file, unsigned char output_to_stderr, unsigned char output_to_queue);
+
+	/**
+	 * @Description Returns the next log entry stored in memory, if any, and removes it from the queue.
+	 * Will return an error if the queue is empty. Logs are only stored in memory if the corresponding option is set with the
+	 * fgt_set_log_output_mode function. Call this function repeatedly until an error is returned to retrieve all log entries.
+	 * @param log char array provided by the user, on which the log string will be copied.
+	 *  Must have at least 2000 bytes of available space.
+	 * @return fgt_ERROR_CODE
+	 */
+	unsigned char FGT_API fgt_get_next_log(char log[2000]);
 
 
 #ifdef __cplusplus

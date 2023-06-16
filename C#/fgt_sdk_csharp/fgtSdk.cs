@@ -29,13 +29,13 @@ namespace fgt_sdk
             }
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-            var basePath = Path.Combine(assemblyPath, "fgt_sdk_dlls");
+            var basePath = Path.Combine(assemblyPath, "runtimes");
             string osFolder;
             string libFile;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                osFolder = "windows";
-                libFile = "fgt_SDK.dll";
+                osFolder = "win";
+                libFile = "libfgt_SDK.dll";
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
@@ -44,7 +44,7 @@ namespace fgt_sdk
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                osFolder = "mac";
+                osFolder = "osx";
                 libFile = "libfgt_SDK.dylib";
             }
             else
@@ -62,12 +62,10 @@ namespace fgt_sdk
                 Architecture arch => throw new NotSupportedException($"Architecture {arch} not supported"),
             };
 
-            var libPath = Path.Combine(basePath, osFolder, archFolder, libFile);
+            var libPath = Path.Combine(basePath, $"{osFolder}-{archFolder}", "native", libFile);
             if (!File.Exists(libPath))
             {
-                // Native library can be placed in the root folder containing the executable that uses it
-                // When doing so, prepend "lib" on Windows to avoid a name collision with the assembly DLL
-                libPath = Path.Combine(assemblyPath, libFile.StartsWith("lib") ? libFile : "lib" + libFile);
+                libPath = Path.Combine(assemblyPath, libFile);
             }
 
             _nativeLibPointer = NativeLibrary.Load(libPath);
@@ -338,6 +336,20 @@ namespace fgt_sdk
         [DllImport(FGT_SDK)]
         private static extern byte fgt_set_sensorBypassValve(uint sensorIndex, byte state);
 
+        #endregion
+
+        #region Logging
+        // unsigned char FGT_API fgt_set_log_verbosity(unsigned int verbosity);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_log_verbosity(uint verbosity);
+
+        // unsigned char FGT_API fgt_set_log_output_mode(unsigned char output_to_file, unsigned char output_to_stderr, unsigned char output_to_queue);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_log_output_mode(byte output_to_file, byte output_to_stderr, byte output_to_queue);
+
+        // unsigned char FGT_API fgt_get_next_log(char log[2000]);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_get_next_log([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 2000)] char[] detail);
         #endregion
 
         #endregion
@@ -1287,6 +1299,49 @@ namespace fgt_sdk
             return errCode;
         }
 
+        #endregion
+
+        #region Logging
+        /// <summary>
+        /// Sets the verbosity of the logging feature, i.e., how much data is logged.
+        /// </summary>
+        /// <param name="verbosity">The amount of data to log. Set to 0 to disable logging (default). 
+        /// Set to 5 to log the maximum amount of data.</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static fgt_ERROR_CODE Fgt_set_log_verbosity(uint verbosity)
+        {
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_log_verbosity(verbosity), fgt_ERRCHECK_TYPE.Generic);
+            return errCode;
+        }
+
+        /// <summary>
+        /// Sets how the SDK outputs the log entries.
+        /// </summary>
+        /// <param name="output_to_file">Output log entries to a file in the current directory. Default: enabled.</param>
+        /// <param name="output_to_stderr">Output log entries to the stderr pipe (console). Default: disabled.</param>
+        /// <param name="output_to_queue">Store log entries in memory. They can be retrieved via the <see cref="Fgt_get_next_log"/> function. Default: disabled.</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static fgt_ERROR_CODE Fgt_set_log_output_mode(bool output_to_file, bool output_to_stderr, bool output_to_queue)
+        {
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_log_output_mode((byte)(output_to_file ? 1 : 0), (byte)(output_to_stderr ? 1 : 0), (byte)(output_to_queue ? 1 : 0)), fgt_ERRCHECK_TYPE.Generic);
+            return errCode;
+        }
+
+        /// <summary>
+        /// Returns the next log entry stored in memory, if any, and removes it from the queue.
+        /// Will return an error if the queue is empty.Logs are only stored in memory if the corresponding
+        /// option is set with the <see cref="Fgt_set_log_output_mode"/> function.
+        /// Call this function repeatedly until an error is returned to retrieve all log entries.
+        /// </summary>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static (fgt_ERROR_CODE, string log) Fgt_get_next_log()
+        {
+            var log = new char[2000];
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_next_log(log), fgt_ERRCHECK_TYPE.Generic);
+            if (errCode != fgt_ERROR_CODE.OK) { return (errCode, string.Empty); }
+            var logString = new string(log.TakeWhile(c => c != '\0').ToArray());
+            return (errCode, logString);
+        }
         #endregion
 
         /// <summary>
