@@ -40,12 +40,13 @@ in the language sub-folder you are interested in.
 
 # Supported hardware
 By using Fluigent SDK, you have direct access to following Fluigent devices:
-* MFCS Series: MFCS, MFCS-EZ, MFCS-EX and PX pressure controllers
-* LineUP Series: Link, Flow EZ pressure controller, Flow Unit connected to Flow EZ,
+* MFCS<sup>TM</sup> Series: MFCS<sup>TM</sup>, MFCS<sup>TM</sup>-EZ, MFCS<sup>TM</sup>-EX and PX pressure controllers
+* LineUP Series: Link, Flow EZ<sup>TM</sup> pressure controller, Flow Unit connected to Flow EZ<sup>TM</sup>,
 Switch EZ and compatible switches, and P-Switch
 * Flowboard and compatible Flow Units
 * Inline Pressure Sensor (IPS)
 * ESS Series Switchboard and compatible switches
+* F-OEM Series: INT-OEM, Pressure Module, Switch Module
 * NIFS (Non-Invasive Flow sensor)
 
 # Software layers
