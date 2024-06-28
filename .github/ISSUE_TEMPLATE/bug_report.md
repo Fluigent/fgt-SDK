@@ -12,26 +12,28 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+1. Plug '...' and '...'
+2. Run script for '....'
+3. See error
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+If applicable, add output logs or screenshots to help explain your problem.
 
 **Software (please complete the following information):**
- - OS: [e.g. Windows10]
- - SDK version: [e.g. 21.0]
+ - OS: [e.g. Windows11]
+ - SDK version: [e.g. 23.0]
 
 **Instrument(s) (please complete the following information):**
 - Family: [e.g. LineUP]
+- Model(s): [e.g. FlowEZ, MFCS-EZ, etc.]
+- SN(s):
+- Firmware version(s):
 
 **Additional context**
-Add any other context about the problem here. Ideally, try to run one of the following script (depending on your OS) and report here its output.
-- Windows: [Debug script](https://fluigent.com)
-- Linux: [Debug script](https://fluigent.com)
-- OSX: [Debug script](https://fluigent.com)
+Add any other context about the problem here. Ideally, try to run your script with the log verbosity set to the maximum. To do so, add this line at the top of your script (example provided for Python, adapt it to your language):
+```python
+fgt_set_log_verbosity(5)
+```
