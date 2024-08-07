@@ -1,5 +1,10 @@
 ﻿# Fluigent Software Developement Kit - version 23.0.0
 
+# Documentation
+
+- [Manual (PDF)](https://github.com/Fluigent/fgt-SDK/blob/master/Fluigent%20SDK.pdf)
+- [Website](https://www.fluigent.com/resources-support/support-tools/software/sdk/))
+
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application;
 it has been ported to the most popular programming language within the instrumentation field
