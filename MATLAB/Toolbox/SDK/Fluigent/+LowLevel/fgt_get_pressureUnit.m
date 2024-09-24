@@ -4,6 +4,8 @@ function [error_code, unit] = fgt_get_pressureUnit( pressureIndex )
 load_fgt
 unit = zeros(1, 140);
 [error_code, unit] = calllib('fgt_sdk', 'fgt_get_pressureUnit', pressureIndex, unit);
-unit = strtrim(char(unit(unit ~=0)));
+unit = unit(unit ~=0);
+unit = mod(int16(unit) + 256, 256);
+unit = native2unicode(unit, 'UTF-8');
 end
 

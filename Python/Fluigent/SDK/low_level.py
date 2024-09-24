@@ -7,56 +7,67 @@ error code.
 import sys
 import platform
 import os
-import pkg_resources
 import ctypes
 from ctypes import byref, c_ubyte, c_ushort, c_uint, c_char, c_int, c_float, POINTER, Structure
 
-_is_64_bits = sys.maxsize > 2**32
-_platform = sys.platform
-_os_name = _platform.lower()
-_machine = platform.machine()
-_processor_arch = _machine.lower()
-_is_windows = _os_name.startswith("win32")
-_is_linux = _os_name.startswith("linux")
-_is_osx = _os_name.startswith("darwin")
-_is_x86 = _processor_arch.startswith("x86") or _processor_arch.startswith("amd")
-_is_arm = _processor_arch.startswith('arm') or _processor_arch.startswith('aarch')
-_libclass = ctypes.CDLL
-_lib_relative_path = ["shared"]
-_lib_name = "fgt_SDK"
-def _raise_system_not_supported():
-    raise NotImplementedError("SDK not supported on {} with architecture {} ({} bits)".
-                              format(_platform, _machine, "64" if _is_64_bits else "32"))
 
-# Determine OS
-if _is_windows:
-    _libclass = ctypes.WinDLL
-    _lib_relative_path.append("windows")
-    _lib_name = _lib_name + ".dll"
-elif _is_linux:
-    _lib_name = "lib" + _lib_name + ".so"
-    _lib_relative_path.append("linux")
-elif _is_osx:
-    _lib_name = "lib" + _lib_name + ".dylib"
-    _lib_relative_path.append("mac")
+def _load_lib():
+    is_64_bits = sys.maxsize > 2**32
+    os_name = sys.platform.lower()
+    machine = platform.machine()
+    processor_arch = machine.lower()
+    is_windows = os_name.startswith("win32")
+    is_linux = os_name.startswith("linux")
+    is_osx = os_name.startswith("darwin")
+    is_x86 = processor_arch.startswith("x86") or processor_arch.startswith("amd")
+    is_arm = processor_arch.startswith('arm') or processor_arch.startswith('aarch')
+    libclass = ctypes.CDLL
+    lib_relative_path = ["shared"]
+    lib_name = "fgt_SDK"
+    def raise_system_not_supported():
+        raise NotImplementedError("SDK not supported on {} with architecture {} ({} bits)".
+                                  format(platform, machine, "64" if is_64_bits else "32"))
 
-# Determine architecture    
-if _is_x86 and _is_64_bits:
-    _lib_relative_path.append("x64")
-elif _is_x86 and not _is_64_bits:
-    _lib_relative_path.append("x86")
-if _is_arm and _is_64_bits:
-    _lib_relative_path.append("arm64")
-elif _is_arm and not _is_64_bits:
-    _lib_relative_path.append("arm")
+    # Determine OS
+    if is_windows:
+        libclass = ctypes.WinDLL
+        lib_relative_path.append("windows")
+        lib_name = lib_name + ".dll"
+    elif is_linux:
+        lib_name = "lib" + lib_name + ".so"
+        lib_relative_path.append("linux")
+    elif is_osx:
+        lib_name = "lib" + lib_name + ".dylib"
+        lib_relative_path.append("mac")
 
-# Find shared library in package
-resource_package = __name__
-resource_path = '/'.join(_lib_relative_path)
-_libdir = pkg_resources.resource_filename(resource_package, resource_path)
-_libpath = os.path.join(_libdir, _lib_name)
-if not(os.path.exists(_libpath)): _raise_system_not_supported()
-lib = _libclass(_libpath) 
+    # Determine architecture    
+    if is_x86 and is_64_bits:
+        lib_relative_path.append("x64")
+    elif is_x86 and not is_64_bits:
+        lib_relative_path.append("x86")
+    if is_arm and is_64_bits:
+        lib_relative_path.append("arm64")
+    elif is_arm and not is_64_bits:
+        lib_relative_path.append("arm")
+
+    # Find shared library in package
+    resource_path = '/'.join(lib_relative_path)
+    if sys.version_info.minor < 9:
+        import pkg_resources
+        resource_package = __name__
+        libdir = pkg_resources.resource_filename(resource_package, resource_path)
+        libpath = os.path.join(libdir, lib_name)
+        if not(os.path.exists(libpath)): raise_system_not_supported()
+        return libclass(libpath) 
+    else:
+        from importlib import resources
+        resource_package = '.'.join(__name__.split('.')[:-1])
+        ref = resources.files(resource_package) / resource_path
+        with resources.as_file(ref) as libdir:
+            libpath = os.path.join(libdir, lib_name)
+            return libclass(libpath) 
+
+lib = _load_lib()
 
 if sys.version_info.major >= 3:
     # Python 3 specific code
@@ -228,6 +239,7 @@ lib.fgt_get_sensorRange.argtypes = [c_uint, POINTER(c_float), POINTER(c_float)]
 lib.fgt_get_valveRange.argtypes = [c_uint, POINTER(c_int)]
 lib.fgt_set_pressureLimit.argtypes = [c_uint, c_float, c_float]
 lib.fgt_set_sensorRegulationResponse.argtypes = [c_uint, c_uint]
+lib.fgt_set_sensorRegulationInverted.argtypes = [c_uint, c_ubyte]
 lib.fgt_set_pressureResponse.argtypes = [c_uint, c_ubyte]
 lib.fgt_get_pressureStatus.argtypes = [c_uint, POINTER(c_int), POINTER(c_ushort), POINTER(c_ubyte), POINTER(c_char)]
 lib.fgt_get_sensorStatus.argtypes = [c_uint, POINTER(c_int), POINTER(c_ushort), POINTER(c_ubyte), POINTER(c_char)]
@@ -506,6 +518,11 @@ def fgt_set_sensorRegulationResponse(sensor_index, response_time):
     c_error = c_ubyte(lib.fgt_set_sensorRegulationResponse(c_uint(sensor_index), 
                                     c_uint(response_time)))
     return c_error.value,
+
+def fgt_set_sensorRegulationInverted(sensor_index, inverted):
+    inverted = c_ubyte(1 if inverted else 0)
+    c_error = c_ubyte(lib.fgt_set_sensorRegulationInverted(c_uint(sensor_index), inverted))
+    return c_error.value,
     
 def fgt_set_pressureResponse(pressure_index, response_mode):
     """Set the pressure response mode"""
@@ -673,6 +690,6 @@ def fgt_set_log_output_mode(output_to_file, output_to_stderr, output_to_queue):
     return c_error.value,
 
 def fgt_get_next_log():
-    log_entry = (c_char * 2000)()
+    log_entry = (c_char * 4000)()
     c_error = c_ubyte(lib.fgt_get_next_log(log_entry))
     return c_error.value, log_entry.value.decode()

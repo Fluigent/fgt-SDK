@@ -1,26 +1,111 @@
 /*============================================================================
-*               Fluigent Software Developement Kit for C++                   
+*               Fluigent Software Development Kit for C++                   
 *----------------------------------------------------------------------------
-*         Copyright (c) Fluigent 2023.  All Rights Reserved.                 
+*         Copyright (c) Fluigent 2024.  All Rights Reserved.                 
 *----------------------------------------------------------------------------
 *                                                                            
 * Title:    fgt_SDK_Cpp.h                                                     
 * Purpose:  Wrapper to fgt_SDK library
 *			Contains an interface to each dll function and type conversions
-* Version:  23.0.0.0
-* Date:	    06/2023
+* Version:  24.0.0.0
+* Date:	    06/2024
 *============================================================================*/
 
 #ifndef _FGT_SDK_CPP_H
 #define _FGT_SDK_CPP_H
-
-#include "fgt_SDK.h"
 
 #include <iomanip> 
 #include <cstdlib>
 #include <iostream>
 #include <cstring>
 
+/** @Description Returned error codes from dll functions */
+enum class fgt_ERROR_CODE
+{
+	OK,								/** No error */
+	USB_error,						/** USB communication error */
+	Wrong_command,					/** Wrong command was sent */
+	No_module_at_index,				/** There is no module initialized at selected index */
+	Wrong_module,					/** Wrong module was selected, unavailable feature */
+	Module_is_sleep,				/** Module is in sleep mode, orders are not taken into account */
+	Master_error,					/** Controller error */
+	Failed_init_all_instr,			/** Some instruments failed to initialize */
+	Wrong_parameter,				/** Function parameter is not correct or out of the bounds*/
+	Overpressure,					/** Pressure module is in overpressure protection */
+	Underpressure,					/** Pressure module is in underpressure protection */
+	No_instr_found,					/** No Fluigent instrument was found */
+	No_modules_found,				/** No Fluigent pressure or sensor module was found */
+	No_pressure_controller_found,	/** No Fluigent pressure controller was found */
+	Calibrating,					/** Pressure or sensor module is calibrating, read value may be incorrect */
+	Dll_dependency_error,			/** Some dependencies are not found */
+	Processing						/** M-Switch is still turning */
+};
+
+/** @Description Instrument controller type */
+enum class fgt_INSTRUMENT_TYPE { None, MFCS, MFCS_EZ, FRP, LineUP, IPS, ESS, F_OEM, CFU, NIFS };
+
+/** @Description Sensor type */
+enum class fgt_SENSOR_TYPE {
+	None,
+	Flow_XS_single, Flow_S_single, Flow_S_dual, Flow_M_single, Flow_M_dual, Flow_L_single, Flow_L_dual, Flow_XL_single,
+	Pressure_S, Pressure_M, Pressure_XL,
+	Flow_M_plus_dual, Flow_L_plus_dual,
+	Flow_L_CFU, Flow_L_NIFS,
+};
+
+/** @Description Sensor calibration table */
+enum class fgt_SENSOR_CALIBRATION { None, H2O, IPA, HFE, FC40, OIL };
+
+/** @Description Power state */
+enum class fgt_POWER { POWER_OFF, POWER_ON, SLEEP };
+
+/** @Description TTL setting mode */
+enum class fgt_TTL_MODE { DETECT_RISING_EDGE, DETECT_FALLING_EDGE, OUTPUT_PULSE_LOW, OUTPUT_PULSE_HIGH };
+
+/** @Description Valve type */
+enum class fgt_VALVE_TYPE { None, MSwitch, TwoSwitch, LSwitch, PSwitch, M_X, Two_X, L_X, Bypass };
+
+/** @Description Switch direction type */
+enum class fgt_SWITCH_DIRECTION { Shortest, Anticlockwise, Clockwise };
+
+using fgt_instrument_t = fgt_INSTRUMENT_TYPE;
+using fgt_sensor_t = fgt_SENSOR_TYPE;
+using fgt_valve_t = fgt_VALVE_TYPE;
+using fgt_ttl_mode_t = fgt_TTL_MODE;
+using fgt_calibration_t = fgt_SENSOR_CALIBRATION;
+using fgt_switch_direction_t = fgt_SWITCH_DIRECTION;
+
+/** @Description Structure containing pressure or sensor identification and details */
+typedef struct
+{
+	/** Serial number of this channel's controller */
+	unsigned short ControllerSN;
+	/** Firmware version of this channel in BCD (0 if not applicable) */
+	unsigned short firmware;
+	/** Serial number of this channel (0 if not applicable) */
+	unsigned short DeviceSN;
+	/** Position on controller */
+	unsigned int position;
+	/** Channel index within its physical quantities family */
+	unsigned int index;
+	/** Unique channel identifier */
+	unsigned int indexID;
+	/** Type of the instrument */
+	fgt_instrument_t InstrType;
+} fgt_CHANNEL_INFO;
+
+/** @Description Structure containing controller identification and details */
+typedef struct
+{
+	/** Serial number */
+	unsigned short SN;
+	/** Firmware version in BCD */
+	unsigned short Firmware;
+	/** Index */
+	unsigned int id;
+	/** Instrument type */
+	fgt_instrument_t InstrType;
+} fgt_CONTROLLER_INFO;
 
 /*============================================================================*/
 /*-------------  Custom definitions and functions section  -------------------*/
@@ -187,7 +272,7 @@ fgt_ERROR_CODE Fgt_get_TtlChannelCount(unsigned char* nbTtlChan);
 fgt_ERROR_CODE Fgt_get_valveChannelCount(unsigned char* nbvalveChan);
 
 /**
- * @Description: Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and intrument type.
+ * @Description: Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
  * By default this array is built with MFCS first, MFCS-EZ second and FlowEZ last. If only one instrument is used, index is the default channel indexing starting at 0.
  * You can initialize instruments in specific order using fgt_initEx function
  * @param info Array of structure of fgt_CHANNEL_INFO
@@ -196,7 +281,7 @@ fgt_ERROR_CODE Fgt_get_valveChannelCount(unsigned char* nbvalveChan);
 fgt_ERROR_CODE Fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256]);
 
 /**
- * @Description: Retrieve information about each initialized sensor channel. This function is useful in order to get channels order, controller, unique ID and intrument type.
+ * @Description: Retrieve information about each initialized sensor channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
  * By default this array is built with FRP Flow Units first, followed by Flow EZ Flow Units, followed by IPS modules. If only one instrument is used, index is the default channel indexing starting at 0.
  * You can initialize instruments in specific order using fgt_initEx function
  * @param info Array of structure of fgt_CHANNEL_INFO
@@ -206,7 +291,7 @@ fgt_ERROR_CODE Fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256]);
 fgt_ERROR_CODE Fgt_get_sensorChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_SENSOR_TYPE sensorType[256]);
 
 /**
- * @Description: Retrieve information about each initialized TTL channel. This function is useful in order to get channels order, controller, unique ID and intrument type.
+ * @Description: Retrieve information about each initialized TTL channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
  * TTL channels are only available for LineUP Series, 2 ports for each connected Link
  * @param info Array of structure of fgt_CHANNEL_INFO
  * @return fgt_ERROR_CODE
@@ -264,7 +349,7 @@ fgt_ERROR_CODE Fgt_get_pressureEx(unsigned int pressureIndex, float* pressure, u
  * Call again this function in order to change the setpoint. Calling fgt_set_pressure on same pressureIndex will stop regulation.
  * @param sensorIndex Index of sensor channel or unique ID
  * @param sensorIndex Index of pressure channel or unique ID
- * @param setpoint Regulation value to be reached in selected unit, default is "�l/min" for flowrate sensors
+ * @param setpoint Regulation value to be reached in selected unit, default is "µl/min" for flowrate sensors
  * @return fgt_ERROR_CODE
  * @see fgt_set_pressure
  * @see fgt_set_customSensorRegulation
@@ -275,7 +360,7 @@ fgt_ERROR_CODE Fgt_set_sensorRegulation(unsigned int sensorIndex, unsigned int p
 /**
  * @Description Read sensor value of selected device
  * @param sensorIndex Index of sensor channel or unique ID
- * @param *value Read sensor value in selected unit, default is "�l/min" for flowrate sensors and 'mbar' for pressure sensors
+ * @param *value Read sensor value in selected unit, default is "µl/min" for flowrate sensors and 'mbar' for pressure sensors
  * @return fgt_ERROR_CODE
  * @see fgt_get_sensorStatus
  */
@@ -284,7 +369,7 @@ fgt_ERROR_CODE Fgt_get_sensorValue(unsigned int sensorIndex, float* value);
 /**
  * @Description Read sensor value and timestamp of selected device. Time stamp is the device internal timer.
  * @param sensorIndex Index of sensor channel or unique ID
- * @param *value Read sensor value in selected unit, default is "�l/min" for flowrate sensors
+ * @param *value Read sensor value in selected unit, default is "µl/min" for flowrate sensors
  * @param *timeStamp Hardware timer in ms
  * @return fgt_ERROR_CODE
  * @see fgt_get_sensorStatus
@@ -337,12 +422,12 @@ fgt_ERROR_CODE Fgt_set_sessionPressureUnit(std::string unit);
  * @Description Set pressure unit on selected pressure device, default value is "mbar". If type is invalid an error is returned.
  * Every pressure read value and sent command will then use this unit.
  * Example: "mbar", "millibar", "kPa" ...
- * @param presureIndex Index of pressure channel or unique ID
+ * @param pressureIndex Index of pressure channel or unique ID
  * @param unit channel unit string
  * @return fgt_ERROR_CODE
  * @see fgt_get_pressureStatus
  */
-fgt_ERROR_CODE Fgt_set_pressureUnit(unsigned int presureIndex, std::string unit);
+fgt_ERROR_CODE Fgt_set_pressureUnit(unsigned int pressureIndex, std::string unit);
 
 /**
  * @Description Get used unit on selected pressure device, default value is "mbar".
@@ -354,7 +439,7 @@ fgt_ERROR_CODE Fgt_set_pressureUnit(unsigned int presureIndex, std::string unit)
 fgt_ERROR_CODE Fgt_get_pressureUnit(unsigned int pressureIndex, std::string* unit);
 
 /**
- * @Description Set sensor unit on selected sensor device, default value is "�l/min" for flowrate sensors and "mbar" for pressure sensors. If type is invalid an error is returned.
+ * @Description Set sensor unit on selected sensor device, default value is "µl/min" for flowrate sensors and "mbar" for pressure sensors. If type is invalid an error is returned.
  * Every sensor read value and regulation command will then use this unit.
  * Example: "�l/h", "ulperDay", "microliter/hour" ...
  * @param sensorIndex Index of sensor channel or unique ID
@@ -365,7 +450,7 @@ fgt_ERROR_CODE Fgt_get_pressureUnit(unsigned int pressureIndex, std::string* uni
 fgt_ERROR_CODE Fgt_set_sensorUnit(unsigned int sensorIndex, std::string unit);
 
 /**
- * @Description Get used unit on selected sensor device, default value is "�l/min" for flowrate sensors and "mbar" for pressure sensors.
+ * @Description Get used unit on selected sensor device, default value is "µl/min" for flowrate sensors and "mbar" for pressure sensors.
  * Every sensor read value and regulation command use this unit.
  * @param sensorIndex Index of sensor channel or unique ID
  * @param unit channel unit string
@@ -490,6 +575,15 @@ fgt_ERROR_CODE Fgt_set_pressureLimit(unsigned int pressureIndex, float PlimMin, 
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_set_sensorRegulationResponse(unsigned int sensorIndex, unsigned int responseTime);
+
+/**
+ * @Description Specify whether the sensor is inverted in the physical setup, i.e., if an increase
+ * in pressure causes the sensor value to decrease and vice-versa.
+ * @param sensorIndex Index of sensor channel or unique ID
+ * @param inverted 0: not inverted, 1: inverted
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_sensorRegulationInverted(unsigned int sensorIndex, unsigned char inverted);
 
 /**
  * @Description Set pressure controller response. This function can be used to customise response time for your set-up.
@@ -709,7 +803,7 @@ fgt_ERROR_CODE Fgt_set_log_output_mode(unsigned char output_to_file, unsigned ch
  * Will return an error if the queue is empty. Logs are only stored in memory if the corresponding option is set with the
  * fgt_set_log_output_mode function. Call this function repeatedly until an error is returned to retrieve all log entries.
  * @param log char array provided by the user, on which the log string will be copied.
- *  Must have at least 2000 bytes of available space.
+ *  Must have at least 4000 bytes of available space.
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_next_log(std::string* log_entry);
