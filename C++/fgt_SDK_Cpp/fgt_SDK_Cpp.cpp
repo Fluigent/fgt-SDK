@@ -1,19 +1,46 @@
 /*============================================================================
-*               Fluigent Software Developement Kit for C++                  
+*               Fluigent Software Development Kit for C++
 *----------------------------------------------------------------------------
-*         Copyright (c) Fluigent 2022.  All Rights Reserved.                 
+*         Copyright (c) Fluigent 2024.  All Rights Reserved.
 *----------------------------------------------------------------------------
-*                                                                            
-* Title:    fgt_SDK_Cpp.cpp                                                  
-* Purpose:  Wrapper to fgt_SDK library			                          
-*			Contains an interface to each dll function and type conversions	  
-* Version:  22.2.0.0                                                         
-* Date:	    11/2022															 
+*
+* Title:    fgt_SDK_Cpp.cpp
+* Purpose:  Wrapper to fgt_SDK library
+*			Contains an interface to each dll function and type conversions
+* Version:  24.0.0.0
+* Date:	    06/2024
 *============================================================================*/
 
 #include <iostream>
 #include <cstdio>
 #include "fgt_SDK_Cpp.h"
+
+namespace fgt_c {
+#include "fgt_SDK.h"
+}
+
+namespace convert {
+	fgt_CONTROLLER_INFO controller_info(fgt_c::fgt_CONTROLLER_INFO src) {
+		fgt_CONTROLLER_INFO dest{};
+		dest.SN = src.SN;
+		dest.Firmware = src.Firmware;
+		dest.id = src.id;
+		dest.InstrType = fgt_INSTRUMENT_TYPE(src.InstrType);
+		return dest;
+	}
+
+	fgt_CHANNEL_INFO channel_info(fgt_c::fgt_CHANNEL_INFO src) {
+		fgt_CHANNEL_INFO dest{};
+		dest.ControllerSN = src.ControllerSN;
+		dest.DeviceSN = src.DeviceSN;
+		dest.firmware = src.firmware;
+		dest.index = src.index;
+		dest.indexID = src.indexID;
+		dest.InstrType = fgt_INSTRUMENT_TYPE(src.InstrType);
+		dest.position = src.position;
+		return dest;
+	}
+}
 
 /*============================================================================*/
 /*-------------  Custom definitions and functions section  -------------------*/
@@ -60,8 +87,8 @@ std::ostream& operator<<(std::ostream& str, fgt_INSTRUMENT_TYPE instrType)
 	case fgt_INSTRUMENT_TYPE::LineUP: str << "LineUP"; break;
 	case fgt_INSTRUMENT_TYPE::IPS: str << "IPS"; break;
 	case fgt_INSTRUMENT_TYPE::ESS: str << "ESS"; break;
-    case fgt_INSTRUMENT_TYPE::F_OEM: str << "F_OEM"; break;
-    case fgt_INSTRUMENT_TYPE::CFU: str << "CFU"; break;
+	case fgt_INSTRUMENT_TYPE::F_OEM: str << "F_OEM"; break;
+	case fgt_INSTRUMENT_TYPE::CFU: str << "CFU"; break;
 	case fgt_INSTRUMENT_TYPE::NIFS: str << "NIFS"; break;
 	default: str << "Unknown instrument type (" << int(instrType) << ")";
 	}
@@ -150,7 +177,7 @@ std::ostream& operator<<(std::ostream& str, fgt_VALVE_TYPE valveType)
 	case fgt_VALVE_TYPE::M_X: str << "M_X"; break;
 	case fgt_VALVE_TYPE::Two_X: str << "Two_X"; break;
 	case fgt_VALVE_TYPE::L_X: str << "L_X"; break;
-    case fgt_VALVE_TYPE::Bypass: str << "Bypass"; break;
+	case fgt_VALVE_TYPE::Bypass: str << "Bypass"; break;
 	default: str << "Unknown valve type (" << int(valveType) << ")";
 	}
 	return str;
@@ -272,7 +299,7 @@ void Fgt_Manage_Generic_Status(fgt_ERROR_CODE error, std::string calledFunctionN
  */
 fgt_ERROR_CODE Fgt_init(void)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_init());					// Call function
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_init());					// Call function
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_init");			// Manage function return code, change this function for custom behaviour
 	return returnCode;
 }
@@ -284,7 +311,7 @@ fgt_ERROR_CODE Fgt_init(void)
  */
 fgt_ERROR_CODE Fgt_close(void)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_close());
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_close());
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_close");
 	return returnCode;
 }
@@ -298,15 +325,14 @@ fgt_ERROR_CODE Fgt_close(void)
  */
 unsigned char Fgt_detect(unsigned short SN[256], fgt_INSTRUMENT_TYPE type[256])
 {
-	int localType[256] = {0};
+	fgt_c::fgt_INSTRUMENT_TYPE localType[256]{};
 	unsigned int localLoop = 0;
 	unsigned char returnCode;
 
 	//initialize array before
-	for (localLoop = 0; localLoop < 256; localLoop++)	localType[localLoop] = 0;
 	for (localLoop = 0; localLoop < 256; localLoop++) SN[localLoop] = 0;
 
-	returnCode = fgt_detect(SN, localType);
+	returnCode = fgt_c::fgt_detect(SN, localType);
 	for(unsigned char loop = 0; loop < 255; loop++) type[loop] = fgt_INSTRUMENT_TYPE(localType[loop]);		// Convert type from dll int to C++ enum fgt_INSTRUMENT_TYPE
 	return returnCode;
 }
@@ -318,21 +344,23 @@ unsigned char Fgt_detect(unsigned short SN[256], fgt_INSTRUMENT_TYPE type[256])
  */
 fgt_ERROR_CODE Fgt_initEx(unsigned short SN[256])
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_initEx(SN));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_initEx(SN));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_initEx");
 	return returnCode;
 }
 
 fgt_ERROR_CODE Fgt_create_simulated_instr(fgt_instrument_t type, unsigned short serial, unsigned short version, int* config, int length)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_create_simulated_instr(type, serial, version, config, length));
+	auto type_c = static_cast<fgt_c::fgt_INSTRUMENT_TYPE>(type);
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_create_simulated_instr(type_c, serial, version, config, length));
 	Fgt_Manage_Generic_Status(returnCode, __func__);
 	return returnCode;
 }
 
 fgt_ERROR_CODE Fgt_remove_simulated_instr(fgt_instrument_t type, unsigned short serial)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_remove_simulated_instr(type, serial));
+	auto type_c = static_cast<fgt_c::fgt_INSTRUMENT_TYPE>(type);
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_remove_simulated_instr(type_c, serial));
 	Fgt_Manage_Generic_Status(returnCode, __func__);
 	return returnCode;
 }
@@ -348,17 +376,10 @@ fgt_ERROR_CODE Fgt_remove_simulated_instr(fgt_instrument_t type, unsigned short 
  */
 fgt_ERROR_CODE Fgt_get_controllersInfo(fgt_CONTROLLER_INFO info[256])
 {
-	unsigned int localLoop = 0;
+	fgt_c::fgt_CONTROLLER_INFO info_c[256]{};
 
-	//initialize array before
-	for (localLoop = 0; localLoop < 256; localLoop++) {
-		info[localLoop].Firmware = 0;
-		info[localLoop].id = 0;
-		info[localLoop].InstrType = fgt_INSTRUMENT_TYPE::None;
-		info[localLoop].SN = 0;
-	}
-
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_controllersInfo(info));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_controllersInfo(info_c));
+	for (auto loop = 0; loop < 256; loop++) info[loop] = convert::controller_info(info_c[loop]);
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_controllersInfo");
 	return returnCode;
 }
@@ -371,7 +392,7 @@ fgt_ERROR_CODE Fgt_get_controllersInfo(fgt_CONTROLLER_INFO info[256])
  */
 fgt_ERROR_CODE Fgt_get_pressureChannelCount(unsigned char* nbPChan)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_pressureChannelCount(nbPChan));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_pressureChannelCount(nbPChan));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_pressureChannelCount");
 	return returnCode;
 }
@@ -384,7 +405,7 @@ fgt_ERROR_CODE Fgt_get_pressureChannelCount(unsigned char* nbPChan)
  */
 fgt_ERROR_CODE Fgt_get_sensorChannelCount(unsigned char* nbSChan)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorChannelCount(nbSChan));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorChannelCount(nbSChan));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_sensorChannelCount");
 	return returnCode;
 }
@@ -397,7 +418,7 @@ fgt_ERROR_CODE Fgt_get_sensorChannelCount(unsigned char* nbSChan)
  */
 fgt_ERROR_CODE Fgt_get_TtlChannelCount(unsigned char* nbTtlChan)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_TtlChannelCount(nbTtlChan));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_TtlChannelCount(nbTtlChan));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_TtlChannelCount");
 	return returnCode;
 }
@@ -409,7 +430,7 @@ fgt_ERROR_CODE Fgt_get_TtlChannelCount(unsigned char* nbTtlChan)
  */
 fgt_ERROR_CODE Fgt_get_valveChannelCount(unsigned char* nbvalveChan)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_valveChannelCount(nbvalveChan));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_valveChannelCount(nbvalveChan));
 	Fgt_Manage_Generic_Status(returnCode, "fgt_get_valveChannelCount");
 	return returnCode;
 }
@@ -423,20 +444,9 @@ fgt_ERROR_CODE Fgt_get_valveChannelCount(unsigned char* nbvalveChan)
  */
 fgt_ERROR_CODE Fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256])
 {
-	unsigned int localLoop = 0;
-
-	//initialize array before
-	for (localLoop = 0; localLoop < 256; localLoop++) {
-		info[localLoop].ControllerSN = 0;
-		info[localLoop].DeviceSN = 0;
-		info[localLoop].InstrType = fgt_INSTRUMENT_TYPE::None;
-		info[localLoop].firmware = 0;
-		info[localLoop].index = 0;
-		info[localLoop].indexID = 0;
-		info[localLoop].position = 0;
-	}
-
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_pressureChannelsInfo(info));
+	fgt_c::fgt_CHANNEL_INFO info_c[256]{};
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_pressureChannelsInfo(info_c));
+	for (auto i = 0; i < 256; i++) info[i] = convert::channel_info(info_c[i]);
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_pressureChannelsInfo");
 	return returnCode;
 }
@@ -452,22 +462,12 @@ fgt_ERROR_CODE Fgt_get_pressureChannelsInfo(fgt_CHANNEL_INFO info[256])
 fgt_ERROR_CODE Fgt_get_sensorChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_SENSOR_TYPE sensorType[256])
 {
 	unsigned int localLoop = 0;
-	fgt_SENSOR_TYPE localSensorType[256]{};
+	fgt_c::fgt_SENSOR_TYPE type_c[256]{};
+	fgt_c::fgt_CHANNEL_INFO info_c[256]{};
 
-	//initialize array before
-	for (localLoop = 0; localLoop < 256; localLoop++) {
-		info[localLoop].ControllerSN = 0;
-		info[localLoop].DeviceSN = 0;
-		info[localLoop].InstrType = fgt_INSTRUMENT_TYPE::None;
-		info[localLoop].firmware = 0;
-		info[localLoop].index = 0;
-		info[localLoop].indexID = 0;
-		info[localLoop].position = 0;
-		sensorType[localLoop] = fgt_SENSOR_TYPE::None;
-	}
-
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorChannelsInfo(info, localSensorType));
-	for (unsigned char loop = 0; loop < 255; loop++) sensorType[loop] = fgt_SENSOR_TYPE(localSensorType[loop]);
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorChannelsInfo(info_c, type_c));
+	for (auto loop = 0; loop < 255; loop++) info[loop] = convert::channel_info(info_c[loop]);
+	for (auto loop = 0; loop < 255; loop++) sensorType[loop] = fgt_SENSOR_TYPE(type_c[loop]);
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_sensorChannelsInfo");
 	return returnCode;
 }
@@ -480,42 +480,22 @@ fgt_ERROR_CODE Fgt_get_sensorChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_SENSOR
  */
 fgt_ERROR_CODE Fgt_get_TtlChannelsInfo(fgt_CHANNEL_INFO info[256])
 {
-	unsigned int localLoop = 0;
+	fgt_c::fgt_CHANNEL_INFO info_c[256]{};
 
-	//initialize array before
-	for (localLoop = 0; localLoop < 256; localLoop++) {
-		info[localLoop].ControllerSN = 0;
-		info[localLoop].DeviceSN = 0;
-		info[localLoop].InstrType = fgt_INSTRUMENT_TYPE::None;
-		info[localLoop].firmware = 0;
-		info[localLoop].index = 0;
-		info[localLoop].indexID = 0;
-		info[localLoop].position = 0;
-	}
-
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_TtlChannelsInfo(info));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_TtlChannelsInfo(info_c));
+	for (auto loop = 0; loop < 256; loop++) info[loop] = convert::channel_info(info_c[loop]);
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_TtlChannelsInfo");
 	return returnCode;
 }
 
 fgt_ERROR_CODE Fgt_get_valveChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_VALVE_TYPE valveType[256])
 {
-	unsigned int localLoop = 0;
-	fgt_VALVE_TYPE localValveType[256]{};
-	//initialize array before
-	for (localLoop = 0; localLoop < 256; localLoop++) {
-		info[localLoop].ControllerSN = 0;
-		info[localLoop].DeviceSN = 0;
-		info[localLoop].InstrType = fgt_INSTRUMENT_TYPE::None;
-		info[localLoop].firmware = 0;
-		info[localLoop].index = 0;
-		info[localLoop].indexID = 0;
-		info[localLoop].position = 0;
-		valveType[localLoop] = fgt_VALVE_TYPE::None;
-	}
+	fgt_c::fgt_CHANNEL_INFO info_c[256]{};
+	fgt_c::fgt_VALVE_TYPE type_c[256]{};
 
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_valveChannelsInfo(info, localValveType));
-	for (unsigned char loop = 0; loop < 255; loop++) valveType[loop] = fgt_VALVE_TYPE(localValveType[loop]);
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_valveChannelsInfo(info_c, type_c));
+	for (auto loop = 0; loop < 256; loop++) info[loop] = convert::channel_info(info_c[loop]);
+	for (auto loop = 0; loop < 256; loop++) valveType[loop] = fgt_VALVE_TYPE(type_c[loop]);
 	Fgt_Manage_Generic_Status(returnCode, "fgt_get_valveChannelsInfo");
 	return returnCode;
 }
@@ -536,8 +516,8 @@ fgt_ERROR_CODE Fgt_get_valveChannelsInfo(fgt_CHANNEL_INFO info[256], fgt_VALVE_T
  */
 fgt_ERROR_CODE Fgt_set_pressure(unsigned int pressureIndex, float pressure)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_pressure(pressureIndex, pressure));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressure");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_pressure(pressureIndex, pressure));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressure");											
 	return returnCode;
 }
 
@@ -551,8 +531,8 @@ fgt_ERROR_CODE Fgt_set_pressure(unsigned int pressureIndex, float pressure)
  */
 fgt_ERROR_CODE Fgt_get_pressure(unsigned int pressureIndex, float* pressure)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_pressure(pressureIndex, pressure));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressure");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_pressure(pressureIndex, pressure));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressure");											
 	return returnCode;
 }
 
@@ -567,8 +547,8 @@ fgt_ERROR_CODE Fgt_get_pressure(unsigned int pressureIndex, float* pressure)
  */
 fgt_ERROR_CODE Fgt_get_pressureEx(unsigned int pressureIndex, float* pressure, unsigned short* timeStamp)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_pressureEx(pressureIndex, pressure, timeStamp));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressureEx");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_pressureEx(pressureIndex, pressure, timeStamp));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressureEx");											
 	return returnCode;
 }
 
@@ -585,8 +565,8 @@ fgt_ERROR_CODE Fgt_get_pressureEx(unsigned int pressureIndex, float* pressure, u
  */
 fgt_ERROR_CODE Fgt_set_sensorRegulation(unsigned int sensorIndex, unsigned int pressureIndex, float setpoint)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorRegulation(sensorIndex, pressureIndex, setpoint));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorRegulation");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorRegulation(sensorIndex, pressureIndex, setpoint));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorRegulation");											
 	return returnCode;
 }
 
@@ -599,8 +579,8 @@ fgt_ERROR_CODE Fgt_set_sensorRegulation(unsigned int sensorIndex, unsigned int p
  */
 fgt_ERROR_CODE Fgt_get_sensorValue(unsigned int sensorIndex, float* value)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorValue(sensorIndex, value));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorValue");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorValue(sensorIndex, value));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorValue");											
 	return returnCode;
 }
 
@@ -614,8 +594,8 @@ fgt_ERROR_CODE Fgt_get_sensorValue(unsigned int sensorIndex, float* value)
  */
 fgt_ERROR_CODE Fgt_get_sensorValueEx(unsigned int sensorIndex, float* value, unsigned short* timeStamp)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorValueEx(sensorIndex, value, timeStamp));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorValueEx");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorValueEx(sensorIndex, value, timeStamp));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorValueEx");											
 	return returnCode;
 }
 
@@ -627,8 +607,8 @@ fgt_ERROR_CODE Fgt_get_sensorValueEx(unsigned int sensorIndex, float* value, uns
  */
 fgt_ERROR_CODE Fgt_get_valvePosition(unsigned int valveIndex, int* position)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_valvePosition(valveIndex, position));
-	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_sensorValue");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_valvePosition(valveIndex, position));
+	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_sensorValue");											
 	return returnCode;
 }
 
@@ -642,8 +622,8 @@ fgt_ERROR_CODE Fgt_get_valvePosition(unsigned int valveIndex, int* position)
  */
 fgt_ERROR_CODE Fgt_set_valvePosition(unsigned int valveIndex, int position, fgt_SWITCH_DIRECTION direction, bool wait)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_valvePosition(valveIndex, position, direction, wait? 1 : 0));
-	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_valvePosition");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_valvePosition(valveIndex, position, static_cast<fgt_c::fgt_SWITCH_DIRECTION>(direction), wait? 1 : 0));
+	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_valvePosition");											
 	return returnCode;
 }
 
@@ -656,8 +636,8 @@ fgt_ERROR_CODE Fgt_set_valvePosition(unsigned int valveIndex, int position, fgt_
  */
 fgt_ERROR_CODE Fgt_set_allValves(unsigned int controllerIndex, unsigned int moduleIndex, int position)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_allValves(controllerIndex, moduleIndex, position));
-	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_allValves");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_allValves(controllerIndex, moduleIndex, position));
+	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_allValves");											
 	return returnCode;
 }
 
@@ -678,8 +658,8 @@ fgt_ERROR_CODE Fgt_set_sessionPressureUnit(std::string unit)
 {
 	char localUnit[140] = { 0 };
 	strcpy(localUnit, unit.c_str());
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sessionPressureUnit(localUnit));
-	Fgt_Manage_Pressure_Status(0, "Fgt_set_sessionPressureUnit");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sessionPressureUnit(localUnit));
+	Fgt_Manage_Pressure_Status(0, "Fgt_set_sessionPressureUnit");											
 	return returnCode;
 }
 
@@ -687,7 +667,7 @@ fgt_ERROR_CODE Fgt_set_sessionPressureUnit(std::string unit)
  * @Description Set pressure unit on selected pressure device, default value is "mbar". If type is invalid an error is returned.
  * Every pressure read value and sent command will then use this unit.
  * Example: "mbar", "millibar", "kPa" ...
- * @param presureIndex Index of pressure channel or unique ID
+ * @param pressureIndex Index of pressure channel or unique ID
  * @param unit channel unit string
  * @return fgt_ERROR_CODE
  * @see fgt_get_pressureStatus
@@ -697,8 +677,8 @@ fgt_ERROR_CODE Fgt_set_pressureUnit(unsigned int pressureIndex, std::string unit
 	char localUnit[140] = { 0 };
 	strcpy(localUnit, unit.c_str());
 
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_pressureUnit(pressureIndex, localUnit));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressureUnit");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_pressureUnit(pressureIndex, localUnit));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressureUnit");											
 	return returnCode;
 }
 
@@ -713,9 +693,9 @@ fgt_ERROR_CODE Fgt_get_pressureUnit(unsigned int pressureIndex, std::string* uni
 {
 	char localUnit[140] = { 0 };
 
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_pressureUnit(pressureIndex, localUnit));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_pressureUnit(pressureIndex, localUnit));
 	*unit = localUnit;
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressureUnit");											// Manage error if occured
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressureUnit");											
 	return returnCode;
 }
 
@@ -733,8 +713,8 @@ fgt_ERROR_CODE Fgt_set_sensorUnit(unsigned int sensorIndex, std::string unit)
 	char localUnit[140] = {0};
 	strcpy(localUnit, unit.c_str());
 
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorUnit(sensorIndex, localUnit));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorUnit");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorUnit(sensorIndex, localUnit));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorUnit");											
 	return returnCode;
 }
 
@@ -749,9 +729,9 @@ fgt_ERROR_CODE Fgt_get_sensorUnit(unsigned int sensorIndex, std::string* unit)
 {
 	char localUnit[140] = { 0 };
 
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorUnit(sensorIndex, localUnit));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorUnit(sensorIndex, localUnit));
 	*unit = localUnit;
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorUnit");											// Manage error if occured
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorUnit");											
 	return returnCode;
 }
 
@@ -763,8 +743,8 @@ fgt_ERROR_CODE Fgt_get_sensorUnit(unsigned int sensorIndex, std::string* unit)
  */
 fgt_ERROR_CODE Fgt_set_sensorCalibration(unsigned int sensorIndex, fgt_SENSOR_CALIBRATION calibration)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorCalibration(sensorIndex, calibration));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorCalibration");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorCalibration(sensorIndex, static_cast<fgt_c::fgt_SENSOR_CALIBRATION>(calibration)));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorCalibration");											
 	return returnCode;
 }
 
@@ -776,11 +756,11 @@ fgt_ERROR_CODE Fgt_set_sensorCalibration(unsigned int sensorIndex, fgt_SENSOR_CA
  */
 fgt_ERROR_CODE Fgt_get_sensorCalibration(unsigned int sensorIndex, fgt_SENSOR_CALIBRATION* calibration)
 {
-	fgt_SENSOR_CALIBRATION localCalibration;
+	fgt_c::fgt_SENSOR_CALIBRATION localCalibration;
 
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorCalibration(sensorIndex, &localCalibration));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorCalibration(sensorIndex, &localCalibration));
 	*calibration = fgt_SENSOR_CALIBRATION(localCalibration);
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorCalibration");											// Manage error if occured
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorCalibration");											
 	return returnCode;
 }
 
@@ -798,8 +778,8 @@ fgt_ERROR_CODE Fgt_get_sensorCalibration(unsigned int sensorIndex, fgt_SENSOR_CA
  */
 fgt_ERROR_CODE Fgt_set_sensorCustomScale(unsigned int sensorIndex, float a, float b, float c)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorCustomScale(sensorIndex, a, b, c));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorCustomScale");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorCustomScale(sensorIndex, a, b, c));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorCustomScale");											
 	return returnCode;
 }
 
@@ -819,8 +799,8 @@ fgt_ERROR_CODE Fgt_set_sensorCustomScale(unsigned int sensorIndex, float a, floa
  */
 fgt_ERROR_CODE Fgt_set_sensorCustomScaleEx(unsigned int sensorIndex, float a, float b, float c, float SMax)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorCustomScaleEx(sensorIndex, a, b, c, SMax));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorCustomScaleEx");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorCustomScaleEx(sensorIndex, a, b, c, SMax));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorCustomScaleEx");											
 	return returnCode;
 }
 
@@ -832,8 +812,8 @@ fgt_ERROR_CODE Fgt_set_sensorCustomScaleEx(unsigned int sensorIndex, float a, fl
  */
 fgt_ERROR_CODE Fgt_calibratePressure(unsigned int pressureIndex)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_calibratePressure(pressureIndex));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_calibratePressure");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_calibratePressure(pressureIndex));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_calibratePressure");											
 	return returnCode;
 }
 
@@ -852,7 +832,7 @@ fgt_ERROR_CODE Fgt_calibratePressure(unsigned int pressureIndex)
  */
 fgt_ERROR_CODE Fgt_set_customSensorRegulation(float measure, float setpoint, float maxSensorRange, unsigned int pressureIndex)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_customSensorRegulation(measure, setpoint, maxSensorRange, pressureIndex));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_customSensorRegulation");
 	return returnCode;
 }
@@ -866,8 +846,8 @@ fgt_ERROR_CODE Fgt_set_customSensorRegulation(float measure, float setpoint, flo
  */
 fgt_ERROR_CODE Fgt_get_pressureRange(unsigned int pressureIndex, float* Pmin, float* Pmax)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_pressureRange(pressureIndex, Pmin, Pmax));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressureRange");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_pressureRange(pressureIndex, Pmin, Pmax));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_pressureRange");											
 	return returnCode;
 }
 
@@ -880,8 +860,8 @@ fgt_ERROR_CODE Fgt_get_pressureRange(unsigned int pressureIndex, float* Pmin, fl
  */
 fgt_ERROR_CODE Fgt_get_sensorRange(unsigned int sensorIndex, float* Smin, float* Smax)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorRange(sensorIndex, Smin, Smax));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorRange");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorRange(sensorIndex, Smin, Smax));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorRange");											
 	return returnCode;
 }
 
@@ -893,8 +873,8 @@ fgt_ERROR_CODE Fgt_get_sensorRange(unsigned int sensorIndex, float* Smin, float*
  */
 fgt_ERROR_CODE Fgt_get_valveRange(unsigned int valveIndex, int* posMax)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_valveRange(valveIndex, posMax));
-	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_valveRange");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_valveRange(valveIndex, posMax));
+	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_valveRange");											
 	return returnCode;
 }
 
@@ -908,8 +888,8 @@ fgt_ERROR_CODE Fgt_get_valveRange(unsigned int valveIndex, int* posMax)
  */
 fgt_ERROR_CODE Fgt_set_pressureLimit(unsigned int pressureIndex, float PlimMin, float PlimMax)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_pressureLimit(pressureIndex, PlimMin, PlimMax));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressure");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_pressureLimit(pressureIndex, PlimMin, PlimMax));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressure");											
 	return returnCode;
 }
 
@@ -927,8 +907,22 @@ fgt_ERROR_CODE Fgt_set_pressureLimit(unsigned int pressureIndex, float PlimMin, 
  */
 fgt_ERROR_CODE Fgt_set_sensorRegulationResponse(unsigned int sensorIndex, unsigned int responseTime)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorRegulationResponse(sensorIndex, responseTime));
-	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorRegulation");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorRegulationResponse(sensorIndex, responseTime));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorRegulationResponse");											
+	return returnCode;
+}
+
+/**
+ * @Description Specify whether the sensor is inverted in the physical setup, i.e., if an increase
+ * in pressure causes the sensor value to decrease and vice-versa.
+ * @param sensorIndex Index of sensor channel or unique ID
+ * @param inverted 0: not inverted, 1: inverted
+ * @return fgt_ERROR_CODE
+ */
+fgt_ERROR_CODE Fgt_set_sensorRegulationInverted(unsigned int sensorIndex, unsigned char inverted)
+{
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorRegulationInverted(sensorIndex, inverted));
+	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorRegulationInverted");
 	return returnCode;
 }
 
@@ -942,8 +936,8 @@ fgt_ERROR_CODE Fgt_set_sensorRegulationResponse(unsigned int sensorIndex, unsign
  */
 fgt_ERROR_CODE Fgt_set_pressureResponse(unsigned int pressureIndex, unsigned char value)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_pressureResponse(pressureIndex, value));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressure");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_pressureResponse(pressureIndex, value));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_pressure");											
 	return returnCode;
 }
 
@@ -963,10 +957,10 @@ fgt_ERROR_CODE Fgt_set_pressureResponse(unsigned int pressureIndex, unsigned cha
  */
 fgt_ERROR_CODE Fgt_get_pressureStatus(unsigned int pressureIndex, fgt_INSTRUMENT_TYPE* type, unsigned short* controllerSN, unsigned char* infoCode, std::string* detail)
 {
-	char localDetail[140] = "";
-	fgt_INSTRUMENT_TYPE localType = fgt_INSTRUMENT_TYPE::None;
+	char localDetail[140]{};
+	fgt_c::fgt_INSTRUMENT_TYPE localType{};
 
-	fgt_ERROR_CODE error = fgt_ERROR_CODE(fgt_get_pressureStatus(pressureIndex, &localType, controllerSN, infoCode, localDetail));
+	fgt_ERROR_CODE error = fgt_ERROR_CODE(fgt_c::fgt_get_pressureStatus(pressureIndex, &localType, controllerSN, infoCode, localDetail));
 	*type = fgt_INSTRUMENT_TYPE(localType);
 	*detail = localDetail;
 	return error;
@@ -985,9 +979,9 @@ fgt_ERROR_CODE Fgt_get_pressureStatus(unsigned int pressureIndex, fgt_INSTRUMENT
 fgt_ERROR_CODE Fgt_get_sensorStatus(unsigned int sensorIndex, fgt_INSTRUMENT_TYPE* type, unsigned short* controllerSN, unsigned char* infoCode, std::string* detail)
 {
 	char localDetail[140] = "";
-	fgt_INSTRUMENT_TYPE localType = fgt_INSTRUMENT_TYPE::None;
+	fgt_c::fgt_INSTRUMENT_TYPE localType{};
 
-	fgt_ERROR_CODE error = fgt_ERROR_CODE(fgt_get_sensorStatus(sensorIndex, &localType, controllerSN, infoCode, localDetail));
+	fgt_ERROR_CODE error = fgt_ERROR_CODE(fgt_c::fgt_get_sensorStatus(sensorIndex, &localType, controllerSN, infoCode, localDetail));
 	*type = fgt_INSTRUMENT_TYPE(localType);
 	*detail = localDetail;
 	return error;
@@ -1002,7 +996,7 @@ fgt_ERROR_CODE Fgt_get_sensorStatus(unsigned int sensorIndex, fgt_INSTRUMENT_TYP
  */
 fgt_ERROR_CODE Fgt_set_power(unsigned int controllerIndex, fgt_POWER powerState)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_power(controllerIndex, (unsigned char)powerState));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_power(controllerIndex, (unsigned char)powerState));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_power");
 	return returnCode;
 }
@@ -1018,7 +1012,7 @@ fgt_ERROR_CODE Fgt_get_power(unsigned int controllerIndex, fgt_POWER* powerState
 {
 	unsigned char localPowerState;
 
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_power(controllerIndex, &localPowerState));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_power(controllerIndex, &localPowerState));
 	*powerState = fgt_POWER(localPowerState);
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_get_power");
 	return returnCode;
@@ -1037,7 +1031,7 @@ fgt_ERROR_CODE Fgt_get_power(unsigned int controllerIndex, fgt_POWER* powerState
  */
 fgt_ERROR_CODE Fgt_set_TtlMode(unsigned int TtlIndex, fgt_TTL_MODE mode)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_TtlMode(TtlIndex, mode));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_TtlMode(TtlIndex, static_cast<fgt_c::fgt_TTL_MODE>(mode)));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_TtlMode");
 	return returnCode;
 }
@@ -1051,7 +1045,7 @@ fgt_ERROR_CODE Fgt_set_TtlMode(unsigned int TtlIndex, fgt_TTL_MODE mode)
  */
 fgt_ERROR_CODE Fgt_read_Ttl(unsigned int TtlIndex, unsigned int* state)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_read_Ttl(TtlIndex, state));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_read_Ttl(TtlIndex, state));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_read_Ttl");
 	return returnCode;
 }
@@ -1064,7 +1058,7 @@ fgt_ERROR_CODE Fgt_read_Ttl(unsigned int TtlIndex, unsigned int* state)
  */
 fgt_ERROR_CODE Fgt_trigger_Ttl(unsigned int TtlIndex)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_trigger_Ttl(TtlIndex));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_trigger_Ttl(TtlIndex));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_trigger_Ttl");
 	return returnCode;
 }
@@ -1082,7 +1076,7 @@ fgt_ERROR_CODE Fgt_trigger_Ttl(unsigned int TtlIndex)
  */
 fgt_ERROR_CODE Fgt_set_purge(unsigned int controllerIndex, unsigned char purge)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_purge(controllerIndex, purge));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_purge(controllerIndex, purge));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_purge");
 	return returnCode;
 }
@@ -1097,8 +1091,8 @@ fgt_ERROR_CODE Fgt_set_purge(unsigned int controllerIndex, unsigned char purge)
  */
 fgt_ERROR_CODE Fgt_set_manual(unsigned int pressureIndex, float value)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_manual(pressureIndex, value));
-	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_manual");											// Manage error if occured
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_manual(pressureIndex, value));
+	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_set_manual");											
 	return returnCode;
 }
 
@@ -1112,14 +1106,14 @@ fgt_ERROR_CODE Fgt_set_manual(unsigned int pressureIndex, float value)
  */
 fgt_ERROR_CODE Fgt_set_digitalOutput(unsigned int controllerIndex, unsigned char port, unsigned char state)
 {
-    fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_digitalOutput(controllerIndex, port, state));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_digitalOutput(controllerIndex, port, state));
 	Fgt_Manage_Generic_Status(returnCode, "Fgt_set_digitalOutput");
 	return returnCode;
 }
 
 /**
  * @Description Read the flag indicating whether the flow rate sensor detects an air bubble. Only 
-    available on Flow Unit sensor ranges M+ and L+.
+	available on Flow Unit sensor ranges M+ and L+.
  * @param sensorIndex Index of sensor channel or unique ID
  * @out detected 1 if an air bubble was detected, 0 otherwise.
  * @return fgt_ERROR_CODE
@@ -1127,7 +1121,7 @@ fgt_ERROR_CODE Fgt_set_digitalOutput(unsigned int controllerIndex, unsigned char
  */
 fgt_ERROR_CODE Fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned char* detected)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorAirBubbleFlag(sensorIndex, detected));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorAirBubbleFlag(sensorIndex, detected));
 	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorAirBubbleFlag");
 	return returnCode;
 }
@@ -1142,7 +1136,7 @@ fgt_ERROR_CODE Fgt_get_sensorAirBubbleFlag(unsigned int sensorIndex, unsigned ch
  */
 fgt_ERROR_CODE Fgt_get_inletPressure(unsigned int pressureIndex, float* pressure)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_inletPressure(pressureIndex, pressure));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_inletPressure(pressureIndex, pressure));
 	Fgt_Manage_Pressure_Status(pressureIndex, "Fgt_get_inletPressure");
 	return returnCode;
 }
@@ -1157,7 +1151,7 @@ fgt_ERROR_CODE Fgt_get_inletPressure(unsigned int pressureIndex, float* pressure
  */
 fgt_ERROR_CODE Fgt_get_differentialPressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax)
 {
-    fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_differentialPressureRange(sensorIndex, Pmin, Pmax));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_differentialPressureRange(sensorIndex, Pmin, Pmax));
 	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_differentialPressureRange");
 	return returnCode;
 }
@@ -1171,7 +1165,7 @@ fgt_ERROR_CODE Fgt_get_differentialPressureRange(unsigned int sensorIndex, float
  */
 fgt_ERROR_CODE Fgt_get_differentialPressure(unsigned int sensorIndex, float* Pdiff)
 {
-    fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_differentialPressure(sensorIndex, Pdiff));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_differentialPressure(sensorIndex, Pdiff));
 	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_differentialPressure");
 	return returnCode;
 }
@@ -1186,7 +1180,7 @@ fgt_ERROR_CODE Fgt_get_differentialPressure(unsigned int sensorIndex, float* Pdi
  */
 fgt_ERROR_CODE Fgt_get_absolutePressureRange(unsigned int sensorIndex, float* Pmin, float* Pmax)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_absolutePressureRange(sensorIndex, Pmin, Pmax));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_absolutePressureRange(sensorIndex, Pmin, Pmax));
 	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_absolutePressureRange");
 	return returnCode;
 }
@@ -1200,7 +1194,7 @@ fgt_ERROR_CODE Fgt_get_absolutePressureRange(unsigned int sensorIndex, float* Pm
  */
 fgt_ERROR_CODE Fgt_get_absolutePressure(unsigned int sensorIndex, float* Pabs)
 {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_absolutePressure(sensorIndex, Pabs));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_absolutePressure(sensorIndex, Pabs));
 	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_absolutePressure");
 	return returnCode;
 }
@@ -1213,7 +1207,7 @@ fgt_ERROR_CODE Fgt_get_absolutePressure(unsigned int sensorIndex, float* Pabs)
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_sensorBypassValve(unsigned int sensorIndex, unsigned char* state) {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_sensorBypassValve(sensorIndex, state));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_sensorBypassValve(sensorIndex, state));
 	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_get_sensorBypassValve");
 	return returnCode;
 }
@@ -1226,7 +1220,7 @@ fgt_ERROR_CODE Fgt_get_sensorBypassValve(unsigned int sensorIndex, unsigned char
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char state) {
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_sensorBypassValve(sensorIndex, state));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_sensorBypassValve(sensorIndex, state));
 	Fgt_Manage_Sensor_Status(sensorIndex, "Fgt_set_sensorBypassValve");
 	return returnCode;
 }
@@ -1238,7 +1232,7 @@ fgt_ERROR_CODE Fgt_set_sensorBypassValve(unsigned int sensorIndex, unsigned char
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_set_log_verbosity(unsigned int verbosity){
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_log_verbosity(verbosity));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_log_verbosity(verbosity));
 	return returnCode;
 }
 
@@ -1250,7 +1244,7 @@ fgt_ERROR_CODE Fgt_set_log_verbosity(unsigned int verbosity){
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_set_log_output_mode(unsigned char output_to_file, unsigned char output_to_stderr, unsigned char output_to_queue){
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_set_log_output_mode(output_to_file, output_to_stderr, output_to_queue));
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_set_log_output_mode(output_to_file, output_to_stderr, output_to_queue));
 	return returnCode;
 }
 
@@ -1259,12 +1253,12 @@ fgt_ERROR_CODE Fgt_set_log_output_mode(unsigned char output_to_file, unsigned ch
  * Will return an error if the queue is empty. Logs are only stored in memory if the corresponding option is set with the
  * fgt_set_log_output_mode function. Call this function repeatedly until an error is returned to retrieve all log entries.
  * @param log char array provided by the user, on which the log string will be copied.
- *  Must have at least 2000 bytes of available space.
+ *  Must have at least 4000 bytes of available space.
  * @return fgt_ERROR_CODE
  */
 fgt_ERROR_CODE Fgt_get_next_log(std::string* log_entry){
-	char buffer[2000] = { 0 };
-	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_get_next_log(buffer));
+	char buffer[4000] = { 0 };
+	fgt_ERROR_CODE returnCode = fgt_ERROR_CODE(fgt_c::fgt_get_next_log(buffer));
 	*log_entry = buffer;
 	return returnCode;
 }

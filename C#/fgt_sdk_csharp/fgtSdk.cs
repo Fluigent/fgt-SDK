@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using fgt_sdk.Enums;
 using fgt_sdk.Structs;
 
@@ -182,23 +183,23 @@ namespace fgt_sdk
 
         // unsigned char __stdcall fgt_set_sessionPressureUnit(char unit[140]);
         [DllImport(FGT_SDK)]
-        private static extern byte fgt_set_sessionPressureUnit(char[] unit);
+        private static extern byte fgt_set_sessionPressureUnit(byte[] unit);
 
-        // unsigned char __stdcall fgt_set_pressureUnit(unsigned int presureIndex, char unit[140]);
+        // unsigned char __stdcall fgt_set_pressureUnit(unsigned int pressureIndex, char unit[140]);
         [DllImport(FGT_SDK)]
-        private static extern byte fgt_set_pressureUnit(uint pressureIndex, char[] unit);
+        private static extern byte fgt_set_pressureUnit(uint pressureIndex, byte[] unit);
 
         // unsigned char __stdcall fgt_get_pressureUnit(unsigned int pressureIndex, char unit[140]);
         [DllImport(FGT_SDK)]
-        private static extern byte fgt_get_pressureUnit(uint pressureIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] unit);
+        private static extern byte fgt_get_pressureUnit(uint pressureIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] byte[] unit);
 
         // unsigned char __stdcall fgt_set_sensorUnit(unsigned int sensorIndex, char unit[140]);
         [DllImport(FGT_SDK)]
-        private static extern byte fgt_set_sensorUnit(uint sensorIndex, char[] unit);
+        private static extern byte fgt_set_sensorUnit(uint sensorIndex, byte[] unit);
 
         // unsigned char __stdcall fgt_get_sensorUnit(unsigned int sensorIndex, char unit[140]);
         [DllImport(FGT_SDK)]
-        private static extern byte fgt_get_sensorUnit(uint sensorIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] char[] unit);
+        private static extern byte fgt_get_sensorUnit(uint sensorIndex, [Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 140)] byte[] unit);
 
         // unsigned char __stdcall fgt_set_sensorCalibration(unsigned int sensorIndex, int calibration);
         [DllImport(FGT_SDK)]
@@ -247,6 +248,10 @@ namespace fgt_sdk
         // unsigned char __stdcall fgt_set_sensorRegulationResponse(unsigned int sensorIndex, unsigned int responseTime);
         [DllImport(FGT_SDK)]
         private static extern byte fgt_set_sensorRegulationResponse(uint sensorIndex, uint responseTime);
+
+        // unsigned char __stdcall fgt_set_sensorRegulationInverted(unsigned int sensorIndex, unsigned char inverted);
+        [DllImport(FGT_SDK)]
+        private static extern byte fgt_set_sensorRegulationInverted(uint sensorIndex, byte inverted);
 
         // unsigned char __stdcall fgt_set_pressureResponse(unsigned int pressureIndex, unsigned char value);
         [DllImport(FGT_SDK)]
@@ -347,9 +352,9 @@ namespace fgt_sdk
         [DllImport(FGT_SDK)]
         private static extern byte fgt_set_log_output_mode(byte output_to_file, byte output_to_stderr, byte output_to_queue);
 
-        // unsigned char FGT_API fgt_get_next_log(char log[2000]);
+        // unsigned char FGT_API fgt_get_next_log(char log[4000]);
         [DllImport(FGT_SDK)]
-        private static extern byte fgt_get_next_log([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 2000)] char[] detail);
+        private static extern byte fgt_get_next_log([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 4000)] byte[] detail);
         #endregion
 
         #endregion
@@ -573,7 +578,7 @@ namespace fgt_sdk
         }
 
         /// <summary>
-        /// Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and intrument type.
+        /// Retrieve information about each initialized pressure channel. This function is useful in order to get channels order, controller, unique ID and instrument type.
         /// By default this array is built with MFCS first, MFCS-EZ second and FlowEZ last.If only one instrument is used, index is the default channel indexing starting at 0.
         /// You can initialize instruments in specific order using <see cref="Fgt_initEx"/> function
         /// </summary>
@@ -775,18 +780,8 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sessionPressureUnit(string unit)
         {
-            var unitArray = unit.ToCharArray();
-            var pressureUnit = new char[140];
-
-            try
-            {
-                unitArray.CopyTo(pressureUnit, 0);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            var pressureUnit = new byte[140];
+            Encoding.UTF8.GetBytes(unit).CopyTo(pressureUnit, 0);
 
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sessionPressureUnit(pressureUnit), fgt_ERRCHECK_TYPE.Pressure);
             return errCode;
@@ -801,18 +796,8 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_pressureUnit(uint pressureIndex, string unit)
         {
-            var unitArray = unit.ToCharArray();
-            var pressureUnit = new char[140];
-
-            try
-            {
-                unitArray.CopyTo(pressureUnit, 0);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            var pressureUnit = new byte[140];
+            Encoding.UTF8.GetBytes(unit).CopyTo(pressureUnit, 0);
 
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
             return errCode;
@@ -826,10 +811,10 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and the current unit string</returns>
         public static (fgt_ERROR_CODE errCode, string unit) Fgt_get_pressureUnit(uint pressureIndex)
         {
-            var pressureUnit = new char[140];
+            var pressureUnit = new byte[140];
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_pressureUnit(pressureIndex, pressureUnit), fgt_ERRCHECK_TYPE.Pressure, pressureIndex);
 
-            var unitString = new string(pressureUnit.TakeWhile(c => c != '\0').ToArray());
+            var unitString = Encoding.UTF8.GetString(pressureUnit.TakeWhile(c => c != '\0').ToArray());
             return (errCode, unitString);
         }
 
@@ -842,18 +827,8 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static fgt_ERROR_CODE Fgt_set_sensorUnit(uint sensorIndex, string sensorUnit)
         {
-            var unitArray = sensorUnit.ToCharArray();
-            var unit = new char[140];
-
-            try
-            {
-                unitArray.CopyTo(unit, 0);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            var unit = new byte[140];
+            Encoding.UTF8.GetBytes(sensorUnit).CopyTo(unit, 0);
 
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
             return errCode;
@@ -867,10 +842,10 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and the current unit string</returns>
         public static (fgt_ERROR_CODE errCode, string unit) Fgt_get_sensorUnit(uint sensorIndex)
         {
-            var unit = new char[140];
+            var unit = new byte[140];
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_sensorUnit(sensorIndex, unit), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
 
-            var unitString = new string(unit.TakeWhile(c => c != '\0').ToArray());
+            var unitString = Encoding.UTF8.GetString(unit.TakeWhile(c => c != '\0').ToArray());
             return (errCode, unitString);
         }
 
@@ -1029,6 +1004,19 @@ namespace fgt_sdk
         }
 
         /// <summary>
+        /// Specify whether the sensor is inverted in the physical setup, i.e., if an increase
+        /// in pressure causes the sensor value to decrease and vice-versa.
+        /// </summary>
+        /// <param name="sensorIndex">Index of sensor channel or unique ID</param>
+        /// <param name="inverted">true if the sensor is inverted, false otherwise</param>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
+        public static fgt_ERROR_CODE Fgt_set_sensorRegulationInverted(uint sensorIndex, bool inverted)
+        {
+            var errCode = ErrCheck((fgt_ERROR_CODE)fgt_set_sensorRegulationInverted(sensorIndex, (byte)(inverted ? 1 : 0)), fgt_ERRCHECK_TYPE.Sensor, sensorIndex);
+            return errCode;
+        }
+
+        /// <summary>
         /// Set pressure controller response. This function can be used to customise response time for your set-up.
         /// For FlowEZ available values are 0: use of fast switch valves or 1: do not use fast switch valves. Default value is 0.
         /// For MFCS available values are from 1 to 255. The bigger the value, the longer is the response time. Default value is 5.
@@ -1131,7 +1119,7 @@ namespace fgt_sdk
         /// Read TTL port (BNC port) if set as input.
         /// </summary>
         /// <param name="ttlIndex">Index of TTL port or unique ID</param>
-        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a boolean indicating if an event (edge) has occured</returns>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a boolean indicating if an event (edge) has occurred</returns>
         public static (fgt_ERROR_CODE errCode, bool ttlEvent) Fgt_read_Ttl(uint ttlIndex)
         {
             uint state = 0;
@@ -1143,7 +1131,7 @@ namespace fgt_sdk
         /// Trigger a specific TTL port (BNC ports) if set as output.
         /// </summary>
         /// <param name="ttlIndex">Index of TTL port or unique ID</param>
-        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a boolean indicating if an event (edge) has occured</returns>
+        /// <returns>Error code <see cref="fgt_ERROR_CODE"/> and a boolean indicating if an event (edge) has occurred</returns>
         public static fgt_ERROR_CODE Fgt_trigger_Ttl(uint ttlIndex)
         {
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_trigger_Ttl(ttlIndex), fgt_ERRCHECK_TYPE.Generic);
@@ -1336,10 +1324,10 @@ namespace fgt_sdk
         /// <returns>Error code <see cref="fgt_ERROR_CODE"/></returns>
         public static (fgt_ERROR_CODE, string log) Fgt_get_next_log()
         {
-            var log = new char[2000];
+            var log = new byte[4000];
             var errCode = ErrCheck((fgt_ERROR_CODE)fgt_get_next_log(log), fgt_ERRCHECK_TYPE.Generic);
             if (errCode != fgt_ERROR_CODE.OK) { return (errCode, string.Empty); }
-            var logString = new string(log.TakeWhile(c => c != '\0').ToArray());
+            var logString = Encoding.UTF8.GetString(log.TakeWhile(c => c != '\0').ToArray());
             return (errCode, logString);
         }
         #endregion
