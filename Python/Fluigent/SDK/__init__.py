@@ -5,7 +5,7 @@ import os
 from . import low_level
 from . import exceptions
 
-__version__ = "24.0.0"
+__version__ = "23.0.0"
 
 # Enums
 class fgt_ERROR(low_level.fgt_ERROR):
@@ -407,7 +407,7 @@ def fgt_set_pressureUnit(pressure_index, unit):
     Every pressure read value and sent command will then use this unit.
 
     Args:
-        pressureIndex: Index of pressure channel or unique ID
+        presureIndex: Index of pressure channel or unique ID
         unit: the desired unit as a string
     Examples: 
         fgt_set_pressureUnit(0, "mbar")
@@ -633,7 +633,6 @@ def fgt_set_sensorRegulation(sensor_index, pressure_index, setpoint):
         fgt_set_pressure
         fgt_set_customSensorRegulation
         fgt_set_sensorRegulationResponse
-        fgt_set_sensorRegulationInverted
     """
     sensor_index = int(sensor_index)
     pressure_index = int(pressure_index)
@@ -839,22 +838,6 @@ def fgt_set_sensorRegulationResponse(sensor_index, response_time):
     sensor_index = int(sensor_index)
     low_level_function = low_level.fgt_set_sensorRegulationResponse
     c_error, = low_level_function(sensor_index, response_time)
-    exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
-    return fgt_ERROR(c_error)
-
-def fgt_set_sensorRegulationInverted(sensor_index, inverted):
-    """Specify whether the sensor is inverted in the physical setup
-
-    I.e., if an increase
-    in pressure causes the sensor value to decrease and vice-versa.
-    
-    Args:
-        sensor_index: Index of sensor channel or unique ID
-        inverted: True if the sensor is inverted, False otherwise
-    """
-    sensor_index = int(sensor_index)
-    low_level_function = low_level.fgt_set_sensorRegulationInverted
-    c_error, = low_level_function(sensor_index, inverted)
     exceptions.manage_sensor_status(low_level_function.__name__, sensor_index)
     return fgt_ERROR(c_error)
 
