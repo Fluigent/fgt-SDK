@@ -1,4 +1,9 @@
-# Fluigent Software Development Kit - version 24.0.0
+﻿# Fluigent Software Developement Kit - version 23.0.0
+
+# Documentation
+
+- [Manual (PDF)](https://github.com/Fluigent/fgt-SDK/blob/master/Fluigent%20SDK.pdf)
+- [Website](https://www.fluigent.com/resources-support/support-tools/software/sdk/))
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application;
@@ -29,11 +34,14 @@ in the language sub-folder you are interested in.
 
 | Operating system | x86 (32 bits) | x64 (64 bits) | ARM (32 bits) | ARM64 (64 bits) |
 | ---------------- | ------------- | ------------- | ------------- | --------------- |
-| Windows 10/11    | X             | X             |               |                 |
-| Linux<sup>1</sup>|               | X             | X             | X               |
+| Windows 7/8/10   | X             | X             |               |                 |
+| Linux<sup>1</sup>|               | X<sup>2</sup> | X<sup>3</sup> | X<sup>4</sup>   |
 | macOS            |               | X             |               |                 |
 
-1. Requires kernel version 2.6.39 or newer and GLIBC >= 2.28 (Debian 10)
+1. Requires kernel version 2.6.39 or newer
+2. Requires GLIBC ≥ 2.14, GLIBCXX ≥ 3.4.26, CXXABI ≥ 1.3.11
+3. Requires GLIBC ≥ 2.7, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11, CXXABI\_ARM ≥ 1.3.3
+4. Requires GLIBC ≥ 2.17, GLIBCXX ≥ 3.4.22, CXXABI ≥ 1.3.11
 
 # Supported hardware
 By using Fluigent SDK, you have direct access to following Fluigent devices:

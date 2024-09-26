@@ -45,7 +45,6 @@
 			<Item Name="fgt set sensor Calibration.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set sensor Calibration.vi"/>
 			<Item Name="fgt set sensor Custom Scale Ex.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set sensor Custom Scale Ex.vi"/>
 			<Item Name="fgt set sensor Custom Scale.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set sensor Custom Scale.vi"/>
-			<Item Name="fgt set sensor Regulation Inverted.vi" Type="VI" URL="../VIs/Regulation settings/fgt set sensor Regulation Inverted.vi"/>
 			<Item Name="fgt set sensor Regulation Response.vi" Type="VI" URL="../VIs/Regulation settings/fgt set sensor Regulation Response.vi"/>
 			<Item Name="fgt set sensor Regulation.vi" Type="VI" URL="../VIs/Basic functions/fgt set sensor Regulation.vi"/>
 			<Item Name="fgt set sensor Unit.vi" Type="VI" URL="../VIs/Units calibration and limits/fgt set sensor Unit.vi"/>
