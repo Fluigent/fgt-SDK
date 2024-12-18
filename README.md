@@ -1,9 +1,11 @@
-﻿# Fluigent Software Developement Kit - version 23.0.0
+﻿# Fluigent Software Developement Kit (SDK) - version 23.0.0
+
+:warning: *If you are looking for Aria SDK, you will find it [here](https://github.com/Fluigent/aria-sdk).*
 
 # Documentation
 
-- [Manual (PDF)](https://github.com/Fluigent/fgt-SDK/blob/master/Fluigent%20SDK.pdf)
-- [Website](https://www.fluigent.com/resources-support/support-tools/software/sdk/))
+- :page_with_curl: [Manual (PDF)](https://github.com/Fluigent/fgt-SDK/blob/master/Fluigent%20SDK.pdf)
+- :globe_with_meridians: [Website](https://www.fluigent.com/research/software-solutions/software-development-kit/)
 
 # Overview
 The Fluigent Software Development Kit (SDK) allows you to fully integrate Fluigent devices in your application;
